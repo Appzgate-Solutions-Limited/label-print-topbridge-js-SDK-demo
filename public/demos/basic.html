@@ -158,6 +158,16 @@
       el.textContent += `[${time}] ${msg}\n`
       el.scrollTop = el.scrollHeight
     }
+
+    // --- iframe height auto-resize ---
+    function reportHeight() {
+      const height = document.documentElement.scrollHeight
+      window.parent.postMessage({ type: 'resize-iframe', height }, '*')
+    }
+    window.addEventListener('load', reportHeight)
+    window.addEventListener('resize', reportHeight)
+    const observer = new MutationObserver(reportHeight)
+    observer.observe(document.body, { childList: true, subtree: true })
   </script>
 </body>
 </html>

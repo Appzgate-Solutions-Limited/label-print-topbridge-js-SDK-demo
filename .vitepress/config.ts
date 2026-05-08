@@ -1,6 +1,21 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
+  head: [
+    ['script', {}, `
+      (function() {
+        window.addEventListener('message', function(e) {
+          if (e.data && e.data.type === 'resize-iframe') {
+            document.querySelectorAll('iframe[src^="/demos/"]').forEach(function(iframe) {
+              if (iframe.contentWindow === e.source) {
+                iframe.style.height = e.data.height + 'px'
+              }
+            })
+          }
+        })
+      })()
+    `]
+  ],
   locales: {
     root: {
       label: 'English',
