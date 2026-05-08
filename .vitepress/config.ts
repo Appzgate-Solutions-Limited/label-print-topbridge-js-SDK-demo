@@ -23,7 +23,7 @@ export default defineConfig({
     root: {
       label: 'English',
       lang: 'en',
-      title: 'TopBridge SDK',
+      title: 'TopBridge JS Core SDK',
       description: 'Developer documentation and examples for @appzgatenz/label-print-topbridge-js',
       themeConfig: {
         nav: [
@@ -65,7 +65,7 @@ export default defineConfig({
     zh: {
       label: '简体中文',
       lang: 'zh-CN',
-      title: 'TopBridge SDK',
+      title: 'TopBridge JS Core SDK',
       description: '开发者文档与示例 — @appzgatenz/label-print-topbridge-js',
       link: '/zh/',
       themeConfig: {

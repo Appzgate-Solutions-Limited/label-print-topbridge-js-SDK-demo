@@ -48,7 +48,7 @@ const features = {
 <style scoped>
 .tb-features {
   position: relative;
-  padding: 48px 24px 80px;
+  padding: 64px 24px 120px;
   max-width: 1100px;
   margin: 0 auto;
 }

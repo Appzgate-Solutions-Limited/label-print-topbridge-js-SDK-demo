@@ -51,7 +51,7 @@ const prefersReducedMotion = useReducedMotion()
     transparent 100%
   );
   opacity: 0;
-  animation: tb-beam-sweep 8s ease-in-out infinite;
+  animation: tb-beam-sweep 16s ease-in-out infinite;
 }
 
 .tb-bg-beam--1 {
@@ -60,7 +60,7 @@ const prefersReducedMotion = useReducedMotion()
 
 .tb-bg-beam--2 {
   top: 70%;
-  animation-delay: 4s;
+  animation-delay: 8s;
   animation-direction: reverse;
 }
 
@@ -69,7 +69,7 @@ const prefersReducedMotion = useReducedMotion()
   border-radius: 50%;
   filter: blur(80px);
   opacity: 0.08;
-  animation: tb-pulse 6s ease-in-out infinite;
+  animation: tb-pulse 10s ease-in-out infinite;
 }
 
 .tb-bg-glow--1 {
@@ -86,6 +86,6 @@ const prefersReducedMotion = useReducedMotion()
   bottom: -80px;
   left: -80px;
   background: var(--tb-accent);
-  animation-delay: 3s;
+  animation-delay: 5s;
 }
 </style>

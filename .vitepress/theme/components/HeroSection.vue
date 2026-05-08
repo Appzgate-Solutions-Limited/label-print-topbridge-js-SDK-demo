@@ -46,7 +46,7 @@ const links = {
         />
       </div>
 
-      <h1 class="tb-hero-title tb-animate">TopBridge SDK</h1>
+      <h1 class="tb-hero-title tb-animate">TopBridge JS Core SDK</h1>
 
       <p class="tb-hero-subtitle tb-animate">{{ i18n[locale].subtitle }}</p>
 
@@ -91,7 +91,7 @@ const links = {
   align-items: center;
   justify-content: center;
   min-height: calc(100vh - 64px);
-  padding: 48px 24px 24px;
+  padding: 64px 24px 48px;
   text-align: center;
 }
 
@@ -101,11 +101,11 @@ const links = {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 32px;
 }
 
 .tb-hero-logo {
-  margin-bottom: 4px;
+  margin-bottom: 12px;
 }
 
 .tb-hero-logo img {
@@ -139,7 +139,7 @@ const links = {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin-top: 8px;
+  margin-top: 16px;
 }
 
 /* Buttons */
@@ -224,15 +224,15 @@ const links = {
   height: 6px;
   border-radius: 50%;
   background: var(--tb-text-tertiary);
-  animation: tb-scroll-bounce 2s ease-in-out infinite;
+  animation: tb-scroll-bounce 3s ease-in-out infinite;
 }
 
 /* Stagger animation delays for hero children */
-.tb-loaded .tb-hero-logo { animation: tb-fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards; }
-.tb-loaded .tb-hero-title { animation: tb-fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards; }
-.tb-loaded .tb-hero-subtitle { animation: tb-fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; }
-.tb-loaded .tb-hero .tb-install { animation: tb-fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.55s forwards; }
-.tb-loaded .tb-hero-actions { animation: tb-fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards; }
+.tb-loaded .tb-hero-logo { animation: tb-fade-up 1.0s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards; }
+.tb-loaded .tb-hero-title { animation: tb-fade-up 1.0s cubic-bezier(0.16, 1, 0.3, 1) 0.40s forwards; }
+.tb-loaded .tb-hero-subtitle { animation: tb-fade-up 1.0s cubic-bezier(0.16, 1, 0.3, 1) 0.65s forwards; }
+.tb-loaded .tb-hero .tb-install { animation: tb-fade-up 1.0s cubic-bezier(0.16, 1, 0.3, 1) 0.90s forwards; }
+.tb-loaded .tb-hero-actions { animation: tb-fade-up 1.0s cubic-bezier(0.16, 1, 0.3, 1) 1.15s forwards; }
 
 /* Responsive */
 @media (min-width: 640px) {

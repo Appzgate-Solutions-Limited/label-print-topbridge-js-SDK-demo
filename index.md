@@ -1,6 +1,6 @@
 ---
 layout: page
-title: TopBridge SDK
+title: TopBridge JS Core SDK
 description: Developer documentation and examples for @appzgatenz/label-print-topbridge-js
 ---
 

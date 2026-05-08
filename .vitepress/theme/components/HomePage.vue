@@ -53,7 +53,7 @@ onMounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 120px;
+  height: 160px;
   background: linear-gradient(to top, var(--tb-bg-secondary), transparent);
   pointer-events: none;
   z-index: 0;
