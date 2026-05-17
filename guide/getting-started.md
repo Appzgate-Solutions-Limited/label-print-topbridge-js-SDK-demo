@@ -12,10 +12,10 @@ npm install @appzgatenz/label-print-topbridge-js
 
 ## Prerequisites
 
-- TopBridge desktop app is installed and running locally
+- **Topbridge App** >= 1.0.45 is installed and running locally — [Download](https://service.topsale.co.nz/self-service/download/topbridge)
 - Browser supports WebSocket (all modern browsers)
-- If using `launch.trigger()`, page CSP must allow `topsale:` custom protocol (`frame-src topsale:`)
-- TopBridge Tray App supports WebSocket API V2 (unified endpoint `/v2`)
+- At least one label printer with a configured protocol (TSPL / ZPL)
+- If using `launch.trigger()`, page CSP must allow `topsale:` custom protocol — see [CSP Configuration](/guide/csp)
 
 ## Initialization
 
@@ -30,14 +30,14 @@ The SDK connects to `ws://localhost:8765` (internally appends `/v2`) with no con
 ## Complete Print Workflow
 
 ```typescript
-// 0. Optional: ensure Tray App is running
+// 0. Optional: ensure Topbridge App is running
 const { printers } = await client.launch.ensureRunning(
   () => client.preflight.run({
     onStepChange: (step) => console.log(`Checking ${step}...`)
   })
 )
 
-// Or run preflight directly (without auto-launching Tray App)
+// Or run preflight directly (without auto-launching)
 // const { printers } = await client.preflight.run()
 
 // 1. Get available templates
@@ -54,11 +54,12 @@ const result = await client.print.execute({
     { name: 'Apple', price: 3.99, currency: '$', unit: '/kg', copies: 2 },
     { name: 'Banana', price: 1.99, currency: '$', copies: 1 },
   ],
-  fieldTypes: { price: 'price' }, // Mark price as a structured field
 })
 
 console.log(`Printed ${result.data.printedCopies} copies`)
 ```
+
+> The SDK automatically fetches the template schema and transforms product data. No need to manually specify field types.
 
 ## Configuration Options
 
@@ -91,7 +92,7 @@ try {
   await client.print.execute({ /* ... */ })
 } catch (err) {
   if (err instanceof TopBridgeConnectionError) {
-    // Tray App is not running or connection timed out
+    // Topbridge App is not running or connection timed out
   } else if (err instanceof TopBridgeAuthError) {
     // Not logged in or update required
     if (err.code === 'UPDATE_REQUIRED') {
@@ -104,7 +105,7 @@ try {
   } else if (err instanceof TopBridgeTemplateError) {
     // Template does not exist or no permission
   } else if (err instanceof TopBridgeNetworkError) {
-    // Tray App is online, but cloud network is disconnected
+    // Topbridge App is online, but cloud network is disconnected
   } else if (err instanceof TopBridgeSourceError) {
     // Source is not in the allowlist
   } else if (err instanceof TopBridgePrintError) {
@@ -113,29 +114,4 @@ try {
 }
 ```
 
-## fieldTypes Configuration
-
-`fieldTypes` tells the SDK which fields need structured conversion (price → `{value, currency, unit}`).
-
-### Simple Mode (string)
-
-Built-in convention: `price` automatically associates `currency` and `unit` sub-fields.
-
-```typescript
-fieldTypes: { price: 'price', weight: 'weight' }
-```
-
-### Explicit Mode (object)
-
-When there are multiple fields of the same type or sub-field names are non-standard:
-
-```typescript
-fieldTypes: {
-  price: { type: 'price', subFields: ['priceCurrency', 'priceUnit'] },
-  weight: { type: 'weight', subFields: ['weightUnit'] },
-}
-```
-
-### Without fieldTypes
-
-When `fieldTypes` is not provided, all fields are sent in raw format (text mode).
+See [Error Handling](/guide/error-handling) for the complete reference.

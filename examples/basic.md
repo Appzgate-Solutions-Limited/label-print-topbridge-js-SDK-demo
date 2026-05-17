@@ -7,7 +7,7 @@ title: Basic Printing Example
 A complete preflight + print workflow, demonstrating the full process from preflight to printing.
 
 :::warning Prerequisites
-The TopBridge desktop app must be running locally (version 1.0.30+).
+Topbridge App must be running locally (version >= 1.0.45). [Download](https://service.topsale.co.nz/self-service/download/topbridge)
 :::
 
 ## Live Demo

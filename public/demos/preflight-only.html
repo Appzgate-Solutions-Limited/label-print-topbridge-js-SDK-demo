@@ -105,7 +105,7 @@
       log('--- Health check only ---')
       try {
         const health = await client.health.check()
-        log(`✓ Tray App ${health.isRunning ? 'running' : 'not running'}`)
+        log(`✓ Topbridge App ${health.isRunning ? 'running' : 'not running'}`)
         if (health.data?.isLoggedIn !== undefined) {
           log(`  Logged in: ${health.data.isLoggedIn ? 'Yes' : 'No'}`)
         }

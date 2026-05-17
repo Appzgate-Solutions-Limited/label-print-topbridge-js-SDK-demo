@@ -12,10 +12,10 @@ npm install @appzgatenz/label-print-topbridge-js
 
 ## 前置条件
 
-- TopBridge 桌面应用已安装并运行在本地
-- 浏览器支持 WebSocket（所有现代浏览器均支持）
-- 如果使用 `launch.trigger()`，页面 CSP 需允许 `topsale:` 自定义协议（`frame-src topsale:`）
-- TopBridge Tray App 支持 WebSocket API V2（统一入口 `/v2`）
+- **Topbridge App** >= 1.0.45 已安装并运行 — [下载](https://service.topsale.co.nz/self-service/download/topbridge)
+- 浏览器支持 WebSocket（所有现代浏览器）
+- 至少一台已配置协议（TSPL / ZPL）的标签打印机
+- 如使用 `launch.trigger()`，页面 CSP 需允许 `topsale:` 自定义协议 — 详见 [CSP 配置](/zh/guide/csp)
 
 ## 初始化
 
@@ -25,19 +25,19 @@ import { TopBridgeClient } from '@appzgatenz/label-print-topbridge-js'
 const client = new TopBridgeClient()
 ```
 
-SDK 固定连接 `ws://localhost:8765`（内部自动拼接 `/v2`），无需配置连接地址。
+SDK 连接 `ws://localhost:8765`（内部自动拼接 `/v2`），无需任何配置。
 
 ## 完整打印流程
 
 ```typescript
-// 0. 可选：确保 Tray App 已启动
+// 0. 可选：确保 Topbridge App 正在运行
 const { printers } = await client.launch.ensureRunning(
   () => client.preflight.run({
-    onStepChange: (step) => console.log(`Checking ${step}...`)
+    onStepChange: (step) => console.log(`正在检查 ${step}...`)
   })
 )
 
-// 或者直接运行预检（不自动唤起 Tray App）
+// 或直接运行预检（不自动唤起）
 // const { printers } = await client.preflight.run()
 
 // 1. 获取可用模板
@@ -54,17 +54,18 @@ const result = await client.print.execute({
     { name: 'Apple', price: 3.99, currency: '$', unit: '/kg', copies: 2 },
     { name: 'Banana', price: 1.99, currency: '$', copies: 1 },
   ],
-  fieldTypes: { price: 'price' }, // 标记 price 为结构化字段
 })
 
-console.log(`Printed ${result.data.printedCopies} copies`)
+console.log(`已打印 ${result.data.printedCopies} 份`)
 ```
+
+> SDK 自动获取模板 schema 并转换产品数据，无需手动指定字段类型。
 
 ## 配置选项
 
 ```typescript
 const client = new TopBridgeClient({
-  debug: true,                     // 开启日志输出
+  debug: true,                     // 开启日志
   timeouts: {
     health: 3000,                  // 健康检查超时（ms）
     preflight: 10000,              // 预检超时（ms）
@@ -91,7 +92,7 @@ try {
   await client.print.execute({ /* ... */ })
 } catch (err) {
   if (err instanceof TopBridgeConnectionError) {
-    // Tray App 未运行或连接超时
+    // Topbridge App 未运行或连接超时
   } else if (err instanceof TopBridgeAuthError) {
     // 未登录或需要更新
     if (err.code === 'UPDATE_REQUIRED') {
@@ -104,38 +105,13 @@ try {
   } else if (err instanceof TopBridgeTemplateError) {
     // 模板不存在或无权限
   } else if (err instanceof TopBridgeNetworkError) {
-    // Tray App 在线，但云端网络断开
+    // Topbridge App 在线，但云端网络断开
   } else if (err instanceof TopBridgeSourceError) {
-    // source 不在白名单中
+    // source 不在白名单
   } else if (err instanceof TopBridgePrintError) {
     // 打印失败
   }
 }
 ```
 
-## fieldTypes 配置
-
-`fieldTypes` 用于告诉 SDK 哪些字段需要结构化转换（price → `{value, currency, unit}`）。
-
-### 简单模式（字符串）
-
-SDK 内置约定：`price` 自动关联 `currency` 和 `unit` 子字段。
-
-```typescript
-fieldTypes: { price: 'price', weight: 'weight' }
-```
-
-### 显式模式（对象）
-
-当有多个同类型字段或子字段命名不标准时：
-
-```typescript
-fieldTypes: {
-  price: { type: 'price', subFields: ['priceCurrency', 'priceUnit'] },
-  weight: { type: 'weight', subFields: ['weightUnit'] },
-}
-```
-
-### 无 fieldTypes
-
-不提供 `fieldTypes` 时，所有字段以原始格式发送（text 模式）。
+完整错误处理参考请见[错误处理](/zh/guide/error-handling)。

@@ -29,7 +29,7 @@ import { TopBridgeClient } from '@appzgatenz/label-print-topbridge-js'
 
 const client = new TopBridgeClient({ debug: true })
 
-// Ensure the Tray App is running and run preflight checks
+// Ensure Topbridge App is running and run preflight checks
 const preflight = await client.launch.ensureRunning(
   () => client.preflight.run()
 )

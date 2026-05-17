@@ -10,15 +10,15 @@ title: Security Model
 
 ## 1. Fixed Local Connection
 
-The SDK communicates exclusively with the locally running Tray App. There is no configuration option for the connection address, which fundamentally prevents redirecting the SDK to a remote server.
+The SDK communicates exclusively with the locally running Topbridge App. There is no configuration option for the connection address, which fundamentally prevents redirecting the SDK to a remote server.
 
 ## 2. Source Verification
 
-SDK requests carry a caller-origin identifier that is validated server-side. Requests from unauthorized sources are rejected by the Tray App.
+SDK requests carry a caller-origin identifier that is validated server-side. Requests from unauthorized sources are rejected by Topbridge App.
 
 ## 3. URL Safety Validation
 
-Before presenting external links from Tray App error responses, the SDK validates protocols:
+Before presenting external links from Topbridge App error responses, the SDK validates protocols:
 
 ```typescript
 // Only the following protocols are allowed
@@ -37,5 +37,5 @@ The SDK automatically strips formula injection prefixes (such as `=` and `=@`) f
 
 | Limitation | Description | Mitigation |
 |------------|-------------|------------|
-| Browser cannot prevent page spoofing | Malicious pages can implement the WS protocol themselves | Tray App source verification + server-side validation |
+| Browser cannot prevent page spoofing | Malicious pages can implement the WS protocol themselves | Topbridge App source verification + server-side validation |
 | WS protocol is unencrypted | localhost communication is not encrypted by default | Local communication does not require encryption (no network transmission risk) |
