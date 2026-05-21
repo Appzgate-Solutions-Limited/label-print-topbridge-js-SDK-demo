@@ -9,9 +9,9 @@ import { computed } from 'vue'
 const { Layout } = DefaultTheme
 const { lang } = useData()
 
-const { sdkType, setSdkType } = provideSdkType()
+const { sdkType } = provideSdkType()
 
-const locale = computed(() => lang.value === 'zh-CN' ? 'zh' as const : 'en' as const)
+const locale = computed(() => (lang.value === 'zh-CN' ? ('zh' as const) : ('en' as const)))
 </script>
 
 <template>

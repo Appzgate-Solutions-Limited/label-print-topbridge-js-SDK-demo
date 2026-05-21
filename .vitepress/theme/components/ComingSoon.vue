@@ -1,36 +1,24 @@
 <script setup lang="ts">
 import type { SdkType } from '../composables/useSdkType'
+import { switchToCore } from '../composables/useSdkType'
+import { sdkNames, comingSoon } from '../locales'
+import { computed } from 'vue'
 
 const props = defineProps<{
   sdkType: SdkType
   locale: 'en' | 'zh'
 }>()
 
-const sdkNames: Record<SdkType, string> = {
-  'js-core': 'JS Core',
-  nextjs: 'Next.js',
-  react: 'React',
-}
-
-const i18n = {
-  en: {
-    title: `${sdkNames[props.sdkType]} SDK`,
-    badge: 'Coming Soon',
-    desc: `The ${sdkNames[props.sdkType]} SDK is currently in planning. Stay tuned for updates!`,
-    cta: 'Back to JS Core',
-  },
-  zh: {
-    title: `${sdkNames[props.sdkType]} SDK`,
-    badge: '即将支持',
-    desc: `${sdkNames[props.sdkType]} SDK 正在规划中，敬请期待！`,
-    cta: '返回 JS Core',
-  },
-}
-
-function backToCore() {
-  document.documentElement.dataset.sdk = 'js-core'
-  window.location.reload()
-}
+const i18n = computed(() => {
+  const l = comingSoon[props.locale]
+  const name = sdkNames[props.sdkType]
+  return {
+    title: `${name} SDK`,
+    badge: l.badge,
+    desc: l.descTemplate.replace('{sdk}', name),
+    cta: l.cta,
+  }
+})
 </script>
 
 <template>
@@ -42,7 +30,7 @@ function backToCore() {
       <h2 class="coming-soon-title">{{ i18n[locale].title }}</h2>
       <span class="coming-soon-badge">{{ i18n[locale].badge }}</span>
       <p class="coming-soon-desc">{{ i18n[locale].desc }}</p>
-      <button class="coming-soon-cta" @click="backToCore">
+      <button class="coming-soon-cta" @click="switchToCore">
         {{ i18n[locale].cta }}
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       </button>

@@ -2,22 +2,34 @@ import { ref, provide, inject, type Ref, type InjectionKey } from 'vue'
 
 export type SdkType = 'js-core' | 'nextjs' | 'react'
 
-export const SDK_TYPE_KEY: InjectionKey<Ref<SdkType>> = Symbol('sdkType')
+interface SdkTypeContext {
+  sdkType: Ref<SdkType>
+  switchSdkType: (t: SdkType) => void
+}
+
+export const SDK_TYPE_KEY: InjectionKey<SdkTypeContext> = Symbol('sdkType')
+
+export function switchToCore() {
+  document.documentElement.dataset.sdk = 'js-core'
+  window.location.reload()
+}
 
 export function provideSdkType() {
   const sdkType = ref<SdkType>('js-core')
 
-  function setSdkType(t: SdkType) {
+  function switchSdkType(t: SdkType) {
     sdkType.value = t
     document.documentElement.dataset.sdk = t
   }
 
-  provide(SDK_TYPE_KEY, sdkType)
+  provide(SDK_TYPE_KEY, { sdkType, switchSdkType })
 
-  return { sdkType, setSdkType }
+  return { sdkType, switchSdkType }
 }
 
 export function useSdkType() {
-  const sdkType = inject(SDK_TYPE_KEY, ref<SdkType>('js-core'))
-  return sdkType
+  return inject(SDK_TYPE_KEY, {
+    sdkType: ref<SdkType>('js-core'),
+    switchSdkType: () => {},
+  })
 }

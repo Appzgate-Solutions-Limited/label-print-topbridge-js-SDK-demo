@@ -12,7 +12,7 @@ const props = defineProps<{
 
 const prefersReducedMotion = useReducedMotion()
 const isLoaded = ref(false)
-const sdkType = useSdkType()
+const { sdkType } = useSdkType()
 
 const locale = props.lang || 'en'
 

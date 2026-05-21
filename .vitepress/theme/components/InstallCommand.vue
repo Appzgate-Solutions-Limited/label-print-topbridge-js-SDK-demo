@@ -1,32 +1,21 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useClipboard } from '../composables/useClipboard'
+import { installLabels } from '../locales'
 
-const props = withDefaults(defineProps<{
-  command: string
-  locale?: 'en' | 'zh'
-}>(), {
-  locale: 'en',
-})
+const props = withDefaults(
+  defineProps<{
+    command: string
+    locale?: 'en' | 'zh'
+  }>(),
+  {
+    locale: 'en',
+  },
+)
 
 const { copied, copy } = useClipboard()
 
-const labels = {
-  en: {
-    copy: 'Copy',
-    copied: 'Copied!',
-    ariaCopy: 'Copy install command',
-    ariaCopied: 'Copied install command',
-  },
-  zh: {
-    copy: '复制',
-    copied: '已复制',
-    ariaCopy: '复制安装命令',
-    ariaCopied: '已复制安装命令',
-  },
-}
-
-const localizedLabels = computed(() => labels[props.locale])
+const localizedLabels = computed(() => installLabels[props.locale])
 </script>
 
 <template>

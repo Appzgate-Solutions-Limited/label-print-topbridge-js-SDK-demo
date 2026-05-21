@@ -3,87 +3,15 @@ import { VPLink } from 'vitepress/theme'
 import { computed } from 'vue'
 import InstallCommand from './InstallCommand.vue'
 import type { SdkType } from '../composables/useSdkType'
+import { switchToCore } from '../composables/useSdkType'
+import { heroMeta } from '../locales'
 
 const props = defineProps<{
   locale: 'en' | 'zh'
   sdkType: SdkType
 }>()
 
-type SdkMeta = {
-  title: string
-  subtitle: string
-  installCmd?: string
-  cta1: string
-  cta1Link?: string
-  cta2?: string
-  cta2Link?: string
-  cta3?: string
-  cta3Link?: string
-  cta4?: string
-  cta4Link?: string
-}
-
-const sdkMeta: Record<SdkType, { en: SdkMeta; zh: SdkMeta }> = {
-  'js-core': {
-    en: {
-      title: 'TopBridge SDK Platform',
-      subtitle: 'Browser-to-Printer, One Bridge Away',
-      installCmd: 'npm install @appzgatenz/label-print-topbridge-js',
-      cta1: 'Get Started',
-      cta1Link: '/guide/getting-started',
-      cta2: 'View on NPM',
-      cta2Link: 'https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js',
-      cta3: 'API Reference',
-      cta3Link: '/guide/developer-guide',
-      cta4: 'SaaS Platform',
-      cta4Link: 'https://topsale.biz/solution/label-printing/',
-    },
-    zh: {
-      title: 'TopBridge SDK 平台',
-      subtitle: '浏览器到打印机，一座桥的距离',
-      installCmd: 'npm install @appzgatenz/label-print-topbridge-js',
-      cta1: '快速开始',
-      cta1Link: '/zh/guide/getting-started',
-      cta2: '查看 NPM',
-      cta2Link: 'https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js',
-      cta3: 'API 参考',
-      cta3Link: '/zh/guide/developer-guide',
-      cta4: 'SaaS 平台',
-      cta4Link: 'https://topsale.biz/solution/label-printing/',
-    },
-  },
-  nextjs: {
-    en: {
-      title: 'TopBridge SDK Platform',
-      subtitle: 'The Next.js SDK is on its way. Stay tuned!',
-      cta1: 'Back to JS Core',
-    },
-    zh: {
-      title: 'TopBridge SDK 平台',
-      subtitle: 'Next.js SDK 即将到来，敬请期待！',
-      cta1: '返回 JS Core',
-    },
-  },
-  react: {
-    en: {
-      title: 'TopBridge SDK Platform',
-      subtitle: 'The React SDK is on its way. Stay tuned!',
-      cta1: 'Back to JS Core',
-    },
-    zh: {
-      title: 'TopBridge SDK 平台',
-      subtitle: 'React SDK 即将到来，敬请期待！',
-      cta1: '返回 JS Core',
-    },
-  },
-}
-
-const meta = computed(() => sdkMeta[props.sdkType][props.locale])
-
-function backToCore() {
-  document.documentElement.dataset.sdk = 'js-core'
-  window.location.reload()
-}
+const meta = computed(() => heroMeta[props.sdkType][props.locale])
 </script>
 
 <template>
@@ -143,7 +71,7 @@ function backToCore() {
 
       <!-- Next.js / React: single back button -->
       <div v-else class="tb-hero-actions tb-animate">
-        <button class="tb-btn tb-btn--outline" @click="backToCore">
+        <button class="tb-btn tb-btn--outline" @click="switchToCore">
           {{ meta.cta1 }}
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tb-btn-arrow"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         </button>

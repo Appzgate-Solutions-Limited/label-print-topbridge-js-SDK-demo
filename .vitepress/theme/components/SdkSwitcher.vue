@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { useSdkType } from '../composables/useSdkType'
 import type { SdkType } from '../composables/useSdkType'
+import { switcherLabels, switcherBadges } from '../locales'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps<{
   locale: 'en' | 'zh'
 }>()
 
-const sdkType = useSdkType()
+const { sdkType, switchSdkType } = useSdkType()
 const open = ref(false)
 const switcherRef = ref<HTMLElement>()
 let originalParent: HTMLElement | null = null
@@ -24,54 +25,6 @@ function reposition() {
   }
 }
 
-onMounted(() => {
-  originalParent = switcherRef.value?.parentElement ?? null
-  reposition()
-  window.addEventListener('resize', reposition)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', reposition)
-  if (originalParent && switcherRef.value && !originalParent.contains(switcherRef.value)) {
-    originalParent.appendChild(switcherRef.value)
-  }
-})
-
-const labels = {
-  en: {
-    'js-core': 'JS Core',
-    nextjs: 'Next.js',
-    react: 'React',
-  },
-  zh: {
-    'js-core': 'JS Core',
-    nextjs: 'Next.js',
-    react: 'React',
-  },
-}
-
-const options: { value: SdkType; badge?: string }[] = [
-  { value: 'js-core' },
-  { value: 'nextjs', badge: props.locale === 'zh' ? '即将支持' : 'Soon' },
-  { value: 'react', badge: props.locale === 'zh' ? '即将支持' : 'Soon' },
-]
-
-const currentLabel = computed(() => labels[props.locale][sdkType.value])
-
-function isActive(t: SdkType) {
-  return sdkType.value === t
-}
-
-function switchTo(t: SdkType) {
-  sdkType.value = t
-  document.documentElement.dataset.sdk = t
-  open.value = false
-}
-
-function toggle() {
-  open.value = !open.value
-}
-
 function onDocClick(e: MouseEvent) {
   const el = e.target as HTMLElement
   if (!el.closest('.sdk-switcher')) {
@@ -80,12 +33,40 @@ function onDocClick(e: MouseEvent) {
 }
 
 onMounted(() => {
+  originalParent = switcherRef.value?.parentElement ?? null
+  reposition()
+  window.addEventListener('resize', reposition)
   document.addEventListener('click', onDocClick)
 })
 
 onUnmounted(() => {
+  window.removeEventListener('resize', reposition)
   document.removeEventListener('click', onDocClick)
+  if (originalParent && switcherRef.value && !originalParent.contains(switcherRef.value)) {
+    originalParent.appendChild(switcherRef.value)
+  }
 })
+
+const options: { value: SdkType; badge?: string }[] = [
+  { value: 'js-core' },
+  { value: 'nextjs', badge: switcherBadges[props.locale] },
+  { value: 'react', badge: switcherBadges[props.locale] },
+]
+
+const currentLabel = computed(() => switcherLabels[props.locale][sdkType.value])
+
+function isActive(t: SdkType) {
+  return sdkType.value === t
+}
+
+function switchTo(t: SdkType) {
+  switchSdkType(t)
+  open.value = false
+}
+
+function toggle() {
+  open.value = !open.value
+}
 </script>
 
 <template>
@@ -122,7 +103,7 @@ onUnmounted(() => {
           :class="{ 'sdk-switcher-item--active': isActive(opt.value) }"
           @click="switchTo(opt.value)"
         >
-          <span class="sdk-switcher-item-text">{{ labels[locale][opt.value] }}</span>
+          <span class="sdk-switcher-item-text">{{ switcherLabels[locale][opt.value] }}</span>
           <span v-if="opt.badge" class="sdk-switcher-badge">{{ opt.badge }}</span>
         </button>
       </div>
