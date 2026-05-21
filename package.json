@@ -14,16 +14,22 @@
     "setup:npmrc": "node scripts/setup-npmrc.mjs",
     "install:deps": "node scripts/setup-npmrc.mjs && pnpm install",
     "deploy": "bash scripts/deploy.sh",
-    "deploy:dry": "bash scripts/deploy.sh --dry-run"
+    "deploy:dry": "bash scripts/deploy.sh --dry-run",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome lint .",
+    "check": "biome check .",
+    "check:fix": "biome check --write ."
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.0.0",
     "playwright": "^1.60.0",
     "vitepress": "^1.6.0",
     "vue": "^3.5.0",
     "wrangler": "^4.90.0"
   },
   "dependencies": {
-    "@appzgatenz/label-print-topbridge-js": "^0.2.0",
+    "@appzgatenz/label-print-topbridge-js": "^0.3.1",
     "@codemirror/commands": "^6.10.3",
     "@codemirror/lang-javascript": "^6.2.5",
     "@codemirror/theme-one-dark": "^6.1.3",
