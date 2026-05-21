@@ -10,5 +10,6 @@ export default {
   Layout,
   enhanceApp({ app }) {
     app.component('HomePage', HomePage)
+    app.component('Playground', () => import('./components/playground/Playground.vue'))
   },
 } satisfies Theme

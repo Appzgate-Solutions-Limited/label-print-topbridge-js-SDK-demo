@@ -8,10 +8,4 @@ title: 预检示例
 
 ## 在线演示
 
-<div class="demo-frame">
-  <iframe src="/demos/preflight-only.html" width="100%" height="600" frameborder="0"></iframe>
-</div>
-
-## 源码
-
-<<< @/public/demos/preflight-only.html{html}
+<Playground template="preflight-only" />

@@ -22,10 +22,4 @@ title: 高级动态表单示例
 
 ## 在线演示
 
-<div class="demo-frame">
-  <iframe src="/demos/advanced-form.html" width="100%" height="700" frameborder="0"></iframe>
-</div>
-
-## 源码
-
-<<< @/public/demos/advanced-form.html{html}
+<Playground template="advanced-form" />

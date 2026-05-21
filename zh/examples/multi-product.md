@@ -8,10 +8,4 @@ title: 批量打印示例
 
 ## 在线演示
 
-<div class="demo-frame">
-  <iframe src="/demos/multi-product.html" width="100%" height="600" frameborder="0"></iframe>
-</div>
-
-## 源码
-
-<<< @/public/demos/multi-product.html{html}
+<Playground template="multi-product" />

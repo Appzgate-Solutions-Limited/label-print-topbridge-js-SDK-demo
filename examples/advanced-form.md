@@ -22,10 +22,4 @@ Try the [out-of-the-box solution](https://label-printing.topsale.biz/) — start
 
 ## Live Demo
 
-<div class="demo-frame">
-  <iframe src="/demos/advanced-form.html" width="100%" height="700" frameborder="0"></iframe>
-</div>
-
-## Source Code
-
-<<< @/public/demos/advanced-form.html{html}
+<Playground template="advanced-form" />

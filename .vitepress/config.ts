@@ -5,19 +5,6 @@ export default defineConfig({
   head: [
     ['link', { rel: 'preconnect', href: 'https://cdn.jsdelivr.net' }],
     ['link', { rel: 'dns-prefetch', href: 'https://cdn.jsdelivr.net' }],
-    ['script', {}, `
-      (function() {
-        window.addEventListener('message', function(e) {
-          if (e.data && e.data.type === 'resize-iframe') {
-            document.querySelectorAll('iframe[src^="/demos/"]').forEach(function(iframe) {
-              if (iframe.contentWindow === e.source) {
-                iframe.style.height = e.data.height + 'px'
-              }
-            })
-          }
-        })
-      })()
-    `]
   ],
   locales: {
     root: {

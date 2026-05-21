@@ -8,10 +8,4 @@ title: 模板查询示例
 
 ## 在线演示
 
-<div class="demo-frame">
-  <iframe src="/demos/template-schema.html" width="100%" height="600" frameborder="0"></iframe>
-</div>
-
-## 源码
-
-<<< @/public/demos/template-schema.html{html}
+<Playground template="template-schema" />

@@ -16,10 +16,4 @@ Try the [out-of-the-box solution](https://label-printing.topsale.biz/) — start
 
 ## Live Demo
 
-<div class="demo-frame">
-  <iframe src="/demos/basic.html" width="100%" height="600" frameborder="0"></iframe>
-</div>
-
-## Source Code
-
-<<< @/public/demos/basic.html{html}
+<Playground template="basic" />
