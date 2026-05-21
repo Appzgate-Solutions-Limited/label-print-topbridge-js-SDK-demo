@@ -18,7 +18,7 @@ npm install @appzgatenz/label-print-topbridge-js
 - If using `launch.trigger()`, page CSP must allow `topsale:` custom protocol — see [CSP Configuration](/guide/csp)
 
 :::tip Don't want to write code?
-Try the [TopSale out-of-the-box label printing solution](https://label-printing.topsale.biz/) — no integration needed.
+Try the [TopSale label printing solution](https://topsale.biz/solution/label-printing/) — no integration needed.
 :::
 
 ## Initialization

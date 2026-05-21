@@ -32,15 +32,19 @@ Download the latest version of TopBridge desktop app for Windows and macOS.
 
 Browse and purchase label printing plans, printer accessories, and subscription packages.
 
-### [Out-of-the-Box Documentation](https://label-printing.topsale.biz/)
+### [Label Designer](https://service.topsale.co.nz/self-service/label-template)
 
-Complete guide for the SaaS platform — no coding required. Start printing labels in minutes.
+Design and edit label templates with the WYSIWYG editor — no installation required.
+
+### [Excel Print](https://service.topsale.co.nz/self-service/excel-print)
+
+Import spreadsheets and batch print labels with custom field mapping.
 
 ## Getting Started
 
 1. [Download TopBridge](https://service.topsale.co.nz/self-service/download/topbridge) and install on your local machine
 2. Sign up at the [Self-Service Portal](https://service.topsale.co.nz/self-service)
-3. Follow the [Out-of-the-Box Documentation](https://label-printing.topsale.biz/) to start printing
+3. Design labels in the [Label Designer](https://service.topsale.co.nz/self-service/label-template), or use [Excel Print](https://service.topsale.co.nz/self-service/excel-print) for batch jobs
 
 :::tip Need more control?
 If you want to build a custom printing experience, the [TopBridge JS SDK](/guide/getting-started) gives you full programmatic control over the printing workflow.

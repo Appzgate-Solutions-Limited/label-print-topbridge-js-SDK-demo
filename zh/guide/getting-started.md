@@ -18,7 +18,7 @@ npm install @appzgatenz/label-print-topbridge-js
 - 如使用 `launch.trigger()`，页面 CSP 需允许 `topsale:` 自定义协议 — 详见 [CSP 配置](/zh/guide/csp)
 
 :::tip 不想写代码？
-试试 [TopSale 开箱即用标签打印方案](https://label-printing.topsale.biz/)，无需集成即可使用。
+试试 [TopSale 标签打印方案](https://topsale.biz/solution/label-printing/)，无需集成即可使用。
 :::
 
 ## 初始化

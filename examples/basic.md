@@ -11,7 +11,7 @@ Topbridge App must be running locally (version >= 1.0.45). [Download](https://se
 :::
 
 :::tip Don't want to integrate the SDK?
-Try the [out-of-the-box solution](https://label-printing.topsale.biz/) — start printing without writing code.
+Try the [TopSale Self-Service Platform](https://service.topsale.co.nz/self-service) — start printing without writing code.
 :::
 
 ## Live Demo

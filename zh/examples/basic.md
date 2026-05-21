@@ -11,7 +11,7 @@ title: 基础打印示例
 :::
 
 :::tip 不想集成 SDK？
-试试 [开箱即用方案](https://label-printing.topsale.biz/) —— 无需写代码即可开始打印。
+试试 [TopSale 自助服务平台](https://service.topsale.co.nz/self-service) —— 无需写代码即可开始打印。
 :::
 
 ## 在线演示
