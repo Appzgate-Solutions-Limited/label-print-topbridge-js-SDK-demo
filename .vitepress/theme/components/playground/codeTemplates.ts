@@ -33,11 +33,17 @@ console.log(\`  Template: \${result.data.templateName}\`)
 
   'error-handling': `import {
   TopBridgeClient,
+  TopBridgeError,
   TopBridgeConnectionError,
   TopBridgeAuthError,
   TopBridgeQuotaError,
+  TopBridgePrintError,
+  TopBridgeConfigError,
   TopBridgeValidationError,
   TopBridgePrinterError,
+  TopBridgeTemplateError,
+  TopBridgeNetworkError,
+  TopBridgeSourceError,
 } from '@appzgatenz/label-print-topbridge-js'
 
 const client = new TopBridgeClient({ debug: true })
@@ -57,15 +63,28 @@ try {
     console.error('Auth error:', err.message)
     if (err.code === 'UPDATE_REQUIRED') {
       console.log('Please update TopBridge')
+      if (err.storeUrl) console.log('Store URL:', err.storeUrl)
     } else {
       console.log('Please log in to TopBridge')
     }
   } else if (err instanceof TopBridgeQuotaError) {
     console.error('Quota error:', err.message)
     console.log('Insufficient print quota')
+    if (err.reason) console.log('Reason:', err.reason)
   } else if (err instanceof TopBridgePrinterError) {
     console.error('Printer error:', err.message)
     console.log('Check if printer is online')
+  } else if (err instanceof TopBridgeTemplateError) {
+    console.error('Template error:', err.message)
+  } else if (err instanceof TopBridgeNetworkError) {
+    console.error('Network error:', err.message)
+  } else if (err instanceof TopBridgeSourceError) {
+    console.error('Source error:', err.message)
+  } else if (err instanceof TopBridgeConfigError) {
+    console.error('Config error:', err.message)
+  } else if (err instanceof TopBridgePrintError) {
+    console.error('Print error:', err.message)
+    if (err.details) console.log('Details:', err.details)
   } else {
     console.error('Unexpected error:', err.message)
   }
@@ -81,9 +100,84 @@ try {
 } catch (err) {
   if (err instanceof TopBridgeValidationError) {
     console.error('Validation failed:', err.message)
+    if (err.field) console.log('Field:', err.field)
     console.log('Products cannot be empty')
   }
 }
+
+// Simulate all error types to demonstrate instanceof narrowing
+function simulateAndHandle(errorType: string) {
+  try {
+    switch (errorType) {
+      case 'connection':
+        throw new TopBridgeConnectionError('TopBridge App is not running')
+      case 'auth-not-authenticated':
+        throw new TopBridgeAuthError('User is not logged in', { code: 'NOT_AUTHENTICATED' })
+      case 'auth-update-required':
+        throw new TopBridgeAuthError('TopBridge App version is too low', { code: 'UPDATE_REQUIRED', storeUrl: 'https://example.com/update' })
+      case 'quota':
+        throw new TopBridgeQuotaError('Print quota exhausted', { reason: 'Monthly limit reached' })
+      case 'printer':
+        throw new TopBridgePrinterError('Printer is offline')
+      case 'template':
+        throw new TopBridgeTemplateError('Template not found')
+      case 'network':
+        throw new TopBridgeNetworkError('Cloud network disconnected')
+      case 'source':
+        throw new TopBridgeSourceError('Origin verification failed')
+      case 'config':
+        throw new TopBridgeConfigError('Invalid configuration')
+      case 'print':
+        throw new TopBridgePrintError('Print job failed', { details: { jobId: '12345' } })
+      case 'validation':
+        throw new TopBridgeValidationError('Invalid input', 'products')
+      default:
+        throw new TopBridgeError('Unknown error')
+    }
+  } catch (err) {
+    if (err instanceof TopBridgeConnectionError) {
+      console.log('[Simulated] ConnectionError:', err.message)
+    } else if (err instanceof TopBridgeAuthError) {
+      console.log('[Simulated] AuthError:', err.message, '- code:', err.code)
+      if (err.storeUrl) console.log('  storeUrl:', err.storeUrl)
+      if (err.downloadUrl) console.log('  downloadUrl:', err.downloadUrl)
+    } else if (err instanceof TopBridgeQuotaError) {
+      console.log('[Simulated] QuotaError:', err.message)
+      if (err.reason) console.log('  reason:', err.reason)
+    } else if (err instanceof TopBridgePrinterError) {
+      console.log('[Simulated] PrinterError:', err.message)
+    } else if (err instanceof TopBridgeTemplateError) {
+      console.log('[Simulated] TemplateError:', err.message)
+    } else if (err instanceof TopBridgeNetworkError) {
+      console.log('[Simulated] NetworkError:', err.message)
+    } else if (err instanceof TopBridgeSourceError) {
+      console.log('[Simulated] SourceError:', err.message)
+    } else if (err instanceof TopBridgeConfigError) {
+      console.log('[Simulated] ConfigError:', err.message)
+    } else if (err instanceof TopBridgePrintError) {
+      console.log('[Simulated] PrintError:', err.message)
+      if (err.details) console.log('  details:', err.details)
+    } else if (err instanceof TopBridgeValidationError) {
+      console.log('[Simulated] ValidationError:', err.message)
+      if (err.field) console.log('  field:', err.field)
+    } else if (err instanceof TopBridgeError) {
+      console.log('[Simulated] TopBridgeError:', err.message)
+    }
+  }
+}
+
+// Run simulations for all error types
+simulateAndHandle('connection')
+simulateAndHandle('auth-not-authenticated')
+simulateAndHandle('auth-update-required')
+simulateAndHandle('quota')
+simulateAndHandle('printer')
+simulateAndHandle('template')
+simulateAndHandle('network')
+simulateAndHandle('source')
+simulateAndHandle('config')
+simulateAndHandle('print')
+simulateAndHandle('validation')
 `,
 
   'template-schema': `import { TopBridgeClient } from '@appzgatenz/label-print-topbridge-js'

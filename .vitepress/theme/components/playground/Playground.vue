@@ -6,6 +6,19 @@ import { codeTemplates } from './codeTemplates'
 import PlaygroundEditor from './PlaygroundEditor.vue'
 import PlaygroundForm from './PlaygroundForm.vue'
 import PlaygroundOutput from './PlaygroundOutput.vue'
+import {
+  TopBridgeError,
+  TopBridgeConnectionError,
+  TopBridgeAuthError,
+  TopBridgeQuotaError,
+  TopBridgePrintError,
+  TopBridgeConfigError,
+  TopBridgeValidationError,
+  TopBridgePrinterError,
+  TopBridgeTemplateError,
+  TopBridgeNetworkError,
+  TopBridgeSourceError,
+} from '@appzgatenz/label-print-topbridge-js'
 
 const props = defineProps<{
   template: string
@@ -134,6 +147,46 @@ async function handleErrorTest(type: string) {
         const name = err.constructor?.name || 'Error'
         addLog(`✗ ${name}: ${err.message}`, 'error')
         if (err.field) addLog(`  field: ${err.field}`)
+      }
+    } else if (type.startsWith('simulate-')) {
+      const errorType = type.replace('simulate-', '')
+      addLog(`--- Simulated ${errorType} ---`)
+      try {
+        switch (errorType) {
+          case 'connection':
+            throw new TopBridgeConnectionError('TopBridge App is not running')
+          case 'auth-not-authenticated':
+            throw new TopBridgeAuthError('User is not logged in', { code: 'NOT_AUTHENTICATED' })
+          case 'auth-update-required':
+            throw new TopBridgeAuthError('TopBridge App version is too low', { code: 'UPDATE_REQUIRED', storeUrl: 'https://example.com/update' })
+          case 'quota':
+            throw new TopBridgeQuotaError('Print quota exhausted', { reason: 'Monthly limit reached' })
+          case 'printer':
+            throw new TopBridgePrinterError('Printer is offline')
+          case 'template':
+            throw new TopBridgeTemplateError('Template not found')
+          case 'network':
+            throw new TopBridgeNetworkError('Cloud network disconnected')
+          case 'source':
+            throw new TopBridgeSourceError('Origin verification failed')
+          case 'config':
+            throw new TopBridgeConfigError('Invalid configuration')
+          case 'print':
+            throw new TopBridgePrintError('Print job failed', { details: { jobId: '12345' } })
+          case 'validation':
+            throw new TopBridgeValidationError('Invalid input', 'products')
+          default:
+            throw new TopBridgeError('Unknown simulated error')
+        }
+      } catch (err: any) {
+        const name = err.constructor?.name || 'Error'
+        addLog(`✗ [Simulated] ${name}: ${err.message}`, 'error')
+        if (err.code) addLog(`  code: ${err.code}`)
+        if (err.storeUrl) addLog(`  storeUrl: ${err.storeUrl}`)
+        if (err.downloadUrl) addLog(`  downloadUrl: ${err.downloadUrl}`)
+        if (err.reason) addLog(`  reason: ${err.reason}`)
+        if (err.field) addLog(`  field: ${err.field}`)
+        if (err.details) addLog(`  details: ${JSON.stringify(err.details)}`)
       }
     }
   } finally {
