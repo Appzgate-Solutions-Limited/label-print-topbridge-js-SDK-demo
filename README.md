@@ -1,35 +1,59 @@
-# TopBridge SDK Platform
+# TopSale Label Printing
 
-[![npm](https://img.shields.io/npm/v/@appzgatenz/label-print-topbridge-js)](https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js)
+[![npm](https://img.shields.io/npm/v/@appzgatenz/label-print-topbridge-js)](https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js) [![docs](https://img.shields.io/badge/docs-label--printing.topsale.biz-blue)](https://label-printing.topsale.biz/)
 
-Documentation and interactive examples for the **TopBridge** label printing SDK platform. Built with [VitePress](https://vitepress.dev).
+**Cloud-based label printing for any printer, anywhere.**
 
-## SDK Types
+TopSale is a cloud-based label printing platform that lets you design, manage, and print labels from your browser. Connect any TSPL or ZPL printer via the lightweight TopBridge desktop app — no server setup, no middleware.
 
-| SDK | Status | Description |
-|-----|--------|-------------|
-| **JS Core** | ✅ Available | Framework-agnostic SDK for browser environments |
-| **Next.js** | 🔜 Coming Soon | Optimized integration for Next.js applications |
-| **React** | 🔜 Coming Soon | Hooks-based SDK for React applications |
+### Key Features
 
-The site includes a **SDK type switcher** in the navigation bar. JS Core shows full documentation and examples; Next.js and React display a Coming Soon page.
+- 🎨 **Cloud Label Editor** — Design labels and create barcodes directly from your browser with a WYSIWYG editor
+- 📊 **Excel Batch Printing** — Import spreadsheets and print labels in bulk with custom field mapping
+- 🖨️ **Any TSPL/ZPL Printer** — TopBridge desktop app connects your printers to the cloud
+- 🔌 **Odoo Integration** — Print labels seamlessly from within Odoo ERP, no tab switching
+- 📦 **Multi-Framework SDK** — JavaScript Core (available now), Next.js and React (coming soon)
 
-## Quick Start (JS Core)
+---
 
-### Installation
+## Quick Links
+
+| Platform | Description |
+|----------|-------------|
+| 🌐 [Official Website](https://topsale.biz/solution/label-printing/) | Product overview, features, and pricing |
+| 🛠️ [Self-Service Portal](https://service.topsale.co.nz/self-service) | Label Designer, Excel Print, Download Centre, and more |
+| 🛍️ [App Store](https://service.topsale.co.nz/store) | Print service packages — subscription & pay-as-you-go |
+| 📖 [Documentation](https://label-printing.topsale.biz/) | SDK guides, API reference, and interactive examples |
+| ⬇️ [Download TopBridge](https://service.topsale.co.nz/self-service/download/topbridge) | Desktop app — connects your TSPL/ZPL printers to the cloud |
+
+---
+
+## Get Started
+
+### For Business Users — Self-Service Platform
+
+No code required. Design and print labels directly from your browser:
+
+1. **Sign up** at the [Self-Service Portal](https://service.topsale.co.nz/self-service)
+2. **Design labels** — Use the WYSIWYG Label Designer with TSPL/ZPL support, barcodes, and dynamic data
+3. **Print** — [Download TopBridge](https://service.topsale.co.nz/self-service/download/topbridge) to connect your printer, or use Excel batch printing for bulk jobs
+
+Flexible pricing with no hidden fees. [View plans →](https://service.topsale.co.nz/store)
+
+### For Developers — SDK Integration
+
+Install the JavaScript Core SDK:
 
 ```bash
 npm install @appzgatenz/label-print-topbridge-js
 ```
-
-### Usage
 
 ```ts
 import { TopBridgeClient } from '@appzgatenz/label-print-topbridge-js'
 
 const client = new TopBridgeClient({ debug: true })
 
-// Ensure Topbridge App is running and run preflight checks
+// Ensure TopBridge App is running and run preflight checks
 const preflight = await client.launch.ensureRunning(
   () => client.preflight.run()
 )
@@ -45,50 +69,14 @@ await client.print.execute({
 })
 ```
 
-See the [full documentation](https://github.com/youngming/label-print-topbridge-js-SDK-demo) for complete API reference.
+See the [full documentation](https://label-printing.topsale.biz/) for API reference, integration tutorials, and interactive examples.
 
-## Local Development
+---
 
-```bash
-pnpm install
-pnpm dev
-```
+## Resources
 
-Open `http://localhost:5173` in your browser.
-
-## Build
-
-```bash
-pnpm build
-```
-
-Static output goes to `.vitepress/dist`.
-
-## Deploy
-
-```bash
-pnpm deploy           # Deploy to Cloudflare Pages
-pnpm deploy:dry       # Pre-check only
-```
-
-## Project Structure
-
-```
-├── .vitepress/
-│   ├── config.ts          # VitePress configuration
-│   └── theme/             # Custom theme (SDK switcher, homepage)
-├── guide/                 # English documentation
-├── examples/              # Example pages
-├── public/demos/          # Standalone HTML demos
-├── zh/                    # Chinese documentation (mirrors English)
-└── scripts/deploy.sh      # Cloudflare Pages deploy script
-```
-
-## Links
-
-- [GitHub](https://github.com/youngming/label-print-topbridge-js-SDK-demo)
-- [NPM Package](https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js)
-- [SDK Source](https://github.com/topsale/label-print-topbridge-js)
+- [SDK Source Code](https://github.com/topsale/label-print-topbridge-js) — GitHub repository
+- [NPM Package](https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js) — `@appzgatenz/label-print-topbridge-js`
 
 ## License
 
