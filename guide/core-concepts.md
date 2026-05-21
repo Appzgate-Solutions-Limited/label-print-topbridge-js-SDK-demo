@@ -24,9 +24,9 @@ The SDK uses short WebSocket connections: each API call independently creates a 
 
 ```
 client.print.execute(...)
-  → Connect to ws://localhost:8765/v2
-  → Fetch template schema (action: "template")
-  → Build and send print payload (action: "print")
+  → Connect to local WebSocket
+  → Fetch template schema
+  → Build and send print payload
   → Receive response
   → Close connection
   → Return PrintResponse

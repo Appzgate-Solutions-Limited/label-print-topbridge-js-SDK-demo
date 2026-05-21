@@ -10,6 +10,10 @@ title: 基础打印示例
 需要本地运行 Topbridge App（版本 >= 1.0.45）。[下载](https://service.topsale.co.nz/self-service/download/topbridge)
 :::
 
+:::tip 不想集成 SDK？
+试试 [开箱即用方案](https://label-printing.topsale.biz/) —— 无需写代码即可开始打印。
+:::
+
 ## 在线演示
 
 <div class="demo-frame">

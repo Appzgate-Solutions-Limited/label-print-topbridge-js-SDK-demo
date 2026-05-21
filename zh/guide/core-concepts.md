@@ -24,9 +24,9 @@ SDK 采用短连接通信：每次 API 调用都会独立创建一个 WebSocket 
 
 ```
 client.print.execute(...)
-  → 连接 ws://localhost:8765/v2
-  → 获取模板 schema (action: "template")
-  → 构建并发送打印数据 (action: "print")
+  → 连接本地 WebSocket
+  → 获取模板 schema
+  → 构建并发送打印数据
   → 接收响应
   → 关闭连接
   → 返回 PrintResponse

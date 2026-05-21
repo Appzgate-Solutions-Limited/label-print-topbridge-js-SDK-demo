@@ -14,7 +14,7 @@ The SDK communicates exclusively with the locally running Topbridge App. There i
 
 ## 2. Source Verification
 
-SDK requests carry a caller-origin identifier that is validated server-side. Requests from unauthorized sources are rejected by Topbridge App.
+The SDK includes caller-origin identification in all requests. Unauthorized calls are rejected by Topbridge App.
 
 ## 3. URL Safety Validation
 
@@ -37,5 +37,5 @@ The SDK automatically strips formula injection prefixes (such as `=` and `=@`) f
 
 | Limitation | Description | Mitigation |
 |------------|-------------|------------|
-| Browser cannot prevent page spoofing | Malicious pages can implement the WS protocol themselves | Topbridge App source verification + server-side validation |
+| Browser cannot prevent page spoofing | Malicious pages can implement the WS protocol themselves | Topbridge App built-in origin verification |
 | WS protocol is unencrypted | localhost communication is not encrypted by default | Local communication does not require encryption (no network transmission risk) |

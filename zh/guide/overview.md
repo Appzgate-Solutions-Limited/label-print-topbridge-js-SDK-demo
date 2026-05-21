@@ -10,6 +10,10 @@ TopBridge 是一个运行在用户本地的桌面应用（简称「Topbridge App
 
 > **下载**：[获取 Topbridge App](https://service.topsale.co.nz/self-service/download/topbridge)
 
+:::tip 正在寻找完整解决方案？
+访问 [TopSale 标签打印官网](https://topsale.biz/solution/label-printing/) 了解我们的全托管平台。
+:::
+
 ## SDK 解决什么问题
 
 `@appzgatenz/label-print-topbridge-js` 是一个 Headless（无 UI）浏览器 SDK，封装了与 Topbridge App 的全部通信细节：
@@ -37,7 +41,7 @@ TopBridgeClient (SDK 入口)
     ├── preflight     编排：health → benefits → printers
     └── launch        Topbridge App 唤起 + 重试编排
     │
-    ▼  WebSocket (固定 ws://localhost:8765/v2)
+    ▼  WebSocket (本地通信)
 Topbridge App (本地桌面应用)
     │
     ▼

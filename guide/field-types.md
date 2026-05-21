@@ -12,13 +12,13 @@ You do **not** need to manually specify field types — the SDK handles everythi
 
 ```
 print.execute({ template, printer, products })
-  ├─ 1. Auto-fetch template schema (action: "template")
-  ├─ 2. Classify fields by fieldType (planFields)
+  ├─ 1. Auto-fetch template schema
+  ├─ 2. Classify fields by fieldType
   │     ├─ Widget fields: text, textfield, price, weight, barcode, qrcode
   │     ├─ Protocol fields: integer
   │     └─ Layout fields: line (skipped)
-  ├─ 3. Transform each product's data (buildProducts)
-  └─ 4. Send transformed data to Topbridge App (action: "print")
+  ├─ 3. Transform each product's data
+  └─ 4. Send transformed data to Topbridge App
 ```
 
 ## Transformation Rules

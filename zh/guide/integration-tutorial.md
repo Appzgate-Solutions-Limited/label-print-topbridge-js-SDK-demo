@@ -12,6 +12,10 @@ title: 完整集成教程
 
 > **前置条件**：需安装 Topbridge App >= 1.0.45（[下载](https://service.topsale.co.nz/self-service/download/topbridge)）。
 
+:::tip 更倾向免代码方案？
+[试试 TopSale 开箱即用方案](https://label-printing.topsale.biz/) —— 无需任何开发，几分钟即可开始打印标签。
+:::
+
 > `preflight` 是推荐的最佳实践但非强制——你也可以直接调用 `print.execute()`。不过，使用 preflight 可以在打印前提前发现并处理问题，提供更好的用户体验。
 >
 > 注意：`preflight.run()` 不会自动唤起 Topbridge App。如需自动唤起，使用 `client.launch.ensureRunning()` 包装。

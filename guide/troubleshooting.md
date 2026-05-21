@@ -14,6 +14,10 @@ title: Troubleshooting
 3. Confirm app version >= 1.0.45 (supports V2 API)
 4. Use `client.launch.ensureRunning()` to automatically handle Topbridge App launch and retry
 
+:::tip Still having issues?
+Visit the [TopSale Self-Service Portal](https://service.topsale.co.nz/self-service) for support resources and account management.
+:::
+
 ## Q: TopBridgeAuthError(code: 'NOT_AUTHENTICATED') thrown
 
 **Cause**: Topbridge App is running but the user is not logged in.

@@ -17,6 +17,10 @@ npm install @appzgatenz/label-print-topbridge-js
 - At least one label printer with a configured protocol (TSPL / ZPL)
 - If using `launch.trigger()`, page CSP must allow `topsale:` custom protocol — see [CSP Configuration](/guide/csp)
 
+:::tip Don't want to write code?
+Try the [TopSale out-of-the-box label printing solution](https://label-printing.topsale.biz/) — no integration needed.
+:::
+
 ## Initialization
 
 ```typescript
@@ -25,7 +29,7 @@ import { TopBridgeClient } from '@appzgatenz/label-print-topbridge-js'
 const client = new TopBridgeClient()
 ```
 
-The SDK connects to `ws://localhost:8765` (internally appends `/v2`) with no configuration required.
+The SDK communicates with Topbridge App via local WebSocket. No configuration required.
 
 ## Complete Print Workflow
 
@@ -107,7 +111,7 @@ try {
   } else if (err instanceof TopBridgeNetworkError) {
     // Topbridge App is online, but cloud network is disconnected
   } else if (err instanceof TopBridgeSourceError) {
-    // Source is not in the allowlist
+    // Origin verification failed
   } else if (err instanceof TopBridgePrintError) {
     // Print failed
   }

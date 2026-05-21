@@ -10,6 +10,10 @@ TopBridge is a desktop application running on the user's local machine (referred
 
 > **Download**: [Get Topbridge App](https://service.topsale.co.nz/self-service/download/topbridge)
 
+:::tip Looking for a complete solution?
+Visit the [TopSale label printing website](https://topsale.biz/solution/label-printing/) to learn more about our fully managed platform.
+:::
+
 ## What Problems Does the SDK Solve
 
 `@appzgatenz/label-print-topbridge-js` is a Headless (no UI) browser SDK that encapsulates all communication details with Topbridge App:
@@ -37,7 +41,7 @@ TopBridgeClient (SDK Entry)
     ├── preflight     Orchestration: health → benefits → printers
     └── launch        Topbridge App launch + retry orchestration
     │
-    ▼  WebSocket (fixed ws://localhost:8765/v2)
+    ▼  WebSocket (Local)
 Topbridge App (Local Desktop Application)
     │
     ▼

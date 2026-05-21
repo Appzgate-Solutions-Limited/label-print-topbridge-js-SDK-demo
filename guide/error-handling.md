@@ -25,7 +25,7 @@ TopBridgeError (Base)
 ├── TopBridgePrinterError        Printer offline / protocol not configured
 ├── TopBridgeTemplateError       Template does not exist or no permission
 ├── TopBridgeNetworkError        Cloud network disconnected
-└── TopBridgeSourceError         Source missing or not in allowlist
+└── TopBridgeSourceError         Origin verification failed
 ```
 
 ## Type-Safe Handling with instanceof
@@ -73,7 +73,7 @@ try {
     // Topbridge App is online, but cloud network is disconnected
   }
   else if (err instanceof TopBridgeSourceError) {
-    // Source is not in the allowlist
+    // Origin verification failed
   }
   else if (err instanceof TopBridgeValidationError) {
     // Input validation failed

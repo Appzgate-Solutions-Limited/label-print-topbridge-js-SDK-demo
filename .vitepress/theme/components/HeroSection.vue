@@ -19,6 +19,8 @@ type SdkMeta = {
   cta2Link?: string
   cta3?: string
   cta3Link?: string
+  cta4?: string
+  cta4Link?: string
 }
 
 const sdkMeta: Record<SdkType, { en: SdkMeta; zh: SdkMeta }> = {
@@ -33,6 +35,8 @@ const sdkMeta: Record<SdkType, { en: SdkMeta; zh: SdkMeta }> = {
       cta2Link: 'https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js',
       cta3: 'API Reference',
       cta3Link: '/guide/developer-guide',
+      cta4: 'SaaS Platform',
+      cta4Link: 'https://topsale.biz/solution/label-printing/',
     },
     zh: {
       title: 'TopBridge SDK 平台',
@@ -44,6 +48,8 @@ const sdkMeta: Record<SdkType, { en: SdkMeta; zh: SdkMeta }> = {
       cta2Link: 'https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js',
       cta3: 'API 参考',
       cta3Link: '/zh/guide/developer-guide',
+      cta4: 'SaaS 平台',
+      cta4Link: 'https://topsale.biz/solution/label-printing/',
     },
   },
   nextjs: {
@@ -122,6 +128,16 @@ function backToCore() {
         <VPLink :href="meta.cta3Link!" class="tb-btn tb-btn--text">
           {{ meta.cta3 }}
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tb-btn-arrow"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </VPLink>
+        <VPLink
+          v-if="meta.cta4"
+          :href="meta.cta4Link!"
+          target="_blank"
+          rel="noopener noreferrer"
+          no-icon
+          class="tb-btn tb-btn--text"
+        >
+          {{ meta.cta4 }}
         </VPLink>
       </div>
 

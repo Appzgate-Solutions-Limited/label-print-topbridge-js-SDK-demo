@@ -25,7 +25,7 @@ TopBridgeError (基类)
 ├── TopBridgePrinterError        打印机离线 / 未配置协议
 ├── TopBridgeTemplateError       模板不存在或无权限
 ├── TopBridgeNetworkError        云端网络断开
-└── TopBridgeSourceError         source 缺失或不在白名单
+└── TopBridgeSourceError         来源验证失败
 ```
 
 ## 使用 instanceof 进行类型安全处理
@@ -73,7 +73,7 @@ try {
     // Topbridge App 在线，但云端网络断开
   }
   else if (err instanceof TopBridgeSourceError) {
-    // source 不在白名单
+    // 来源验证失败
   }
   else if (err instanceof TopBridgeValidationError) {
     // 输入校验失败

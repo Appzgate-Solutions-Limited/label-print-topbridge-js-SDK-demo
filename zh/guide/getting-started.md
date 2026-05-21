@@ -17,6 +17,10 @@ npm install @appzgatenz/label-print-topbridge-js
 - 至少一台已配置协议（TSPL / ZPL）的标签打印机
 - 如使用 `launch.trigger()`，页面 CSP 需允许 `topsale:` 自定义协议 — 详见 [CSP 配置](/zh/guide/csp)
 
+:::tip 不想写代码？
+试试 [TopSale 开箱即用标签打印方案](https://label-printing.topsale.biz/)，无需集成即可使用。
+:::
+
 ## 初始化
 
 ```typescript
@@ -25,7 +29,7 @@ import { TopBridgeClient } from '@appzgatenz/label-print-topbridge-js'
 const client = new TopBridgeClient()
 ```
 
-SDK 连接 `ws://localhost:8765`（内部自动拼接 `/v2`），无需任何配置。
+SDK 通过本地 WebSocket 与 Topbridge App 通信，无需配置。
 
 ## 完整打印流程
 
@@ -107,7 +111,7 @@ try {
   } else if (err instanceof TopBridgeNetworkError) {
     // Topbridge App 在线，但云端网络断开
   } else if (err instanceof TopBridgeSourceError) {
-    // source 不在白名单
+    // 来源验证失败
   } else if (err instanceof TopBridgePrintError) {
     // 打印失败
   }

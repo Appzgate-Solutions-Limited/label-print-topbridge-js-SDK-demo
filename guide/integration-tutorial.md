@@ -12,6 +12,10 @@ Before printing, confirm three things: Topbridge App is running and the user is 
 
 > **Prerequisite**: Topbridge App >= 1.0.45 must be installed ([download](https://service.topsale.co.nz/self-service/download/topbridge)).
 
+:::tip Prefer a no-code solution?
+[Try TopSale out-of-the-box](https://label-printing.topsale.biz/) — start printing labels in minutes without any development.
+:::
+
 > `preflight` is the recommended best practice but not mandatory — you can also call `print.execute()` directly. However, using preflight allows you to discover and handle issues before printing, providing a better user experience.
 >
 > Note: `preflight.run()` does not automatically launch Topbridge App. For auto-launch, wrap it with `client.launch.ensureRunning()`.

@@ -29,6 +29,7 @@ export default defineConfig({
         nav: [
           { text: 'Guide', link: '/guide/getting-started' },
           { text: 'Examples', link: '/examples/basic' },
+          { text: 'SaaS Platform', link: 'https://topsale.biz/solution/label-printing/' },
           { text: 'NPM Package', link: 'https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js' },
         ],
         sidebar: {
@@ -61,6 +62,12 @@ export default defineConfig({
                 { text: 'Security Model', link: '/guide/security' },
               ],
             },
+            {
+              text: 'SaaS Platform',
+              items: [
+                { text: 'TopSale SaaS Platform', link: '/guide/saas-platform' },
+              ],
+            },
           ],
           '/examples/': [
             {
@@ -88,6 +95,7 @@ export default defineConfig({
         nav: [
           { text: '指南', link: '/zh/guide/getting-started' },
           { text: '示例', link: '/zh/examples/basic' },
+          { text: 'SaaS 平台', link: 'https://topsale.biz/solution/label-printing/' },
           { text: 'NPM 包', link: 'https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js' },
         ],
         sidebar: {
@@ -120,6 +128,12 @@ export default defineConfig({
                 { text: '安全模型', link: '/zh/guide/security' },
               ],
             },
+            {
+              text: 'SaaS 平台',
+              items: [
+                { text: 'TopSale SaaS 平台', link: '/zh/guide/saas-platform' },
+              ],
+            },
           ],
           '/zh/examples/': [
             {
@@ -142,6 +156,7 @@ export default defineConfig({
   themeConfig: {
     socialLinks: [
       { icon: 'github', link: 'https://github.com/youngming/label-print-topbridge-js-SDK-demo' },
+      { icon: { svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' }, link: 'https://topsale.biz/solution/label-printing/', ariaLabel: 'TopSale' },
     ],
     search: {
       provider: 'local',

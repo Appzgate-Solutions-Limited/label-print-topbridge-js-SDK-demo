@@ -14,6 +14,10 @@ title: 故障排查
 3. 确认应用版本 >= 1.0.45（支持 V2 API）
 4. 使用 `client.launch.ensureRunning()` 自动处理 Topbridge App 唤起和重试
 
+:::tip 仍然遇到问题？
+访问 [TopSale 自助服务平台](https://service.topsale.co.nz/self-service) 获取支持资源和账户管理。
+:::
+
 ## Q: 抛出 TopBridgeAuthError(code: 'NOT_AUTHENTICATED')
 
 **原因**：Topbridge App 在运行但用户未登录。
