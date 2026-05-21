@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import type { PlaygroundPrinter, PlaygroundSchemaField, PlaygroundTemplateItem } from '../../composables/usePlayground'
 
 const props = defineProps<{
   template: string
   isLoading: boolean
-  printers: { name: string; isDefault: boolean; protocol?: string }[]
-  templates: { id: string; code?: string; name: string; isEnabled: boolean }[]
+  printers: PlaygroundPrinter[]
+  templates: PlaygroundTemplateItem[]
+  schemaFields: PlaygroundSchemaField[]
   preflightDone: boolean
 }>()
 
@@ -21,6 +23,7 @@ const emit = defineEmits<{
 // basic / multi-product 通用参数
 const selectedTemplate = ref('')
 const selectedPrinter = ref('')
+const visibleSchemaFields = computed(() => props.schemaFields)
 const productName = ref('Test Product')
 const productPrice = ref('3.99')
 const productCurrency = ref('$')
@@ -64,9 +67,6 @@ function emitPrint() {
   }
 }
 
-// template-schema 参数
-const schemaResult = ref<any>(null)
-
 function querySchema() {
   if (selectedTemplate.value) {
     emit('query-schema', selectedTemplate.value)
@@ -74,8 +74,39 @@ function querySchema() {
 }
 
 // advanced-form 参数
-const schemaFields = ref<any[]>([])
-const schemaFormData = ref<Record<string, any>>({})
+const schemaFormData = ref<Record<string, string | number | { value: string | number; currency?: string; unit?: string }>>({})
+
+watch(
+  () => props.templates,
+  templates => {
+    if (!selectedTemplate.value) {
+      selectedTemplate.value = templates[0]?.code || templates[0]?.id || ''
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  () => props.printers,
+  printers => {
+    if (!selectedPrinter.value) {
+      selectedPrinter.value = printers.find(p => p.isDefault)?.name || printers[0]?.name || ''
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  () => props.schemaFields,
+  fields => {
+    schemaFormData.value = Object.fromEntries(
+      fields
+        .filter(field => field.type !== 'line')
+        .map(field => [field.name, defaultValueForField(field)]),
+    )
+  },
+  { immediate: true },
+)
 
 function updateSchemaField(name: string, value: any) {
   schemaFormData.value = { ...schemaFormData.value, [name]: value }
@@ -85,17 +116,52 @@ function emitAdvancedPrint() {
   emit('print', {
     template: selectedTemplate.value,
     printer: selectedPrinter.value,
-    products: [schemaFormData.value],
+    rawProducts: [schemaFormData.value],
   })
 }
 
-defineExpose({
-  selectedTemplate,
-  selectedPrinter,
-  schemaResult,
-  schemaFields,
-  schemaFormData,
-})
+function defaultValueForField(field: PlaygroundSchemaField) {
+  if (field.type === 'price') {
+    return {
+      value: toNumberOrFallback(field.default, 1.99),
+      currency: '$',
+      unit: '/ea',
+    }
+  }
+
+  if (field.type === 'weight') {
+    return {
+      value: toNumberOrFallback(field.default, 0.5),
+      unit: 'kg',
+    }
+  }
+
+  if (field.type === 'integer') {
+    return toNumberOrFallback(field.default, field.name === 'copies' ? 1 : 0)
+  }
+
+  return typeof field.default === 'string'
+    ? field.default
+    : field.name === 'name'
+      ? 'Test Product'
+      : ''
+}
+
+function toNumberOrFallback(value: unknown, fallback: number) {
+  const parsed = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(parsed) ? parsed : fallback
+}
+
+function parseNumberInput(value: string) {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : ''
+}
+
+function parseIntegerInput(value: string, name: string) {
+  const parsed = Number.parseInt(value, 10)
+  if (!Number.isFinite(parsed)) return name === 'copies' ? 1 : ''
+  return parsed
+}
 </script>
 
 <template>
@@ -150,7 +216,7 @@ defineExpose({
           <input v-model="productCopies" type="number" min="1" max="9999">
         </div>
         <div class="pg-form-row">
-          <button class="pg-btn pg-btn-primary" :disabled="isLoading || !selectedTemplate" @click="emitPrint">
+          <button class="pg-btn pg-btn-primary" :disabled="isLoading || !selectedTemplate || !selectedPrinter" @click="emitPrint">
             {{ isLoading ? 'Printing...' : 'Print' }}
           </button>
         </div>
@@ -191,7 +257,7 @@ defineExpose({
             <option v-for="p in printers" :key="p.name" :value="p.name">{{ p.name }}{{ p.isDefault ? ' (default)' : '' }}</option>
           </select>
         </div>
-        <button class="pg-btn pg-btn-primary" :disabled="isLoading || !selectedTemplate" @click="emitPrint">
+        <button class="pg-btn pg-btn-primary" :disabled="isLoading || !selectedTemplate || !selectedPrinter" @click="emitPrint">
           {{ isLoading ? 'Printing...' : 'Batch Print' }}
         </button>
       </div>
@@ -225,7 +291,7 @@ defineExpose({
       <div v-if="templates.length" class="pg-form-section">
         <div class="pg-form-title">2. Query Schema</div>
         <div class="pg-form-row">
-          <select v-model="selectedTemplate">
+          <select v-model="selectedTemplate" @change="querySchema">
             <option value="" disabled>-- select --</option>
             <option v-for="t in templates" :key="t.code || t.id" :value="t.code || t.id">{{ t.name }}</option>
           </select>
@@ -242,7 +308,7 @@ defineExpose({
         <div class="pg-form-title">2. Template & Printer</div>
         <div class="pg-form-row">
           <label>Template</label>
-          <select v-model="selectedTemplate">
+          <select v-model="selectedTemplate" @change="querySchema">
             <option value="" disabled>-- select --</option>
             <option v-for="t in templates" :key="t.code || t.id" :value="t.code || t.id">{{ t.name }}</option>
           </select>
@@ -255,14 +321,14 @@ defineExpose({
           </select>
         </div>
       </div>
-      <div v-if="schemaFields.length" class="pg-form-section">
+      <div v-if="visibleSchemaFields.length" class="pg-form-section">
         <div class="pg-form-title">3. Dynamic Form</div>
-        <template v-for="field in schemaFields" :key="field.name">
+        <template v-for="field in visibleSchemaFields" :key="field.name">
           <div v-if="field.type !== 'line'" class="pg-form-row">
             <label>{{ field.name }}<span v-if="field.required" class="pg-required">*</span></label>
             <template v-if="field.type === 'price'">
               <input type="number" step="0.01" placeholder="value" :value="schemaFormData[field.name]?.value ?? 1.99"
-                @input="updateSchemaField(field.name, { ...schemaFormData[field.name], value: parseFloat(($event.target as HTMLInputElement).value) })">
+                @input="updateSchemaField(field.name, { ...schemaFormData[field.name], value: parseNumberInput(($event.target as HTMLInputElement).value) })">
               <input type="text" placeholder="$" style="width:40px" :value="schemaFormData[field.name]?.currency ?? '$'"
                 @input="updateSchemaField(field.name, { ...schemaFormData[field.name], currency: ($event.target as HTMLInputElement).value })">
               <input type="text" placeholder="unit" style="width:60px" :value="schemaFormData[field.name]?.unit ?? '/ea'"
@@ -270,14 +336,14 @@ defineExpose({
             </template>
             <template v-else-if="field.type === 'weight'">
               <input type="number" step="0.01" placeholder="value" :value="schemaFormData[field.name]?.value ?? 0.5"
-                @input="updateSchemaField(field.name, { ...schemaFormData[field.name], value: parseFloat(($event.target as HTMLInputElement).value) })">
+                @input="updateSchemaField(field.name, { ...schemaFormData[field.name], value: parseNumberInput(($event.target as HTMLInputElement).value) })">
               <input type="text" placeholder="unit" style="width:60px" :value="schemaFormData[field.name]?.unit ?? 'kg'"
                 @input="updateSchemaField(field.name, { ...schemaFormData[field.name], unit: ($event.target as HTMLInputElement).value })">
             </template>
             <template v-else-if="field.type === 'integer'">
               <input type="number" :min="field.name === 'copies' ? 1 : undefined" :max="field.name === 'copies' ? 9999 : undefined"
                 :value="schemaFormData[field.name] ?? field.default ?? (field.name === 'copies' ? 1 : '')"
-                @input="updateSchemaField(field.name, ($event.target as HTMLInputElement).value)">
+                @input="updateSchemaField(field.name, parseIntegerInput(($event.target as HTMLInputElement).value, field.name))">
             </template>
             <template v-else>
               <input type="text" :value="schemaFormData[field.name] ?? (field.name === 'name' ? 'Test Product' : '')"
@@ -287,7 +353,7 @@ defineExpose({
           </div>
         </template>
         <div class="pg-form-row" style="margin-top:8px">
-          <button class="pg-btn pg-btn-primary" :disabled="isLoading || !selectedTemplate" @click="emitAdvancedPrint">
+          <button class="pg-btn pg-btn-primary" :disabled="isLoading || !selectedTemplate || !selectedPrinter" @click="emitAdvancedPrint">
             {{ isLoading ? 'Printing...' : 'Print' }}
           </button>
         </div>

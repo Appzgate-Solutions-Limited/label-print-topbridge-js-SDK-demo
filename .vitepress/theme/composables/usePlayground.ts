@@ -1,4 +1,5 @@
 import { ref, shallowRef } from 'vue'
+import type { SyncedPrinter, TemplateFieldSchema, TemplateItem } from '@appzgatenz/label-print-topbridge-js'
 import {
   TopBridgeClient,
   TopBridgeConnectionError,
@@ -14,6 +15,10 @@ import {
   TopBridgeError,
 } from '@appzgatenz/label-print-topbridge-js'
 import { transform } from 'sucrase'
+
+export type PlaygroundPrinter = SyncedPrinter
+export type PlaygroundTemplateItem = TemplateItem
+export type PlaygroundSchemaField = TemplateFieldSchema
 
 export interface LogEntry {
   time: string
@@ -40,8 +45,8 @@ export function usePlayground() {
   const client = shallowRef<TopBridgeClient | null>(null)
   const logs = ref<LogEntry[]>([])
   const isLoading = ref(false)
-  const printers = ref<{ name: string; isDefault: boolean; protocol?: string }[]>([])
-  const templates = ref<{ id: string; code?: string; name: string; isEnabled: boolean }[]>([])
+  const printers = ref<PlaygroundPrinter[]>([])
+  const templates = ref<PlaygroundTemplateItem[]>([])
 
   function addLog(message: string, type: LogEntry['type'] = 'info') {
     logs.value = [...logs.value, {
@@ -108,8 +113,7 @@ export function usePlayground() {
   }
 
   async function executeUserCode(code: string) {
-    // 去掉 import 语句
-    const stripped = code.replace(/^import\s+.*from\s+['"].*['"];?\s*$/gm, '')
+    const stripped = stripSdkImports(code)
     const js = transform(stripped, { transforms: ['typescript'] }).code
 
     const paramNames = Object.keys(sdkExports)
@@ -123,6 +127,13 @@ export function usePlayground() {
 
     const fn = new Function(...paramNames, 'console', `return (async () => { ${js} })()`)
     return await fn(...paramValues, customConsole)
+  }
+
+  function stripSdkImports(code: string) {
+    return code.replace(
+      /^\s*import[\s\S]*?from\s+['"]@appzgatenz\/label-print-topbridge-js['"];?\s*$/gm,
+      '',
+    )
   }
 
   return {

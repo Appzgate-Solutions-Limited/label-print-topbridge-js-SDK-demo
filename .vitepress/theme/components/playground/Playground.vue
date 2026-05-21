@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import type { PlaygroundSchemaField } from '../../composables/usePlayground'
 import { usePlayground } from '../../composables/usePlayground'
 import { codeTemplates } from './codeTemplates'
+import PlaygroundEditor from './PlaygroundEditor.vue'
 import PlaygroundForm from './PlaygroundForm.vue'
 import PlaygroundOutput from './PlaygroundOutput.vue'
 
@@ -17,7 +19,7 @@ const {
 
 const preflightDone = ref(false)
 const isAdvancedMode = ref(false)
-const editorRef = ref<InstanceType<typeof import('./PlaygroundEditor.vue')>>()
+const schemaFields = ref<PlaygroundSchemaField[]>([])
 
 const defaultCode = computed(() => codeTemplates[props.template] || '')
 const editorCode = ref(defaultCode.value)
@@ -28,12 +30,14 @@ function toggleMode() {
 
 async function handlePreflight() {
   try {
-    await runPreflight()
+    const result = await runPreflight()
     preflightDone.value = true
 
     if (props.template === 'advanced-form' && templates.value.length) {
       const firstCode = templates.value[0]?.code || templates.value[0]?.id
       if (firstCode) await handleQuerySchema(firstCode)
+      const defaultPrinter = result.printers.data?.defaultPrinter
+      if (defaultPrinter) addLog(`  Selected printer: ${defaultPrinter}`)
     }
   } catch {
     // usePlayground 内部已处理错误日志
@@ -85,6 +89,7 @@ async function handleQuerySchema(templateCode: string) {
   try {
     const c = ensureClient()
     const schema = await c.templates.schema(templateCode)
+    schemaFields.value = schema.data.fields ?? []
     addLog(`✓ Schema: ${schema.data.name} (${schema.data.code})`, 'success')
     addLog(`  Fields: ${schema.data.fields?.length ?? 0}`)
     for (const f of schema.data.fields ?? []) {
@@ -93,6 +98,7 @@ async function handleQuerySchema(templateCode: string) {
       }
     }
   } catch (err: any) {
+    schemaFields.value = []
     addLog(`✗ Schema failed: ${err.message}`, 'error')
   } finally {
     isLoading.value = false
@@ -163,6 +169,7 @@ async function handleEditorRun(code: string) {
       :is-loading="isLoading"
       :printers="printers"
       :templates="templates"
+      :schema-fields="schemaFields"
       :preflight-done="preflightDone"
       @preflight="handlePreflight"
       @health-check="handleHealthCheck"
@@ -174,8 +181,8 @@ async function handleEditorRun(code: string) {
 
     <PlaygroundEditor
       v-if="isAdvancedMode"
-      ref="editorRef"
       v-model="editorCode"
+      :is-running="isLoading"
       @run="handleEditorRun"
     />
 

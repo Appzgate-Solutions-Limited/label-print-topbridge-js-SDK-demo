@@ -4,6 +4,22 @@ title: 错误处理
 
 # 错误处理
 
+## 整体设计思路
+
+SDK 采用**分层继承 + 协议错误码 + 结构化元数据**的三层模型处理错误：
+
+1. **分层继承**：所有错误继承自 `TopBridgeError`（再继承原生 `Error`），并按业务领域划分为 9 个子类。这种设计的优势是：
+   - 调用方可以用 `instanceof` 精确捕获特定错误
+   - TypeScript 会自动窄化类型，无需额外类型断言
+   - 错误语义与业务场景一一对应，降低认知成本
+
+2. **协议错误码**：底层 V2 WebSocket 协议返回的 `code` 字段（如 `NOT_AUTHENTICATED`、`UPDATE_REQUIRED`）会被映射到对应错误类，同时保留在 `error.code` 上，方便程序化判断。
+
+3. **结构化元数据**：每个错误对象除 `message` 和 `name` 外，还包含：
+   - `code?` — 协议层错误码
+   - `details?` — 扩展详情（任意类型，视具体错误而定）
+   - 子类专属字段 — 如 `TopBridgeAuthError.storeUrl`、`TopBridgeQuotaError.reason`、`TopBridgeValidationError.field`
+
 ## 错误类层次
 
 所有 SDK 错误继承自 `TopBridgeError` 基类：
@@ -84,6 +100,38 @@ try {
 }
 ```
 
+## 获取错误详情
+
+除了用 `instanceof` 区分错误类型，你还可以直接读取错误对象上的通用属性和子类专属属性，构建更精细的错误提示或日志上报：
+
+```typescript
+try {
+  await client.print.execute({ /* ... */ })
+} catch (err) {
+  if (err instanceof TopBridgeError) {
+    // 通用属性：所有 SDK 错误都有
+    console.error('Error:', err.name, '-', err.message)
+    if (err.code) console.error('Code:', err.code)
+    if (err.details) console.error('Details:', err.details)
+
+    // 子类专属属性
+    if (err instanceof TopBridgeAuthError) {
+      if (err.storeUrl) console.log('Store URL:', err.storeUrl)
+      if (err.downloadUrl) console.log('Download URL:', err.downloadUrl)
+    }
+    if (err instanceof TopBridgeQuotaError) {
+      if (err.reason) console.log('Quota reason:', err.reason)
+    }
+    if (err instanceof TopBridgeValidationError) {
+      if (err.field) console.log('Invalid field:', err.field)
+    }
+  } else {
+    // 非 SDK 错误（如运行时异常、代码 Bug）
+    console.error('Unexpected error:', err)
+  }
+}
+```
+
 ## 错误与场景对照
 
 | 场景 | 错误类型 | 处理建议 |
@@ -116,3 +164,17 @@ if (result.warnings?.length) {
 | code | reason | 触发条件 |
 |------|--------|---------|
 | `DATA_FORMAT` | `newline_truncated` | schema 中 `text` 类型的字段值包含换行符，SDK 已自动截取第一行 |
+
+## 业界最佳实践对比
+
+现代 JS SDK 普遍采用**"基类 + 领域子类 + 错误码"**的三层模型。以下是 TopBridge SDK 与主流 SDK 的简要对比：
+
+| SDK | 基类设计 | 错误码机制 | 调试元数据 | 类型区分方式 |
+|-----|---------|-----------|-----------|-------------|
+| **AWS SDK v3** | `ServiceException` 接口 | `$metadata` + `name` | requestId, httpStatusCode, extendedRequestId | `instanceof` / `error.name` |
+| **Stripe Node.js** | `StripeError` 基类 | `type` 字段 | `raw`, `headers`, `requestId`, `statusCode` | `instanceof` 子类 |
+| **Twilio Node.js** | `RestException` | `code` + `status` | `moreInfo`, `details` | `instanceof` |
+| **Prisma** | `PrismaClientKnownRequestError` 等 | `code`（如 `P2002`） | `meta`, `clientVersion` | `instanceof` + `code` |
+| **TopBridge SDK** | `TopBridgeError` 基类 | `code`（V2 协议码） | `details`, 子类专属字段 | `instanceof` 子类 |
+
+**结论**：TopBridge SDK 的错误处理设计与 Stripe、Prisma 处于同一水准，采用语义化的类层级、可程序化的错误码以及携带业务上下文元数据的子类字段，符合现代 JS SDK 的主流方向。

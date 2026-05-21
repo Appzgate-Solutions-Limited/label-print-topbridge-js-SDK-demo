@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, defineAsyncComponent, shallowRef } from 'vue'
+import { ref, onBeforeUnmount, onMounted, shallowRef } from 'vue'
 import LZString from 'lz-string'
 
 const props = defineProps<{
   modelValue: string
+  isRunning: boolean
 }>()
 
 const emit = defineEmits<{
@@ -13,61 +14,59 @@ const emit = defineEmits<{
 
 const editorContainer = ref<HTMLElement>()
 const editorReady = ref(false)
-const isRunning = ref(false)
-const EditorView = shallowRef<any>(null)
 const view = shallowRef<any>(null)
 
 onMounted(async () => {
   const [
-    { EditorView: EV },
+    { EditorView: EV, keymap },
     { javascript },
     { oneDark },
-    { keymap },
-    { defaultKeymap },
-    { indentWithTab },
+    { defaultKeymap, indentWithTab },
   ] = await Promise.all([
-    import('codemirror/view'),
+    import('@codemirror/view'),
     import('@codemirror/lang-javascript'),
     import('@codemirror/theme-one-dark'),
-    import('codemirror/commands'),
-    import('codemirror/commands'),
-    import('codemirror/commands'),
+    import('@codemirror/commands'),
   ])
 
-  EditorView.value = EV
+  const restoredCode = tryRestoreFromHash()
+  const initialCode = restoredCode ?? props.modelValue
+  if (restoredCode !== null) emit('update:modelValue', restoredCode)
 
   view.value = new EV({
     parent: editorContainer.value,
-    state: {
-      doc: props.modelValue,
-      extensions: [
-        javascript({ typescript: true }),
-        oneDark,
-        keymap.of([
-          ...defaultKeymap,
-          indentWithTab,
-          {
-            key: 'Mod-Enter',
-            run: () => {
-              handleRun()
-              return true
-            },
+    doc: initialCode,
+    extensions: [
+      javascript({ typescript: true }),
+      oneDark,
+      keymap.of([
+        ...defaultKeymap,
+        indentWithTab,
+        {
+          key: 'Mod-Enter',
+          run: () => {
+            handleRun()
+            return true
           },
-        ]),
-        EV.updateListener.of((update: any) => {
-          if (update.docChanged) {
-            emit('update:modelValue', update.state.doc.toString())
-          }
-        }),
-      ],
-    },
+        },
+      ]),
+      EV.updateListener.of((update: any) => {
+        if (update.docChanged) {
+          emit('update:modelValue', update.state.doc.toString())
+        }
+      }),
+    ],
   })
 
   editorReady.value = true
 })
 
+onBeforeUnmount(() => {
+  view.value?.destroy()
+})
+
 function handleRun() {
-  if (isRunning.value) return
+  if (props.isRunning) return
   const code = view.value?.state.doc.toString() ?? props.modelValue
   emit('run', code)
 }
@@ -95,8 +94,6 @@ function tryRestoreFromHash(): string | null {
   }
   return null
 }
-
-defineExpose({ tryRestoreFromHash })
 </script>
 
 <template>
@@ -106,8 +103,8 @@ defineExpose({ tryRestoreFromHash })
       <div class="pg-editor-actions">
         <span class="pg-editor-hint">Ctrl+Enter to run</span>
         <button class="pg-btn pg-btn-secondary" @click="share">Share</button>
-        <button class="pg-btn pg-btn-primary" :disabled="isRunning" @click="handleRun">
-          {{ isRunning ? 'Running...' : 'Run' }}
+        <button class="pg-btn pg-btn-primary" :disabled="props.isRunning" @click="handleRun">
+          {{ props.isRunning ? 'Running...' : 'Run' }}
         </button>
       </div>
     </div>
