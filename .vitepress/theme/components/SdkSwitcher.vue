@@ -9,6 +9,33 @@ const props = defineProps<{
 
 const sdkType = useSdkType()
 const open = ref(false)
+const switcherRef = ref<HTMLElement>()
+let originalParent: HTMLElement | null = null
+
+function reposition() {
+  const el = switcherRef.value
+  if (!el) return
+  const isDesktop = window.innerWidth >= 768
+  const menu = document.querySelector('.VPNavBarMenu')
+  if (isDesktop && menu && el.parentElement !== menu) {
+    menu.appendChild(el)
+  } else if (!isDesktop && originalParent && el.parentElement !== originalParent) {
+    originalParent.appendChild(el)
+  }
+}
+
+onMounted(() => {
+  originalParent = switcherRef.value?.parentElement ?? null
+  reposition()
+  window.addEventListener('resize', reposition)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', reposition)
+  if (originalParent && switcherRef.value && !originalParent.contains(switcherRef.value)) {
+    originalParent.appendChild(switcherRef.value)
+  }
+})
 
 const labels = {
   en: {
@@ -62,7 +89,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="sdk-switcher">
+  <div ref="switcherRef" class="sdk-switcher">
     <button
       class="sdk-switcher-trigger"
       :class="{ 'sdk-switcher-trigger--active': open }"

@@ -16,8 +16,15 @@ export default defineConfig({
         nav: [
           { text: 'Guide', link: '/guide/getting-started' },
           { text: 'Examples', link: '/examples/basic' },
-          { text: 'SaaS Platform', link: 'https://topsale.biz/solution/label-printing/' },
-          { text: 'NPM Package', link: 'https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js' },
+          {
+            text: 'SaaS Platform',
+            items: [
+              { text: 'Official Website', link: 'https://topsale.biz/solution/label-printing/' },
+              { text: 'App Store', link: 'https://service.topsale.co.nz/store' },
+              { text: 'Self-Service Portal', link: 'https://service.topsale.co.nz/self-service' },
+              { text: 'TopBridge Download', link: 'https://service.topsale.co.nz/self-service/download/topbridge' },
+            ],
+          },
         ],
         sidebar: {
           '/guide/': [
@@ -82,8 +89,15 @@ export default defineConfig({
         nav: [
           { text: '指南', link: '/zh/guide/getting-started' },
           { text: '示例', link: '/zh/examples/basic' },
-          { text: 'SaaS 平台', link: 'https://topsale.biz/solution/label-printing/' },
-          { text: 'NPM 包', link: 'https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js' },
+          {
+            text: 'SaaS 平台',
+            items: [
+              { text: '官网', link: 'https://topsale.biz/solution/label-printing/' },
+              { text: '自助服务平台', link: 'https://service.topsale.co.nz/self-service' },
+              { text: '购物商店', link: 'https://service.topsale.co.nz/store' },
+              { text: 'TopBridge 下载链接', link: 'https://service.topsale.co.nz/self-service/download/topbridge' },
+            ],
+          },
         ],
         sidebar: {
           '/zh/guide/': [
@@ -143,7 +157,6 @@ export default defineConfig({
   themeConfig: {
     socialLinks: [
       { icon: 'github', link: 'https://github.com/youngming/label-print-topbridge-js-SDK-demo' },
-      { icon: { svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' }, link: 'https://topsale.biz/solution/label-printing/', ariaLabel: 'TopSale' },
     ],
     search: {
       provider: 'local',
