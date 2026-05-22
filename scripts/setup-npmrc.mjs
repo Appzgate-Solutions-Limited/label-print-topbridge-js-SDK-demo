@@ -23,7 +23,7 @@ function getBranch() {
   try {
     return normalizeBranch(execSync('git branch --show-current', { encoding: 'utf8' }))
   } catch {
-    console.warn('[setup-npmrc] 无法检测 git 分支，默认使用 NPM')
+    console.warn('[setup-npmrc] Unable to detect git branch, defaulting to NPM')
     return 'main'
   }
 }
@@ -50,11 +50,13 @@ const existingNpmrc = readExistingNpmrc()
 if (!isDevelop) {
   if (existingNpmrc && isGenerated(existingNpmrc)) {
     unlinkSync(npmrcPath)
-    console.log(`[setup-npmrc] 分支: ${branch} → 删除 .npmrc（走默认 NPM）`)
+    console.log(`[setup-npmrc] branch: ${branch} → removed .npmrc (using default NPM)`)
   } else if (existingNpmrc) {
-    console.warn(`[setup-npmrc] 分支: ${branch} → 保留非本脚本生成的 .npmrc，无法强制切回默认 NPM`)
+    console.warn(
+      `[setup-npmrc] branch: ${branch} → keeping non-generated .npmrc, cannot force default NPM`,
+    )
   } else {
-    console.log(`[setup-npmrc] 分支: ${branch} → 无需 .npmrc（走默认 NPM）`)
+    console.log(`[setup-npmrc] branch: ${branch} → no .npmrc needed (using default NPM)`)
   }
   process.exit(0)
 }
@@ -76,4 +78,4 @@ if (!CODEARTIFACT_REGISTRY) {
 const template = readFileSync(templatePath, 'utf8')
 const content = template.replace(/\{\{REGISTRY_URL\}\}/, CODEARTIFACT_REGISTRY)
 writeFileSync(npmrcPath, content)
-console.log(`[setup-npmrc] 分支: ${branch} → .npmrc 指向 CodeArtifact`)
+console.log(`[setup-npmrc] branch: ${branch} → .npmrc points to CodeArtifact`)

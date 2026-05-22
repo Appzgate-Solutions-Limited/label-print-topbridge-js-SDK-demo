@@ -125,15 +125,26 @@ fi
 ok "Cloudflare Pages project exists: ${PROJECT_NAME}"
 
 BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
-if [[ "$BRANCH" != "main" ]]; then
-  warn "Current branch: $BRANCH (not main). Continue deploy? [y/N]"
-  read -r answer
-  [[ "$answer" =~ ^[yY]$ ]] || { info "Deploy cancelled"; exit 0; }
-fi
 
-if [[ "$BRANCH" == "main" ]] && [[ -f "pnpm-lock.yaml" ]] && grep -q "codeartifact" pnpm-lock.yaml; then
-  error "Lockfile on main branch contains CodeArtifact URLs. Regenerate it (see docs/codeartifact-switching-guide.md)"
-fi
+case "$BRANCH" in
+  main)
+    if [[ -f "pnpm-lock.yaml" ]] && grep -q "codeartifact" pnpm-lock.yaml; then
+      error "Lockfile on main branch contains CodeArtifact URLs. Regenerate it (see docs/archived/codeartifact-switching-guide.md)"
+    fi
+    ok "Branch: main → production deploy"
+    ;;
+  develop)
+    if ! grep -q "codeartifact" ~/.npmrc 2>/dev/null; then
+      error "CodeArtifact token not found in ~/.npmrc. Run: aws codeartifact login --tool npm --repository Label-printing-js-core-prelaunch --domain topsale --domain-owner 533267398655 --region ap-southeast-2"
+    fi
+    ok "Branch: develop → preview deploy (CodeArtifact auth verified)"
+    ;;
+  *)
+    warn "Current branch: $BRANCH (not main/develop). Continue deploy? [y/N]"
+    read -r answer
+    [[ "$answer" =~ ^[yY]$ ]] || { info "Deploy cancelled"; exit 0; }
+    ;;
+esac
 
 info "All preflight checks passed"
 
@@ -157,7 +168,12 @@ FILE_COUNT=$(find "$DIST_DIR" -type f | wc -l | tr -d ' ')
 ok "Build complete: $FILE_COUNT files in $DIST_DIR"
 
 # ── Deploy ────────────────────────────────────────────────
-info "Deploying to Cloudflare Pages (project: ${PROJECT_NAME})..."
-pnpm exec wrangler pages deploy "$DIST_DIR" --project-name "$PROJECT_NAME"
+DEPLOY_BRANCH_FLAG=""
+if [[ "$BRANCH" != "main" ]]; then
+  DEPLOY_BRANCH_FLAG="--branch=$BRANCH"
+fi
 
-ok "Deploy complete!"
+info "Deploying to Cloudflare Pages (project: ${PROJECT_NAME}${DEPLOY_BRANCH_FLAG:+, branch: $BRANCH})..."
+pnpm exec wrangler pages deploy "$DIST_DIR" --project-name "$PROJECT_NAME" $DEPLOY_BRANCH_FLAG
+
+ok "Deploy complete!${DEPLOY_BRANCH_FLAG:+ (preview: $BRANCH)}"
