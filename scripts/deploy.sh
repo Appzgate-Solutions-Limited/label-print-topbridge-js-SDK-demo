@@ -133,7 +133,13 @@ ok "Cloudflare Pages 项目存在: ${PROJECT_NAME}"
 # 检查当前分支
 BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 if [[ "$BRANCH" != "main" ]]; then
-  warn "当前分支: $BRANCH（非 main），确认要继续部署？"
+  warn "当前分支: $BRANCH（非 main），确认要继续部署？ [y/N]"
+  read -r answer
+  [[ "$answer" =~ ^[yY]$ ]] || { info "部署已取消"; exit 0; }
+fi
+
+if [[ "$BRANCH" == "main" ]] && [[ -f "pnpm-lock.yaml" ]] && grep -q "codeartifact" pnpm-lock.yaml; then
+  error "main 分支的 lockfile 包含 CodeArtifact URL，请重新生成（参考 docs/codeartifact-switching-guide.md）"
 fi
 
 info "预检查全部通过"
