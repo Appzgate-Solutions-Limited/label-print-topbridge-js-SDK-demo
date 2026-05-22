@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import BasicForm from './forms/BasicForm.vue'
-import MultiProductForm from './forms/MultiProductForm.vue'
-import ErrorHandlingForm from './forms/ErrorHandlingForm.vue'
-import TemplateSchemaForm from './forms/TemplateSchemaForm.vue'
-import AdvancedForm from './forms/AdvancedForm.vue'
 import type {
   PlaygroundPrinter,
   PlaygroundSchemaField,
   PlaygroundTemplateItem,
 } from '../../composables/usePlayground'
+import AdvancedForm from './forms/AdvancedForm.vue'
+import BasicForm from './forms/BasicForm.vue'
+import ErrorHandlingForm from './forms/ErrorHandlingForm.vue'
+import MultiProductForm from './forms/MultiProductForm.vue'
+import TemplateSchemaForm from './forms/TemplateSchemaForm.vue'
 
 defineProps<{
   template: string
@@ -88,7 +88,6 @@ const PREFLIGHT_TEMPLATES = ['basic', 'multi-product', 'preflight-only', 'advanc
 </template>
 
 <style scoped>
-@import './forms/form-styles.css';
 .pg-form {
   display: flex;
   flex-direction: column;

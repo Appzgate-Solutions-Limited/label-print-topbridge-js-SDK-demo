@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch } from 'vue'
 import type {
   PlaygroundPrinter,
   PlaygroundSchemaField,
   PlaygroundTemplateItem,
-} from '../../composables/usePlayground'
+} from '../../../composables/usePlayground'
 
 const props = defineProps<{
   isLoading: boolean
@@ -23,7 +23,6 @@ const selectedPrinter = ref('')
 const schemaFormData = ref<
   Record<string, string | number | { value: string | number; currency?: string; unit?: string }>
 >({})
-const visibleSchemaFields = computed(() => props.schemaFields)
 
 watch(
   () => props.templates,
@@ -60,7 +59,7 @@ function emitPrint() {
   emit('print', {
     template: selectedTemplate.value,
     printer: selectedPrinter.value,
-    rawProducts: [schemaFormData.value],
+    products: [schemaFormData.value],
   })
 }
 
@@ -120,9 +119,9 @@ function querySchema() {
       </select>
     </div>
   </div>
-  <div v-if="visibleSchemaFields.length" class="pg-form-section">
+  <div v-if="schemaFields.length" class="pg-form-section">
     <div class="pg-form-title">3. Dynamic Form</div>
-    <template v-for="field in visibleSchemaFields" :key="field.name">
+    <template v-for="field in schemaFields" :key="field.name">
       <div v-if="field.type !== 'line'" class="pg-form-row">
         <label>{{ field.name }}<span v-if="field.required" class="pg-required">*</span></label>
         <template v-if="field.type === 'price'">
@@ -158,5 +157,3 @@ function querySchema() {
     </div>
   </div>
 </template>
-
-<style scoped src="./form-styles.css"></style>

@@ -1,24 +1,33 @@
-import { ref, shallowRef } from 'vue'
 import type {
   SyncedPrinter,
   TemplateFieldSchema,
   TemplateItem,
 } from '@appzgatenz/label-print-topbridge-js'
 import {
-  TopBridgeClient,
-  TopBridgeConnectionError,
   TopBridgeAuthError,
-  TopBridgeQuotaError,
-  TopBridgePrintError,
-  TopBridgeValidationError,
-  TopBridgePrinterError,
-  TopBridgeTemplateError,
-  TopBridgeNetworkError,
-  TopBridgeSourceError,
+  TopBridgeClient,
   TopBridgeConfigError,
+  TopBridgeConnectionError,
   TopBridgeError,
+  TopBridgeNetworkError,
+  TopBridgePrintError,
+  TopBridgePrinterError,
+  TopBridgeQuotaError,
+  TopBridgeSourceError,
+  TopBridgeTemplateError,
+  TopBridgeValidationError,
 } from '@appzgatenz/label-print-topbridge-js'
 import { transform } from 'sucrase'
+import { ref, shallowRef } from 'vue'
+
+/**
+ * 错误传播约定:
+ * - runPreflight / runHealthCheck:catch 后 addLog 再 throw,允许调用方根据成功/失败做后续编排
+ *   (例如 preflightDone 状态切换、advanced-form 自动 querySchema)
+ * - print / fetchTemplates / querySchema / runErrorTest / executeUserCode:
+ *   内部 catch 后仅 addLog,**永不向外抛**——这些函数的语义是"日志面板自洽展示",
+ *   调用方不需要也不应该 try/catch 它们
+ */
 
 export type PlaygroundPrinter = SyncedPrinter
 export type PlaygroundTemplateItem = TemplateItem
@@ -74,14 +83,11 @@ export function usePlayground() {
   const schemaFields = ref<PlaygroundSchemaField[]>([])
 
   function addLog(message: string, type: LogEntry['type'] = 'info') {
-    logs.value = [
-      ...logs.value,
-      {
-        time: new Date().toLocaleTimeString(),
-        message,
-        type,
-      },
-    ]
+    logs.value.push({
+      time: new Date().toLocaleTimeString(),
+      message,
+      type,
+    })
   }
 
   function clearLogs() {

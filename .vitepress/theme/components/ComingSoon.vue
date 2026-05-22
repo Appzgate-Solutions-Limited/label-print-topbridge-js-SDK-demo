@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import type { SdkType } from '../composables/useSdkType'
-import { switchToCore } from '../composables/useSdkType'
-import { sdkNames, comingSoon } from '../locales'
 import { computed } from 'vue'
+import type { SdkType } from '../composables/useSdkType'
+import { useSdkType } from '../composables/useSdkType'
+import { comingSoon, sdkNames } from '../locales'
 
 const props = defineProps<{
   sdkType: SdkType
   locale: 'en' | 'zh'
 }>()
+
+const { switchSdkType } = useSdkType()
 
 const i18n = computed(() => {
   const l = comingSoon[props.locale]
@@ -19,6 +21,10 @@ const i18n = computed(() => {
     cta: l.cta,
   }
 })
+
+function backToCore() {
+  switchSdkType('js-core')
+}
 </script>
 
 <template>
@@ -27,11 +33,11 @@ const i18n = computed(() => {
       <div class="coming-soon-icon">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       </div>
-      <h2 class="coming-soon-title">{{ i18n[locale].title }}</h2>
-      <span class="coming-soon-badge">{{ i18n[locale].badge }}</span>
-      <p class="coming-soon-desc">{{ i18n[locale].desc }}</p>
-      <button class="coming-soon-cta" @click="switchToCore">
-        {{ i18n[locale].cta }}
+      <h2 class="coming-soon-title">{{ i18n.title }}</h2>
+      <span class="coming-soon-badge">{{ i18n.badge }}</span>
+      <p class="coming-soon-desc">{{ i18n.desc }}</p>
+      <button class="coming-soon-cta" @click="backToCore">
+        {{ i18n.cta }}
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       </button>
     </div>

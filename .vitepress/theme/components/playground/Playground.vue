@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { usePlayground } from '../../composables/usePlayground'
 import { codeTemplates } from './codeTemplates'
 import PlaygroundEditor from './PlaygroundEditor.vue'
@@ -114,3 +114,6 @@ async function handlePreflight() {
   color: var(--vp-c-text-1);
 }
 </style>
+
+<!-- 表单样式以非 scoped 形式在 Playground 顶层加载一次,避免 5 个 forms 子组件各自 scoped 复制 -->
+<style src="./forms/form-styles.css"></style>

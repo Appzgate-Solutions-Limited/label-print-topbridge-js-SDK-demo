@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { PlaygroundPrinter, PlaygroundTemplateItem } from '../../composables/usePlayground'
+import type { PlaygroundPrinter, PlaygroundTemplateItem } from '../../../composables/usePlayground'
 
 const props = defineProps<{
   isLoading: boolean
@@ -55,7 +55,7 @@ function emitPrint() {
       price: parseFloat(productPrice.value),
       currency: productCurrency.value,
       unit: productUnit.value,
-      copies: parseInt(productCopies.value) || 1,
+      copies: Number.parseInt(productCopies.value, 10) || 1,
     },
     ...extraProducts.value
       .filter((p) => p.name)
@@ -64,7 +64,7 @@ function emitPrint() {
         price: parseFloat(p.price),
         currency: p.currency,
         unit: p.unit,
-        copies: parseInt(p.copies) || 1,
+        copies: Number.parseInt(p.copies, 10) || 1,
       })),
   ]
   emit('print', {
@@ -113,5 +113,3 @@ function emitPrint() {
     </button>
   </div>
 </template>
-
-<style scoped src="./form-styles.css"></style>

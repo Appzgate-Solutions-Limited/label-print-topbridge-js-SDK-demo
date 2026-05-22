@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { PlaygroundTemplateItem } from '../../composables/usePlayground'
+import type { PlaygroundTemplateItem } from '../../../composables/usePlayground'
 
 const props = defineProps<{
   isLoading: boolean
@@ -47,5 +47,3 @@ function querySchema() {
     </div>
   </div>
 </template>
-
-<style scoped src="./form-styles.css"></style>

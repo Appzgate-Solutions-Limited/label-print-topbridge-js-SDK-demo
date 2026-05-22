@@ -82,8 +82,8 @@ const saasNavItems = {
   ],
   zh: [
     { text: '官网', link: 'https://topsale.biz/solution/label-printing/' },
-    { text: '自助服务平台', link: 'https://service.topsale.co.nz/self-service' },
     { text: '购物商店', link: 'https://service.topsale.co.nz/store' },
+    { text: '自助服务平台', link: 'https://service.topsale.co.nz/self-service' },
     {
       text: 'TopBridge 下载链接',
       link: 'https://service.topsale.co.nz/self-service/download/topbridge',

@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import { VPLink } from 'vitepress/theme'
 import { computed } from 'vue'
-import InstallCommand from './InstallCommand.vue'
 import type { SdkType } from '../composables/useSdkType'
-import { switchToCore } from '../composables/useSdkType'
+import { useSdkType } from '../composables/useSdkType'
 import { heroMeta } from '../locales'
+import InstallCommand from './InstallCommand.vue'
 
 const props = defineProps<{
   locale: 'en' | 'zh'
   sdkType: SdkType
 }>()
 
+const { switchSdkType } = useSdkType()
+
 const meta = computed(() => heroMeta[props.sdkType][props.locale])
+
+function backToCore() {
+  switchSdkType('js-core')
+}
 </script>
 
 <template>
@@ -71,7 +77,7 @@ const meta = computed(() => heroMeta[props.sdkType][props.locale])
 
       <!-- Next.js / React: single back button -->
       <div v-else class="tb-hero-actions tb-animate">
-        <button class="tb-btn tb-btn--outline" @click="switchToCore">
+        <button class="tb-btn tb-btn--outline" @click="backToCore">
           {{ meta.cta1 }}
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tb-btn-arrow"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         </button>
