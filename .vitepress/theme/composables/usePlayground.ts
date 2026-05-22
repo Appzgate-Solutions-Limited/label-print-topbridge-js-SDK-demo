@@ -19,6 +19,9 @@ import {
 } from '@appzgatenz/label-print-topbridge-js'
 import { transform } from 'sucrase'
 import { ref, shallowRef } from 'vue'
+import type { CapturedRequest } from './devTransport'
+import { DevTransport } from './devTransport'
+import { useDevMode } from './useDevMode'
 
 /**
  * 错误传播约定:
@@ -37,21 +40,7 @@ export interface LogEntry {
   time: string
   message: string
   type: 'info' | 'success' | 'error'
-}
-
-const sdkExports = {
-  TopBridgeClient,
-  TopBridgeConnectionError,
-  TopBridgeAuthError,
-  TopBridgeQuotaError,
-  TopBridgePrintError,
-  TopBridgeValidationError,
-  TopBridgePrinterError,
-  TopBridgeTemplateError,
-  TopBridgeNetworkError,
-  TopBridgeSourceError,
-  TopBridgeConfigError,
-  TopBridgeError,
+  data?: { title: string; content: string }
 }
 
 const ERROR_CONSTRUCTORS: Record<string, () => Error> = {
@@ -75,18 +64,21 @@ const ERROR_CONSTRUCTORS: Record<string, () => Error> = {
 }
 
 export function usePlayground() {
+  const { isDevMode } = useDevMode()
   const client = shallowRef<TopBridgeClient | null>(null)
+  let clientIsDevMode: boolean | null = null
   const logs = ref<LogEntry[]>([])
   const isLoading = ref(false)
   const printers = ref<PlaygroundPrinter[]>([])
   const templates = ref<PlaygroundTemplateItem[]>([])
   const schemaFields = ref<PlaygroundSchemaField[]>([])
 
-  function addLog(message: string, type: LogEntry['type'] = 'info') {
+  function addLog(message: string, type: LogEntry['type'] = 'info', data?: LogEntry['data']) {
     logs.value.push({
       time: new Date().toLocaleTimeString(),
       message,
       type,
+      data,
     })
   }
 
@@ -94,9 +86,22 @@ export function usePlayground() {
     logs.value = []
   }
 
+  function onTransportRequest(request: CapturedRequest) {
+    addLog(`→ Transport: ${request.action}`, 'info', {
+      title: `Transport Request: ${request.action}`,
+      content: JSON.stringify(request, null, 2),
+    })
+  }
+
   function ensureClient() {
-    if (!client.value) {
-      client.value = new TopBridgeClient({ debug: true })
+    const devMode = isDevMode.value
+    if (!client.value || clientIsDevMode !== devMode) {
+      if (devMode) {
+        client.value = new TopBridgeClient({ transport: new DevTransport(onTransportRequest) })
+      } else {
+        client.value = new TopBridgeClient({ debug: true })
+      }
+      clientIsDevMode = devMode
     }
     return client.value
   }
@@ -113,6 +118,29 @@ export function usePlayground() {
   async function runPreflight() {
     return withLoading(async () => {
       try {
+        if (isDevMode.value) {
+          addLog('⚡ [Dev Mode] Skipping preflight — injecting mock data', 'info')
+          printers.value = [{ name: 'Mock Printer', isDefault: true, protocol: 'TSPL' }]
+          templates.value = [
+            { id: '1', name: 'Price Label', code: 'PRICE_LABEL', isEnabled: true },
+            { id: '2', name: 'Product Tag', code: 'PRODUCT_TAG', isEnabled: true },
+          ]
+          addLog('✓ Preflight passed (mock)', 'success')
+          addLog('  Printers: 1, default: Mock Printer')
+          addLog('  Templates: 2 available')
+          return {
+            health: {
+              status: 'ok' as const,
+              type: 'pong' as const,
+              isRunning: true as const,
+              data: { isLoggedIn: true, version: '0.0.0-dev' },
+              message: 'OK',
+            },
+            benefits: { status: 'ok' as const, data: { isValid: true }, message: 'OK' },
+            printers: { status: 'ok' as const, data: printers.value, message: 'OK' },
+          }
+        }
+
         const c = ensureClient()
         const result = await c.launch.ensureRunning(
           () =>
@@ -162,6 +190,12 @@ export function usePlayground() {
   async function print(params: any) {
     return withLoading(async () => {
       try {
+        if (isDevMode.value) {
+          addLog('⚡ [Dev Mode] SDK Params:', 'info', {
+            title: 'SDK Params',
+            content: JSON.stringify(params, null, 2),
+          })
+        }
         const result = await ensureClient().print.execute(params)
         addLog('✓ Print successful', 'success')
         addLog(`  Copies: ${result.data.printedCopies}`)
@@ -267,8 +301,10 @@ export function usePlayground() {
         const stripped = stripSdkImports(code)
         const js = transform(stripped, { transforms: ['typescript'] }).code
 
-        const paramNames = Object.keys(sdkExports)
-        const paramValues = Object.values(sdkExports)
+        const devMode = isDevMode.value
+        const exports = devMode ? buildDevSdkExports() : buildRealSdkExports()
+        const paramNames = Object.keys(exports)
+        const paramValues = Object.values(exports)
 
         const customConsole = {
           log: (...args: any[]) => addLog(args.map(String).join(' ')),
@@ -283,6 +319,34 @@ export function usePlayground() {
         addLog(`✗ Execution error: ${err.message}`, 'error')
       }
     })
+  }
+
+  function buildRealSdkExports() {
+    return {
+      TopBridgeClient,
+      TopBridgeConnectionError,
+      TopBridgeAuthError,
+      TopBridgeQuotaError,
+      TopBridgePrintError,
+      TopBridgeValidationError,
+      TopBridgePrinterError,
+      TopBridgeTemplateError,
+      TopBridgeNetworkError,
+      TopBridgeSourceError,
+      TopBridgeConfigError,
+      TopBridgeError,
+    }
+  }
+
+  function buildDevSdkExports() {
+    return {
+      ...buildRealSdkExports(),
+      TopBridgeClient: class extends TopBridgeClient {
+        constructor(config?: any) {
+          super({ ...config, transport: new DevTransport(onTransportRequest) })
+        }
+      },
+    }
   }
 
   function stripSdkImports(code: string) {

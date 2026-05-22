@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { useData } from 'vitepress'
 import { computed, ref } from 'vue'
+import { useDevMode } from '../../composables/useDevMode'
 import { usePlayground } from '../../composables/usePlayground'
 import { codeTemplates } from './codeTemplates'
+import DevModeBadge from './DevModeBadge.vue'
 import PlaygroundEditor from './PlaygroundEditor.vue'
 import PlaygroundForm from './PlaygroundForm.vue'
 import PlaygroundOutput from './PlaygroundOutput.vue'
 import SdkVersionBadge from './SdkVersionBadge.vue'
 
 const { lang } = useData()
+const { isDevMode } = useDevMode()
 const locale = computed(() => (lang.value === 'zh-CN' ? ('zh' as const) : ('en' as const)))
 
 const props = defineProps<{
@@ -58,7 +61,10 @@ async function handlePreflight() {
 <template>
   <div class="pg-container">
     <div class="pg-toolbar">
-      <SdkVersionBadge :locale="locale" />
+      <div class="pg-toolbar-left">
+        <SdkVersionBadge :locale="locale" />
+        <span v-if="isDevMode" class="pg-dev-indicator">DEV</span>
+      </div>
       <button class="pg-toggle-btn" @click="toggleMode">
         {{ isAdvancedMode ? '← Form Mode' : 'Advanced Mode →' }}
       </button>
@@ -91,6 +97,8 @@ async function handlePreflight() {
       :logs="logs"
       @clear="clearLogs"
     />
+
+    <DevModeBadge />
   </div>
 </template>
 
@@ -105,6 +113,22 @@ async function handlePreflight() {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.pg-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pg-dev-indicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: #f59e0b;
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
 }
 .pg-toggle-btn {
   padding: 4px 12px;

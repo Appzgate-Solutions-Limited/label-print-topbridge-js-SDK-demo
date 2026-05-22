@@ -3,6 +3,7 @@ import DefaultTheme from 'vitepress/theme'
 import HomePage from './components/HomePage.vue'
 import Playground from './components/playground/Playground.vue'
 import Layout from './Layout.vue'
+import './composables/useDevMode'
 import './styles/variables.css'
 import './styles/animations.css'
 

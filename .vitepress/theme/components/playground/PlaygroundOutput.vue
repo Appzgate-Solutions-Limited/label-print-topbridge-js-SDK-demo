@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
-import type { LogEntry } from '../composables/usePlayground'
+import type { LogEntry } from '../../composables/usePlayground'
 
 const props = defineProps<{
   logs: LogEntry[]
@@ -37,10 +37,20 @@ function typeClass(type: LogEntry['type']) {
       <div v-if="logs.length === 0" class="pg-output-empty">
         Run an action to see output...
       </div>
-      <div v-for="(entry, i) in logs" :key="i" :class="['pg-log-line', typeClass(entry.type)]">
-        <span class="pg-log-time">[{{ entry.time }}]</span>
-        {{ entry.message }}
-      </div>
+      <template v-for="(entry, i) in logs" :key="i">
+        <div v-if="entry.data" :class="['pg-log-line', typeClass(entry.type)]">
+          <span class="pg-log-time">[{{ entry.time }}]</span>
+          {{ entry.message }}
+          <details class="pg-dev-details">
+            <summary>{{ entry.data.title }}</summary>
+            <pre class="pg-dev-json">{{ entry.data.content }}</pre>
+          </details>
+        </div>
+        <div v-else :class="['pg-log-line', typeClass(entry.type)]">
+          <span class="pg-log-time">[{{ entry.time }}]</span>
+          {{ entry.message }}
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -100,5 +110,30 @@ function typeClass(type: LogEntry['type']) {
 }
 .pg-btn-sm:hover {
   background: var(--vp-c-bg-soft);
+}
+.pg-dev-details {
+  margin-top: 4px;
+  margin-left: 8px;
+}
+.pg-dev-details summary {
+  cursor: pointer;
+  color: #f59e0b;
+  font-size: 12px;
+  user-select: none;
+}
+.pg-dev-details summary:hover {
+  color: #fbbf24;
+}
+.pg-dev-json {
+  margin-top: 4px;
+  padding: 8px;
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 2px solid #f59e0b;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: #d4d4d4;
 }
 </style>
