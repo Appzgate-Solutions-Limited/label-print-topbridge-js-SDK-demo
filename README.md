@@ -73,6 +73,37 @@ See the [full documentation](https://label-printing.topsale.biz/) for API refere
 
 ---
 
+## Development
+
+This repository hosts the documentation and interactive demo site. To run it locally:
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) >= 22
+- [pnpm](https://pnpm.io/) 10.33.4 (see `packageManager` in `package.json`)
+
+### Setup
+
+```bash
+# Install dependencies
+pnpm install
+```
+
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start local dev server (`http://localhost:5173`) |
+| `pnpm build` | Build for production (outputs to `.vitepress/dist`) |
+| `pnpm preview` | Preview the production build locally |
+| `pnpm deploy` | Deploy to Cloudflare Pages |
+| `pnpm deploy:dry` | Run deploy pre-checks without uploading |
+| `pnpm format` | Format code with Biome |
+| `pnpm lint` | Lint code with Biome |
+| `pnpm check` | Run Biome format + lint checks |
+
+---
+
 ## Resources
 
 - [SDK Source Code](https://github.com/topsale/label-print-topbridge-js) — GitHub repository
