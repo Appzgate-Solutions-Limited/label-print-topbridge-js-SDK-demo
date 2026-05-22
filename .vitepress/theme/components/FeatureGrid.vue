@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import FeatureCard from './FeatureCard.vue'
 import { useScrollReveal } from '../composables/useScrollReveal'
 import { features } from '../locales'
+import FeatureCard from './FeatureCard.vue'
 
 defineProps<{
   locale: 'en' | 'zh'

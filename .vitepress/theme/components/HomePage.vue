@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import HeroSection from './HeroSection.vue'
-import FeatureGrid from './FeatureGrid.vue'
-import AnimatedBackground from './AnimatedBackground.vue'
-import { useSdkType } from '../composables/useSdkType'
+import { onMounted, ref } from 'vue'
 import { useReducedMotion } from '../composables/useReducedMotion'
+import { useSdkType } from '../composables/useSdkType'
+import AnimatedBackground from './AnimatedBackground.vue'
+import FeatureGrid from './FeatureGrid.vue'
+import HeroSection from './HeroSection.vue'
 
 const props = defineProps<{
   lang?: 'en' | 'zh'

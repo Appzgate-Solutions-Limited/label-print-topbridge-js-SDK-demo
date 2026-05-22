@@ -1,4 +1,4 @@
-import { ref, onMounted, onBeforeUnmount, type Ref } from 'vue'
+import { onBeforeUnmount, onMounted, type Ref, ref } from 'vue'
 
 export function useScrollReveal(containerRef: Ref<HTMLElement | null>) {
   let observer: IntersectionObserver | null = null

@@ -1,8 +1,8 @@
 /* Geist — Vercel 的几何技术感字体 */
 @font-face {
-  font-family: 'Geist';
-  src: url('https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/Geist-Variable.woff2')
-    format('woff2');
+  font-family: "Geist";
+  src: url("https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/Geist-Variable.woff2")
+    format("woff2");
   font-weight: 100 900;
   font-display: swap;
   unicode-range: U+0020-007E;
@@ -16,7 +16,7 @@
   --vp-c-brand-soft: hsla(168, 72%, 40%, 0.12);
 
   /* TopBridge 设计令牌 */
-  --tb-font-display: 'Geist', system-ui, -apple-system, sans-serif;
+  --tb-font-display: "Geist", system-ui, -apple-system, sans-serif;
   --tb-accent: hsl(36, 92%, 50%);
   --tb-accent-soft: hsla(36, 92%, 50%, 0.12);
 

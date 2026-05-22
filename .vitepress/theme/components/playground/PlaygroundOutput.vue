@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import type { LogEntry } from '../composables/usePlayground'
 
 const props = defineProps<{
@@ -8,12 +8,15 @@ const props = defineProps<{
 
 const container = ref<HTMLElement>()
 
-watch(() => props.logs.length, async () => {
-  await nextTick()
-  if (container.value) {
-    container.value.scrollTop = container.value.scrollHeight
-  }
-})
+watch(
+  () => props.logs.length,
+  async () => {
+    await nextTick()
+    if (container.value) {
+      container.value.scrollTop = container.value.scrollHeight
+    }
+  },
+)
 
 function typeClass(type: LogEntry['type']) {
   return {

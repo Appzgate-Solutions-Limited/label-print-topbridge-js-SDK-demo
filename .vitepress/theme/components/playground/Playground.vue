@@ -1,10 +1,15 @@
 <script setup lang="ts">
+import { useData } from 'vitepress'
 import { computed, ref } from 'vue'
 import { usePlayground } from '../../composables/usePlayground'
 import { codeTemplates } from './codeTemplates'
 import PlaygroundEditor from './PlaygroundEditor.vue'
 import PlaygroundForm from './PlaygroundForm.vue'
 import PlaygroundOutput from './PlaygroundOutput.vue'
+import SdkVersionBadge from './SdkVersionBadge.vue'
+
+const { lang } = useData()
+const locale = computed(() => (lang.value === 'zh-CN' ? ('zh' as const) : ('en' as const)))
 
 const props = defineProps<{
   template: string
@@ -53,6 +58,7 @@ async function handlePreflight() {
 <template>
   <div class="pg-container">
     <div class="pg-toolbar">
+      <SdkVersionBadge :locale="locale" />
       <button class="pg-toggle-btn" @click="toggleMode">
         {{ isAdvancedMode ? '← Form Mode' : 'Advanced Mode →' }}
       </button>
@@ -97,7 +103,8 @@ async function handlePreflight() {
 }
 .pg-toolbar {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
 }
 .pg-toggle-btn {
   padding: 4px 12px;

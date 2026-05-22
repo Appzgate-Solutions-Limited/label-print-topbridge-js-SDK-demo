@@ -167,3 +167,8 @@ export const switcherBadges: Record<Locale, string> = {
   en: 'Soon',
   zh: '即将支持',
 }
+
+export const sdkVersionLabels: Record<Locale, { label: string; source: string }> = {
+  en: { label: 'SDK', source: 'Source' },
+  zh: { label: 'SDK', source: '来源' },
+}

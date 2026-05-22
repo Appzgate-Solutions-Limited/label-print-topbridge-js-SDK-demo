@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import DefaultTheme from 'vitepress/theme'
-import SdkSwitcher from './components/SdkSwitcher.vue'
-import ComingSoonOverlay from './components/ComingSoonOverlay.vue'
-import { provideSdkType } from './composables/useSdkType'
 import { useData } from 'vitepress'
+import DefaultTheme from 'vitepress/theme'
 import { computed } from 'vue'
+import ComingSoonOverlay from './components/ComingSoonOverlay.vue'
+import SdkSwitcher from './components/SdkSwitcher.vue'
+import { provideSdkType } from './composables/useSdkType'
 
 const { Layout } = DefaultTheme
 const { lang } = useData()

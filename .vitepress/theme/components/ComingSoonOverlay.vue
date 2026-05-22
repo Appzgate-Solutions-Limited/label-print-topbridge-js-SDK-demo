@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useRoute } from 'vitepress'
-import ComingSoon from './ComingSoon.vue'
+import { computed } from 'vue'
 import type { SdkType } from '../composables/useSdkType'
+import ComingSoon from './ComingSoon.vue'
 
 const props = defineProps<{
   sdkType: SdkType

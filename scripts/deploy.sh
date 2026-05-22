@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# 加载 .env（develop 分支需要 CODEARTIFACT_REGISTRY_URL）
+if [[ -f ".env" ]]; then
+  set -a; source .env; set +a
+fi
+
 # Cloudflare Pages deploy script (Direct Upload)
 # Usage:
 #   bash scripts/deploy.sh          # full deploy
 #   bash scripts/deploy.sh --dry-run # preflight only
 #   bash scripts/deploy.sh --help    # show help
 
-PROJECT_NAME="${CF_PROJECT_NAME:-label-print-topbridge-sdk-demo}"
+PROJECT_NAME="${CF_PROJECT_NAME:-topbridge-js-sdk-docs}"
 DIST_DIR=".vitepress/dist"
 MIN_NODE_MAJOR=22
 
@@ -30,7 +35,7 @@ Options:
   --help     Show this help
 
 Environment variables:
-  CF_PROJECT_NAME  Cloudflare Pages project name, default label-print-topbridge-sdk-demo
+  CF_PROJECT_NAME  Cloudflare Pages project name, default topbridge-js-sdk-docs
 EOF
 }
 
@@ -120,7 +125,7 @@ if ! PROJECT_STATUS=$(printf '%s' "$PROJECTS_JSON" | project_status "$PROJECT_NA
 fi
 
 if [[ "$PROJECT_STATUS" != "found" ]]; then
-  error "Cloudflare Pages project not found: ${PROJECT_NAME}. Create it first: pnpm exec wrangler pages project create ${PROJECT_NAME} --production-branch=main"
+  error "Cloudflare Pages project '${PROJECT_NAME}' not found. Create once (from any branch):\n  pnpm exec wrangler pages project create ${PROJECT_NAME} --production-branch=main"
 fi
 ok "Cloudflare Pages project exists: ${PROJECT_NAME}"
 

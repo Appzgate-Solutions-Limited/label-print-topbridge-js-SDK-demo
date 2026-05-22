@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useSdkType } from '../composables/useSdkType'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import type { SdkType } from '../composables/useSdkType'
-import { switcherLabels, switcherBadges } from '../locales'
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useSdkType } from '../composables/useSdkType'
+import { switcherBadges, switcherLabels } from '../locales'
 
 const props = defineProps<{
   locale: 'en' | 'zh'

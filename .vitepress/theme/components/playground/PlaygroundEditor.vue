@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onBeforeUnmount, onMounted, shallowRef } from 'vue'
 import LZString from 'lz-string'
+import { onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 
 const props = defineProps<{
   modelValue: string
@@ -9,7 +9,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
-  'run': [code: string]
+  run: [code: string]
 }>()
 
 const editorContainer = ref<HTMLElement>()

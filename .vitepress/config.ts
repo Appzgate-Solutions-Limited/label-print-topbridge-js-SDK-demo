@@ -1,4 +1,34 @@
+import { execSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vitepress'
+
+function detectBranch(): string {
+  const keys = ['TOPBRIDGE_SDK_SOURCE_BRANCH', 'CF_PAGES_BRANCH', 'GITHUB_REF_NAME']
+  for (const key of keys) {
+    const v = (process.env[key] ?? '')
+      .trim()
+      .replace(/^refs\/heads\//, '')
+      .replace(/^origin\//, '')
+    if (v) return v
+  }
+  try {
+    return execSync('git branch --show-current', { encoding: 'utf8' }).trim()
+  } catch {
+    return 'main'
+  }
+}
+
+let sdkVersion = ''
+let sdkSource = 'unknown'
+try {
+  const pkg = JSON.parse(
+    readFileSync('node_modules/@appzgatenz/label-print-topbridge-js/package.json', 'utf8'),
+  )
+  sdkVersion = pkg.version ?? ''
+  sdkSource = detectBranch() === 'develop' ? 'CodeArtifact' : 'npm'
+} catch {
+  // 包未安装，组件降级为不渲染
+}
 
 type SidebarGroup = { text: string; items: { text: string; link: string }[] }
 
@@ -132,6 +162,12 @@ export default defineConfig({
           '/zh/examples/': buildExampleSidebar('zh', '/zh/examples/'),
         },
       },
+    },
+  },
+  vite: {
+    define: {
+      __SDK_VERSION__: JSON.stringify(sdkVersion),
+      __SDK_SOURCE__: JSON.stringify(sdkSource),
     },
   },
   base: '/',
