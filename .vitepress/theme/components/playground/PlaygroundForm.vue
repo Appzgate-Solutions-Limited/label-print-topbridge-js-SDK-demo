@@ -46,7 +46,7 @@ const PREFLIGHT_TEMPLATES = ['basic', 'multi-product', 'preflight-only', 'advanc
     </div>
 
     <BasicForm
-      v-if="template === 'basic' && preflightDone"
+      v-if="template === 'basic'"
       :is-loading="isLoading"
       :templates="templates"
       :printers="printers"
@@ -54,7 +54,7 @@ const PREFLIGHT_TEMPLATES = ['basic', 'multi-product', 'preflight-only', 'advanc
     />
 
     <MultiProductForm
-      v-if="template === 'multi-product' && preflightDone"
+      v-if="template === 'multi-product'"
       :is-loading="isLoading"
       :templates="templates"
       :printers="printers"
@@ -76,7 +76,7 @@ const PREFLIGHT_TEMPLATES = ['basic', 'multi-product', 'preflight-only', 'advanc
     />
 
     <AdvancedForm
-      v-if="template === 'advanced-form' && preflightDone"
+      v-if="template === 'advanced-form'"
       :is-loading="isLoading"
       :templates="templates"
       :printers="printers"

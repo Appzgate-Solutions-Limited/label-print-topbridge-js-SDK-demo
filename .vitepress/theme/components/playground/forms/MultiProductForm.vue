@@ -12,7 +12,7 @@ const emit = defineEmits<{
   print: [params: any]
 }>()
 
-const selectedTemplate = ref('')
+const selectedTemplate = ref('PRICE_LABEL')
 const selectedPrinter = ref('')
 const productName = ref('Test Product')
 const productPrice = ref('3.99')
@@ -68,8 +68,8 @@ function emitPrint() {
       })),
   ]
   emit('print', {
-    template: selectedTemplate.value,
-    printer: selectedPrinter.value,
+    template: selectedTemplate.value.trim(),
+    printer: selectedPrinter.value.trim(),
     products: allProducts,
   })
 }
@@ -98,17 +98,25 @@ function emitPrint() {
   <div class="pg-form-section">
     <div class="pg-form-row">
       <label>Template</label>
-      <select v-model="selectedTemplate">
-        <option value="" disabled>-- select --</option>
-        <option v-for="t in templates" :key="t.code || t.id" :value="t.code || t.id">{{ t.name }}</option>
-      </select>
+      <input v-model="selectedTemplate" type="text" list="multi-template-options">
+      <datalist id="multi-template-options">
+        <option v-for="t in templates" :key="t.code || t.id" :value="t.code || t.id">
+          {{ t.name }}
+        </option>
+      </datalist>
       <label>Printer</label>
-      <select v-model="selectedPrinter">
-        <option value="" disabled>-- select --</option>
-        <option v-for="p in printers" :key="p.name" :value="p.name">{{ p.name }}{{ p.isDefault ? ' (default)' : '' }}</option>
-      </select>
+      <input v-model="selectedPrinter" type="text" list="multi-printer-options">
+      <datalist id="multi-printer-options">
+        <option v-for="p in printers" :key="p.name" :value="p.name">
+          {{ p.name }}{{ p.isDefault ? ' (default)' : '' }}
+        </option>
+      </datalist>
     </div>
-    <button class="pg-btn pg-btn-primary" :disabled="isLoading || !selectedTemplate || !selectedPrinter" @click="emitPrint">
+    <button
+      class="pg-btn pg-btn-primary"
+      :disabled="isLoading || !selectedTemplate.trim() || !selectedPrinter.trim()"
+      @click="emitPrint"
+    >
       {{ isLoading ? 'Printing...' : 'Batch Print' }}
     </button>
   </div>
