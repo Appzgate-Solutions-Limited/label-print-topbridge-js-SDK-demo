@@ -92,7 +92,7 @@ const saasNavItems = {
 }
 
 export default defineConfig({
-  srcExclude: ['AGENTS.md', 'CLAUDE.md'],
+  srcExclude: ['AGENTS.md', 'CLAUDE.md', 'docs/**'],
   head: [
     ['link', { rel: 'preconnect', href: 'https://cdn.jsdelivr.net' }],
     ['link', { rel: 'dns-prefetch', href: 'https://cdn.jsdelivr.net' }],
