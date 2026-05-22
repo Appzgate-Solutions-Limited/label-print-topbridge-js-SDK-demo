@@ -1,4 +1,4 @@
-import { onBeforeUnmount, onMounted, type Ref, ref } from 'vue'
+import { onBeforeUnmount, onMounted, type Ref } from 'vue'
 
 export function useScrollReveal(containerRef: Ref<HTMLElement | null>) {
   let observer: IntersectionObserver | null = null
@@ -19,7 +19,9 @@ export function useScrollReveal(containerRef: Ref<HTMLElement | null>) {
     )
 
     const items = containerRef.value.querySelectorAll('.tb-reveal-item')
-    items.forEach((el) => observer?.observe(el))
+    items.forEach((el) => {
+      observer?.observe(el)
+    })
   })
 
   onBeforeUnmount(() => {
