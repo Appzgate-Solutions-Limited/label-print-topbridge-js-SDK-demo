@@ -45,7 +45,9 @@ watch(
   () => props.schemaFields,
   (fields) => {
     schemaFormData.value = Object.fromEntries(
-      fields.filter((f) => f.type !== 'line').map((f) => [f.name, defaultValueForField(f)]),
+      fields
+        .filter((f) => f.fieldType !== 'line')
+        .map((f) => [f.dataField, defaultValueForField(f)]),
     )
   },
   { immediate: true },
@@ -64,18 +66,18 @@ function emitPrint() {
 }
 
 function defaultValueForField(field: PlaygroundSchemaField) {
-  if (field.type === 'price') {
+  if (field.fieldType === 'price') {
     return { value: toNumberOrFallback(field.default, 1.99), currency: '$', unit: '/ea' }
   }
-  if (field.type === 'weight') {
+  if (field.fieldType === 'weight') {
     return { value: toNumberOrFallback(field.default, 0.5), unit: 'kg' }
   }
-  if (field.type === 'integer') {
-    return toNumberOrFallback(field.default, field.name === 'copies' ? 1 : 0)
+  if (field.fieldType === 'integer') {
+    return toNumberOrFallback(field.default, field.dataField === 'copies' ? 1 : 0)
   }
   return typeof field.default === 'string'
     ? field.default
-    : field.name === 'name'
+    : field.dataField === 'name'
       ? 'Test Product'
       : ''
 }
@@ -121,33 +123,33 @@ function querySchema() {
   </div>
   <div v-if="schemaFields.length" class="pg-form-section">
     <div class="pg-form-title">3. Dynamic Form</div>
-    <template v-for="field in schemaFields" :key="field.name">
-      <div v-if="field.type !== 'line'" class="pg-form-row">
-        <label>{{ field.name }}<span v-if="field.required" class="pg-required">*</span></label>
-        <template v-if="field.type === 'price'">
-          <input type="number" step="0.01" placeholder="value" :value="schemaFormData[field.name]?.value ?? 1.99"
-            @input="updateSchemaField(field.name, { ...schemaFormData[field.name], value: parseNumberInput(($event.target as HTMLInputElement).value) })">
-          <input type="text" placeholder="$" style="width:40px" :value="schemaFormData[field.name]?.currency ?? '$'"
-            @input="updateSchemaField(field.name, { ...schemaFormData[field.name], currency: ($event.target as HTMLInputElement).value })">
-          <input type="text" placeholder="unit" style="width:60px" :value="schemaFormData[field.name]?.unit ?? '/ea'"
-            @input="updateSchemaField(field.name, { ...schemaFormData[field.name], unit: ($event.target as HTMLInputElement).value })">
+    <template v-for="field in schemaFields" :key="field.dataField">
+      <div v-if="field.fieldType !== 'line'" class="pg-form-row">
+        <label>{{ field.dataField }}<span v-if="field.required" class="pg-required">*</span></label>
+        <template v-if="field.fieldType === 'price'">
+          <input type="number" step="0.01" placeholder="value" :value="schemaFormData[field.dataField]?.value ?? 1.99"
+            @input="updateSchemaField(field.dataField, { ...schemaFormData[field.dataField], value: parseNumberInput(($event.target as HTMLInputElement).value) })">
+          <input type="text" placeholder="$" style="width:40px" :value="schemaFormData[field.dataField]?.currency ?? '$'"
+            @input="updateSchemaField(field.dataField, { ...schemaFormData[field.dataField], currency: ($event.target as HTMLInputElement).value })">
+          <input type="text" placeholder="unit" style="width:60px" :value="schemaFormData[field.dataField]?.unit ?? '/ea'"
+            @input="updateSchemaField(field.dataField, { ...schemaFormData[field.dataField], unit: ($event.target as HTMLInputElement).value })">
         </template>
-        <template v-else-if="field.type === 'weight'">
-          <input type="number" step="0.01" placeholder="value" :value="schemaFormData[field.name]?.value ?? 0.5"
-            @input="updateSchemaField(field.name, { ...schemaFormData[field.name], value: parseNumberInput(($event.target as HTMLInputElement).value) })">
-          <input type="text" placeholder="unit" style="width:60px" :value="schemaFormData[field.name]?.unit ?? 'kg'"
-            @input="updateSchemaField(field.name, { ...schemaFormData[field.name], unit: ($event.target as HTMLInputElement).value })">
+        <template v-else-if="field.fieldType === 'weight'">
+          <input type="number" step="0.01" placeholder="value" :value="schemaFormData[field.dataField]?.value ?? 0.5"
+            @input="updateSchemaField(field.dataField, { ...schemaFormData[field.dataField], value: parseNumberInput(($event.target as HTMLInputElement).value) })">
+          <input type="text" placeholder="unit" style="width:60px" :value="schemaFormData[field.dataField]?.unit ?? 'kg'"
+            @input="updateSchemaField(field.dataField, { ...schemaFormData[field.dataField], unit: ($event.target as HTMLInputElement).value })">
         </template>
-        <template v-else-if="field.type === 'integer'">
-          <input type="number" :min="field.name === 'copies' ? 1 : undefined" :max="field.name === 'copies' ? 9999 : undefined"
-            :value="schemaFormData[field.name] ?? field.default ?? (field.name === 'copies' ? 1 : '')"
-            @input="updateSchemaField(field.name, parseIntegerInput(($event.target as HTMLInputElement).value, field.name))">
+        <template v-else-if="field.fieldType === 'integer'">
+          <input type="number" :min="field.dataField === 'copies' ? 1 : undefined" :max="field.dataField === 'copies' ? 9999 : undefined"
+            :value="schemaFormData[field.dataField] ?? field.default ?? (field.dataField === 'copies' ? 1 : '')"
+            @input="updateSchemaField(field.dataField, parseIntegerInput(($event.target as HTMLInputElement).value, field.dataField))">
         </template>
         <template v-else>
-          <input type="text" :value="schemaFormData[field.name] ?? (field.name === 'name' ? 'Test Product' : '')"
-            @input="updateSchemaField(field.name, ($event.target as HTMLInputElement).value)">
+          <input type="text" :value="schemaFormData[field.dataField] ?? (field.dataField === 'name' ? 'Test Product' : '')"
+            @input="updateSchemaField(field.dataField, ($event.target as HTMLInputElement).value)">
         </template>
-        <span class="pg-field-type">{{ field.type }}</span>
+        <span class="pg-field-type">{{ field.fieldType }}</span>
       </div>
     </template>
     <div class="pg-form-row" style="margin-top:8px">

@@ -12,10 +12,15 @@ npm install @appzgatenz/label-print-topbridge-js
 
 ## 前置条件
 
-- **Topbridge App** >= 1.0.45 已安装并运行 — [下载](https://service.topsale.co.nz/self-service/download/topbridge)
-- 浏览器支持 WebSocket（所有现代浏览器）
-- 至少一台已配置协议（TSPL / ZPL）的标签打印机
-- 如使用 `launch.trigger()`，页面 CSP 需允许 `topsale:` 自定义协议 — 详见 [CSP 配置](/zh/guide/csp)
+| # | 条件 | 说明 |
+|---|------|------|
+| 1 | 支持 WebSocket 的现代浏览器 | Chrome 16+, Firefox 11+, Safari 7+, Edge 12+ |
+| 2 | Topbridge App >= 1.0.45 已安装 | [下载](https://service.topsale.co.nz/self-service/download/topbridge) |
+| 3 | Topbridge App 正在运行 | 健康检查返回 `pong` |
+| 4 | 用户已登录 Topbridge App | `data.isLoggedIn === true` |
+| 5 | 打印权益有效 | 权益验证通过 |
+| 6 | 至少一台打印机已配置协议（TSPL/ZPL） | 打印机列表非空 |
+| 7 | CSP 允许 `topsale:` 协议（使用 launch 时） | 详见 [CSP 配置](/zh/guide/csp) |
 
 :::tip 不想写代码？
 试试 [TopSale 标签打印方案](https://topsale.biz/solution/label-printing/)，无需集成即可使用。
@@ -69,7 +74,9 @@ console.log(`已打印 ${result.data.printedCopies} 份`)
 
 ```typescript
 const client = new TopBridgeClient({
-  debug: true,                     // 开启日志
+  source: 'Core-SDK',             // SDK 来源标识
+  debug: true,                     // 开启控制台日志
+  logger: customLogger,            // 自定义日志器实现
   timeouts: {
     health: 3000,                  // 健康检查超时（ms）
     preflight: 10000,              // 预检超时（ms）
@@ -77,6 +84,30 @@ const client = new TopBridgeClient({
   },
 })
 ```
+
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `source` | `'Core-SDK' \| 'React-SDK' \| 'Nextjs-SDK'` | `'Core-SDK'` | SDK 来源标识 |
+| `debug` | `boolean` | `false` | 启用控制台日志（前缀：`[TopBridge]`） |
+| `logger` | `Logger` | 静默（空操作） | 自定义日志器实现 |
+| `timeouts.health` | `number` (ms) | `3000` | 健康检查超时 |
+| `timeouts.preflight` | `number` (ms) | `10000` | 预检 / 模板查询超时 |
+| `timeouts.print` | `number` (ms) | `60000` | 打印执行超时 |
+
+### Logger
+
+你可以提供自定义日志器，对接监控服务（如 Sentry、Datadog）：
+
+```typescript
+interface Logger {
+  debug: (...args: unknown[]) => void
+  info: (...args: unknown[]) => void
+  warn: (...args: unknown[]) => void
+  error: (...args: unknown[]) => void
+}
+```
+
+日志器优先级：自定义 `logger` > `debug: true` 控制台日志 > 静默（默认）。
 
 ## 错误处理
 

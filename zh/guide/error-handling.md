@@ -8,7 +8,7 @@ title: 错误处理
 
 SDK 采用**分层继承 + 协议错误码 + 结构化元数据**的三层模型处理错误：
 
-1. **分层继承**：所有错误继承自 `TopBridgeError`（再继承原生 `Error`），并按业务领域划分为 9 个子类。这种设计的优势是：
+1. **分层继承**：所有错误继承自 `TopBridgeError`（再继承原生 `Error`），并按业务领域划分为 11 个子类。这种设计的优势是：
    - 调用方可以用 `instanceof` 精确捕获特定错误
    - TypeScript 会自动窄化类型，无需额外类型断言
    - 错误语义与业务场景一一对应，降低认知成本
@@ -27,15 +27,19 @@ SDK 采用**分层继承 + 协议错误码 + 结构化元数据**的三层模型
 ```
 TopBridgeError (基类)
 ├── TopBridgeConnectionError     连接失败 / 超时 / Topbridge App 未运行
-├── TopBridgeAuthError           认证或版本问题
-│     .code: 'NOT_AUTHENTICATED' | 'UPDATE_REQUIRED'
-│     .storeUrl?: string         更新链接（仅 UPDATE_REQUIRED）
-│     .downloadUrl?: string      下载链接（仅 UPDATE_REQUIRED）
+├── TopBridgeAuthError           认证问题
+│     .code: 'NOT_AUTHENTICATED'
+│     .storeUrl?: string         更新链接
+│     .downloadUrl?: string      下载链接
+├── TopBridgeVersionError        Topbridge App 版本过低
+│     .code: 'UPDATE_REQUIRED'
+│     .storeUrl?: string         更新链接
+│     .downloadUrl?: string      下载链接
 ├── TopBridgeQuotaError          权益无效 / 配额耗尽
 │     .reason?: string           具体原因
 ├── TopBridgePrintError          打印失败（未命中特定错误码时）
 │     .details?: unknown         错误详情
-├── TopBridgeConfigError         配置错误
+├── TopBridgeConfigError         配置错误（如无效的 source）
 ├── TopBridgeValidationError     输入校验失败
 │     .field?: string            出错的字段名
 ├── TopBridgePrinterError        打印机离线 / 未配置协议
@@ -52,6 +56,7 @@ TopBridgeError (基类)
 import {
   TopBridgeConnectionError,
   TopBridgeAuthError,
+  TopBridgeVersionError,
   TopBridgeQuotaError,
   TopBridgePrintError,
   TopBridgePrinterError,
@@ -68,13 +73,12 @@ try {
     // Topbridge App 未运行或网络不通
   }
   else if (err instanceof TopBridgeAuthError) {
-    if (err.code === 'NOT_AUTHENTICATED') {
-      // 用户未登录
-    }
-    if (err.code === 'UPDATE_REQUIRED') {
-      // Topbridge App 版本过低
-      if (err.storeUrl) window.open(err.storeUrl)
-    }
+    // 用户未登录
+    if (err.storeUrl) console.log('Store:', err.storeUrl)
+  }
+  else if (err instanceof TopBridgeVersionError) {
+    // Topbridge App 版本过低 — 引导用户更新
+    if (err.storeUrl) window.open(err.storeUrl)
   }
   else if (err instanceof TopBridgeQuotaError) {
     // 权益无效或配额耗尽
@@ -137,13 +141,15 @@ try {
 | 场景 | 错误类型 | 处理建议 |
 |------|---------|---------|
 | Topbridge App 未安装/未运行 | `TopBridgeConnectionError` | 使用 `client.launch.ensureRunning()` 自动唤起重试 |
-| 用户未登录 | `TopBridgeAuthError(NOT_AUTHENTICATED)` | 引导用户登录 Topbridge App |
-| Topbridge App 版本过低 | `TopBridgeAuthError(UPDATE_REQUIRED)` | 使用 `err.storeUrl` 引导更新 |
+| 用户未登录 | `TopBridgeAuthError` | 引导用户登录 Topbridge App |
+| Topbridge App 版本过低 | `TopBridgeVersionError` | 使用 `err.storeUrl` 引导更新 |
 | 打印配额耗尽 | `TopBridgeQuotaError` | 展示 `err.reason`，引导续费 |
+| SDK 配置无效 | `TopBridgeConfigError` | 检查初始化参数 |
 | 打印机离线 | `TopBridgePrinterError` | 检查打印机连接和协议配置 |
 | 模板不存在 | `TopBridgeTemplateError` | 检查模板 ID/Code 是否正确 |
 | 云端网络断开 | `TopBridgeNetworkError` | 检查网络连接 |
-| products 为空 | `TopBridgeValidationError` | `err.field` 指明问题字段 |
+| 来源验证失败 | `TopBridgeSourceError` | 检查 `source` 配置 |
+| products 为空或无效 | `TopBridgeValidationError` | `err.field` 指明问题字段 |
 | 打印失败（其他） | `TopBridgePrintError` | 查看 `err.details` 获取详情 |
 
 ## 警告处理

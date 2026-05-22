@@ -12,10 +12,15 @@ npm install @appzgatenz/label-print-topbridge-js
 
 ## Prerequisites
 
-- **Topbridge App** >= 1.0.45 is installed and running locally — [Download](https://service.topsale.co.nz/self-service/download/topbridge)
-- Browser supports WebSocket (all modern browsers)
-- At least one label printer with a configured protocol (TSPL / ZPL)
-- If using `launch.trigger()`, page CSP must allow `topsale:` custom protocol — see [CSP Configuration](/guide/csp)
+| # | Requirement | Details |
+|---|-------------|---------|
+| 1 | Modern browser with WebSocket support | Chrome 16+, Firefox 11+, Safari 7+, Edge 12+ |
+| 2 | Topbridge App >= 1.0.45 installed | [Download](https://service.topsale.co.nz/self-service/download/topbridge) |
+| 3 | Topbridge App is running | Health check returns `pong` |
+| 4 | User is logged in to Topbridge App | `data.isLoggedIn === true` |
+| 5 | Print entitlement is valid | Benefits check passes |
+| 6 | At least one printer configured with protocol (TSPL/ZPL) | Printer list is non-empty |
+| 7 | CSP allows `topsale:` protocol (if using `launch`) | See [CSP Configuration](/guide/csp) |
 
 :::tip Don't want to write code?
 Try the [TopSale label printing solution](https://topsale.biz/solution/label-printing/) — no integration needed.
@@ -69,7 +74,9 @@ console.log(`Printed ${result.data.printedCopies} copies`)
 
 ```typescript
 const client = new TopBridgeClient({
-  debug: true,                     // Enable logging
+  source: 'Core-SDK',             // SDK source identifier
+  debug: true,                     // Enable console logging
+  logger: customLogger,            // Custom logger implementation
   timeouts: {
     health: 3000,                  // Health check timeout (ms)
     preflight: 10000,              // Preflight timeout (ms)
@@ -77,6 +84,30 @@ const client = new TopBridgeClient({
   },
 })
 ```
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `source` | `'Core-SDK' \| 'React-SDK' \| 'Nextjs-SDK'` | `'Core-SDK'` | SDK source identifier |
+| `debug` | `boolean` | `false` | Enable console logging (prefix: `[TopBridge]`) |
+| `logger` | `Logger` | Silent (no-op) | Custom logger implementation |
+| `timeouts.health` | `number` (ms) | `3000` | Health check timeout |
+| `timeouts.preflight` | `number` (ms) | `10000` | Preflight / template query timeout |
+| `timeouts.print` | `number` (ms) | `60000` | Print execution timeout |
+
+### Logger
+
+You can provide a custom logger to integrate with monitoring services (e.g., Sentry, Datadog):
+
+```typescript
+interface Logger {
+  debug: (...args: unknown[]) => void
+  info: (...args: unknown[]) => void
+  warn: (...args: unknown[]) => void
+  error: (...args: unknown[]) => void
+}
+```
+
+Logger priority: custom `logger` > `debug: true` console logs > silent (default).
 
 ## Error Handling
 

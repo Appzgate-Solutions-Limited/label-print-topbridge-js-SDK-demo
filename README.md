@@ -63,9 +63,8 @@ await client.print.execute({
   template: 'PRICE_LABEL',
   printer: preflight.printers.data.defaultPrinter,
   products: [
-    { name: 'Example', price: 9.99, currency: '$', copies: 1 },
+    { name: 'Example', price: 9.99, currency: '$', unit: '/ea', copies: 1 },
   ],
-  fieldTypes: { price: 'price' },
 })
 ```
 

@@ -48,6 +48,9 @@ interface SdkResponse<T> {
 - `status: 'ok'` — Request succeeded, `data` contains business data
 - `status: 'warning'` — Request succeeded with additional hints (e.g., network disconnected during health check). You can use `data` normally, and check `message` for details
 - `warnings` — Non-fatal data format hints. The SDK adds these when potential issues are found during data conversion, without blocking print execution
+- `message` — Human-readable status description (e.g., "Print job completed")
+
+When a request fails, the SDK does **not** return a response — instead, it throws a `TopBridgeError` subclass. See [Error Handling](/guide/error-handling) for the complete error reference.
 
 **SdkWarning Structure**:
 

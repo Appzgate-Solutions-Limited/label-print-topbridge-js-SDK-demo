@@ -48,6 +48,9 @@ interface SdkResponse<T> {
 - `status: 'ok'` — 请求成功，`data` 包含业务数据
 - `status: 'warning'` — 请求成功但有附加提示（例如健康检查时网络断开）。可正常使用 `data`，同时检查 `message` 获取提示详情
 - `warnings` — 非致命的数据格式提示数组。SDK 会在数据转换过程中发现潜在问题时添加，不会阻止打印执行
+- `message` — 人类可读的状态描述（如 "Print job completed"）
+
+当请求失败时，SDK **不会**返回响应——而是抛出 `TopBridgeError` 子类异常。详见 [错误处理](/zh/guide/error-handling)。
 
 **SdkWarning 结构**：
 

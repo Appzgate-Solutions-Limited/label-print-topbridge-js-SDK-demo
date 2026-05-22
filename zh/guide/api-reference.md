@@ -18,6 +18,27 @@ title: API 速查表
 | `launch` | [`trigger()`](/zh/guide/launch-module#trigger) | `void` | 触发 Topbridge App 唤起 |
 | `launch` | [`ensureRunning(fn, options?)`](/zh/guide/launch-module#ensurerunning-fn-options) | `Promise<T>` | 唤起 + 重试编排 |
 
+### TopBridgeClientConfig
+
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `source` | `'Core-SDK' \| 'React-SDK' \| 'Nextjs-SDK'` | `'Core-SDK'` | SDK 来源标识 |
+| `debug` | `boolean` | `false` | 启用控制台日志（前缀：`[TopBridge]`） |
+| `logger` | `Logger` | 静默（空操作） | 自定义日志器实现 |
+| `timeouts.health` | `number` (ms) | `3000` | 健康检查超时 |
+| `timeouts.preflight` | `number` (ms) | `10000` | 预检 / 模板查询超时 |
+| `timeouts.print` | `number` (ms) | `60000` | 打印执行超时 |
+
+```typescript
+import type { TopBridgeClientConfig } from '@appzgatenz/label-print-topbridge-js'
+
+const client = new TopBridgeClient({
+  source: 'Core-SDK',
+  debug: true,
+  timeouts: { health: 5000, print: 120000 },
+})
+```
+
 ### PrintExecuteRequest
 
 ```typescript
@@ -25,6 +46,25 @@ interface PrintExecuteRequest {
   template: string             // 模板 ID 或 Code
   printer: string              // 打印机名称
   products: PrintProductInput[] // 产品数据数组
+}
+```
+
+### PrintProductInput
+
+```typescript
+interface PrintProductInput {
+  [key: string]: string | number | Record<string, string | number | undefined> | undefined
+  copies?: number  // 打印份数，范围 [1, 9999]，默认 1
+}
+```
+
+### SyncedPrinter
+
+```typescript
+interface SyncedPrinter {
+  name: string               // 打印机名称（用作 printer 参数）
+  isDefault: boolean         // 是否为默认打印机
+  protocol?: 'TSPL' | 'ZPL' // 标签协议
 }
 ```
 
@@ -40,6 +80,27 @@ interface PrintExecuteRequest {
 | `PrintResponse` | `message`(顶层), `data.printedCopies`, `data.jobId`, `data.templateName`, `data.userId`(可选), `details`(可选), `warnings`(可选) |
 | `PreflightResult` | `health`, `benefits`, `printers` |
 
+### SdkResponse\<T\> {#sdk-response}
+
+所有 SDK 方法返回统一的响应信封：
+
+```typescript
+interface SdkResponse<T> {
+  status: 'ok' | 'warning'  // 请求结果状态
+  requestId?: string         // 请求追踪 ID
+  data: T                    // 业务数据
+  message: string            // 人类可读的状态描述
+  details?: unknown          // 扩展详情（可选）
+  warnings?: SdkWarning[]    // 非致命格式提示（可选）
+}
+```
+
+| 状态 | 行为 |
+|------|------|
+| `'ok'` | 请求成功，可直接使用 `data` |
+| `'warning'` | 请求成功但有提示，`data` 可正常使用，查看 `message` 和 `warnings` 了解详情 |
+| *(错误)* | SDK 抛出 `TopBridgeError` 子类异常，无返回值 |
+
 ## 导出清单 {#export-list}
 
 ```typescript
@@ -47,11 +108,12 @@ interface PrintExecuteRequest {
 import { TopBridgeClient } from '@appzgatenz/label-print-topbridge-js'
 import { LaunchModule } from '@appzgatenz/label-print-topbridge-js'
 
-// 错误类（10 个）
+// 错误类（11 个）
 import {
   TopBridgeError,
   TopBridgeConnectionError,
   TopBridgeAuthError,
+  TopBridgeVersionError,
   TopBridgeQuotaError,
   TopBridgePrintError,
   TopBridgeConfigError,

@@ -12,14 +12,16 @@ You do **not** need to manually specify field types — the SDK handles everythi
 
 ```
 print.execute({ template, printer, products })
-  ├─ 1. Auto-fetch template schema
+  ├─ 1. Auto-fetch template schema (automatic, no manual call needed)
   ├─ 2. Classify fields by fieldType
   │     ├─ Widget fields: text, textfield, price, weight, barcode, qrcode
   │     ├─ Protocol fields: integer
   │     └─ Layout fields: line (skipped)
   ├─ 3. Transform each product's data
-  └─ 4. Send transformed data to Topbridge App
+  └─ 4. Send print command to Topbridge App
 ```
+
+`print.execute()` handles the entire pipeline automatically — you only need to provide the product data with the correct field names.
 
 ## Transformation Rules
 
@@ -106,6 +108,26 @@ When a `text` field value contains newlines, the SDK:
 2. Adds a warning to the response: `{ code: 'DATA_FORMAT', reason: 'newline_truncated', message: '...' }`
 
 This only applies to fields with `text` fieldType in the schema. `textfield` preserves newlines.
+
+## Warning Types
+
+`PrintResponse.warnings` may contain warnings from two sources:
+
+| code | reason | Source | Description |
+|------|--------|--------|-------------|
+| `DATA_FORMAT` | `newline_truncated` | SDK client | A `text` field contained newlines; auto-truncated to first line |
+| `DPI_MISMATCH` | — | Topbridge App | Printer DPI does not match the template design DPI |
+
+Both are merged into a single `warnings[]` array on the response. These are non-fatal — the print job still executes.
+
+## Formula Injection Prevention
+
+For `textfield` type fields, the SDK automatically strips formula injection prefixes (`=` and `=@`) from input values. This is a built-in safety measure — you do not need to sanitize data manually.
+
+```
+Input:  '=SUM(A1:A10)'   →   Output: 'SUM(A1:A10)'
+Input:  '=@cmd'           →   Output: 'cmd'
+```
 
 ## Deprecated Parameters
 

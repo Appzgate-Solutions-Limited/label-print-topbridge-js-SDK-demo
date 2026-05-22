@@ -14,7 +14,7 @@ The SDK communicates exclusively with the locally running Topbridge App. There i
 
 ## 2. Source Verification
 
-The SDK includes caller-origin identification in all requests. Unauthorized calls are rejected by Topbridge App.
+The SDK includes a caller-origin identifier (`source`) in all requests. Only predefined source values are accepted — unauthorized calls are rejected by Topbridge App. This prevents unknown callers from interacting with the local print service.
 
 ## 3. URL Safety Validation
 
@@ -31,7 +31,23 @@ Before presenting external links from Topbridge App error responses, the SDK val
 
 ## 4. Input Sanitization
 
-The SDK automatically strips formula injection prefixes (such as `=` and `=@`) from print data to prevent injection attacks.
+The SDK automatically strips formula injection prefixes from print data to prevent injection attacks. When processing `textfield` type fields, values starting with `=` or `=@` are automatically cleaned:
+
+```
+'=SUM(A1:A10)'  →  'SUM(A1:A10)'
+'=@cmd'          →  'cmd'
+'==nested'       →  'nested'
+```
+
+This protection is applied automatically — developers do not need to sanitize data manually.
+
+## 5. Build-Time Protection
+
+The published npm package applies multiple build-time protections:
+
+- **Code minification** — production code is compressed and obfuscated
+- **Tree-shaking** — unused code is eliminated at build time
+- **No source maps** — source map files are not published to npm
 
 ## Known Limitations
 

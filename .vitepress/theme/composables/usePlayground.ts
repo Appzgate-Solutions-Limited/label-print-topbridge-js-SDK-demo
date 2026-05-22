@@ -199,8 +199,8 @@ export function usePlayground() {
         addLog(`✓ Schema: ${schema.data.name} (${schema.data.code})`, 'success')
         addLog(`  Fields: ${schema.data.fields?.length ?? 0}`)
         for (const f of schema.data.fields ?? []) {
-          if (f.type !== 'line') {
-            addLog(`    ${f.name}: ${f.type}${f.required ? ' (required)' : ''}`)
+          if (f.fieldType !== 'line') {
+            addLog(`    ${f.dataField}: ${f.fieldType}${f.required ? ' (required)' : ''}`)
           }
         }
       } catch (err: any) {

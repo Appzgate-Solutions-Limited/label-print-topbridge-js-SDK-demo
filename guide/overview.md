@@ -55,3 +55,33 @@ Label Printer
 3. **Print** — Submit a print request with flat product data; the SDK automatically fetches the template schema and transforms the data into the format Topbridge App expects
 
 The SDK handles all WebSocket communication internally. You only interact with the high-level module API — no need to manage connections, parse protocol messages, or handle data transformation manually.
+
+## Internal Architecture
+
+The SDK is organized in four conceptual layers:
+
+```
+Public API Layer     TopBridgeClient (Facade)
+                         │
+Module Layer         health · benefits · printers · templates · print · preflight · launch
+                         │
+Transport Layer      Communication with Topbridge App (short-connection model)
+                         │
+Utility Layer        Data transformation · Input validation · Launch orchestration
+```
+
+- **Public API Layer** — `TopBridgeClient` is the single entry point. It orchestrates all modules and hides internal complexity.
+- **Module Layer** — 7 independent modules, each responsible for a specific business domain. All public methods are async and return typed responses.
+- **Transport Layer** — Handles communication with Topbridge App using a short-connection model (connect → send → receive → close per call).
+- **Utility Layer** — Provides data transformation, input validation, and launch orchestration used internally by modules.
+
+## Package Info
+
+| Property | Value |
+|----------|-------|
+| Package | `@appzgatenz/label-print-topbridge-js` |
+| Size | ~3.2 KB gzipped |
+| Dependencies | Zero runtime dependencies |
+| Formats | ESM + CJS dual output |
+| Tree-shaking | Supported (`sideEffects: false`) |
+| Node.js | >= 18 |

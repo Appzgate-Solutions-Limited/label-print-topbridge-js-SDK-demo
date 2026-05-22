@@ -201,7 +201,7 @@ if (firstCode) {
   console.log(\`  Fields: \${schema.data.fields?.length ?? 0}\`)
 
   for (const f of schema.data.fields ?? []) {
-    console.log(\`  - \${f.name}: \${f.type}\${f.required ? ' (required)' : ''}\`)
+    console.log(\`  - \${f.dataField}: \${f.fieldType}\${f.required ? ' (required)' : ''}\`)
   }
 }
 `,
@@ -299,8 +299,8 @@ console.log(\`Template: \${firstCode}\`)
 const schema = await client.templates.schema(firstCode!)
 console.log(\`Schema: \${schema.data.fields?.length} fields\`)
 for (const f of schema.data.fields ?? []) {
-  if (f.type !== 'line') {
-    console.log(\`  \${f.name}: \${f.type}\${f.required ? ' *' : ''}\`)
+  if (f.fieldType !== 'line') {
+    console.log(\`  \${f.dataField}: \${f.fieldType}\${f.required ? ' *' : ''}\`)
   }
 }
 
