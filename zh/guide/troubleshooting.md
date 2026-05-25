@@ -6,7 +6,7 @@ title: 故障排查
 
 ## Q: 调用 API 时抛出 TopBridgeConnectionError
 
-**原因**：无法连接到 Topbridge App。SDK 固定连接 `ws://localhost:8765`（内部自动拼接 `/v2`）。
+**原因**：无法连接到 Topbridge App。SDK 通过固定的 WebSocket 地址与 Topbridge App 通信。
 
 **排查步骤**：
 1. 确认 Topbridge App 已安装（[下载](https://service.topsale.co.nz/self-service/download/topbridge)）并正在运行

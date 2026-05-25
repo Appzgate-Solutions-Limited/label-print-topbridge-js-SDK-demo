@@ -10,11 +10,11 @@ title: Security Model
 
 ## 1. Fixed Local Connection
 
-The SDK communicates exclusively with the locally running Topbridge App. There is no configuration option for the connection address, which fundamentally prevents redirecting the SDK to a remote server.
+The SDK uses fixed, non-configurable connection endpoints. The default mode connects locally to Topbridge App; an optional secure (WSS) mode is also available. This fundamentally prevents redirecting SDK traffic to arbitrary servers.
 
 ## 2. Source Verification
 
-The SDK includes a caller-origin identifier (`source`) in all requests. Only predefined source values are accepted — unauthorized calls are rejected by Topbridge App. This prevents unknown callers from interacting with the local print service.
+The SDK includes a caller-origin identifier (`source`) in all requests for origin verification. Unauthorized calls are rejected by Topbridge App.
 
 ## 3. URL Safety Validation
 
@@ -53,5 +53,5 @@ The published npm package applies multiple build-time protections:
 
 | Limitation | Description | Mitigation |
 |------------|-------------|------------|
-| Browser cannot prevent page spoofing | Malicious pages can implement the WS protocol themselves | Topbridge App built-in origin verification |
-| WS protocol is unencrypted | localhost communication is not encrypted by default | Local communication does not require encryption (no network transmission risk) |
+| Browser cannot prevent page spoofing | Other web pages could attempt to interact with the print service | Topbridge App built-in origin verification |
+| Local mode is unencrypted | Default localhost connection is not encrypted | Enable WSS mode for encrypted communication; local mode has no network transmission risk |

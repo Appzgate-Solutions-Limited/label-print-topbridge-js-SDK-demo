@@ -6,7 +6,7 @@ title: Troubleshooting
 
 ## Q: TopBridgeConnectionError thrown when calling API
 
-**Cause**: Cannot connect to Topbridge App. The SDK connects to `ws://localhost:8765` (internally appending `/v2`).
+**Cause**: Cannot connect to Topbridge App. The SDK communicates with Topbridge App via a fixed WebSocket address.
 
 **Troubleshooting**:
 1. Confirm Topbridge App is installed ([download](https://service.topsale.co.nz/self-service/download/topbridge)) and running

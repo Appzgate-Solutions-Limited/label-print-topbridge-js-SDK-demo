@@ -56,24 +56,19 @@ Label Printer
 
 The SDK handles all WebSocket communication internally. You only interact with the high-level module API — no need to manage connections, parse protocol messages, or handle data transformation manually.
 
-## Internal Architecture
+## SDK Modules
 
-The SDK is organized in four conceptual layers:
+The SDK provides 7 independent modules, all accessed via `TopBridgeClient`:
 
-```
-Public API Layer     TopBridgeClient (Facade)
-                         │
-Module Layer         health · benefits · printers · templates · print · preflight · launch
-                         │
-Transport Layer      Communication with Topbridge App (short-connection model)
-                         │
-Utility Layer        Data transformation · Input validation · Launch orchestration
-```
-
-- **Public API Layer** — `TopBridgeClient` is the single entry point. It orchestrates all modules and hides internal complexity.
-- **Module Layer** — 7 independent modules, each responsible for a specific business domain. All public methods are async and return typed responses.
-- **Transport Layer** — Handles communication with Topbridge App using a short-connection model (connect → send → receive → close per call).
-- **Utility Layer** — Provides data transformation, input validation, and launch orchestration used internally by modules.
+| Module | Access | Description |
+|--------|--------|-------------|
+| health | `client.health` | Topbridge App health check |
+| benefits | `client.benefits` | Entitlement and quota validation |
+| printers | `client.printers` | Synced printer list |
+| templates | `client.templates` | Template list and field schema |
+| print | `client.print` | Execute label print with auto data conversion |
+| preflight | `client.preflight` | Orchestration: health → benefits → printers |
+| launch | `client.launch` | Topbridge App launch and retry |
 
 ## Package Info
 

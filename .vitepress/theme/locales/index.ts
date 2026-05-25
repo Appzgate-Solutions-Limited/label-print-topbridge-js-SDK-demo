@@ -106,7 +106,7 @@ export const features: Record<Locale, { icon: string; title: string; desc: strin
     {
       icon: 'lock',
       title: 'Security First',
-      desc: 'Fixed local connection, source allowlist, input sanitization, build obfuscation.',
+      desc: 'Fixed connection endpoints, origin verification, input sanitization, build obfuscation.',
     },
     {
       icon: 'zap',
@@ -130,7 +130,7 @@ export const features: Record<Locale, { icon: string; title: string; desc: strin
     {
       icon: 'lock',
       title: '安全优先',
-      desc: '固定本地连接 + Source 白名单 + 输入清洗 + 构建混淆。',
+      desc: '固定连接端点 + 来源验证 + 输入清洗 + 构建混淆。',
     },
     { icon: 'zap', title: '自动启动与重试', desc: '自动检测并启动 Tray App，内置连接重试编排。' },
   ],

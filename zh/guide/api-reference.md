@@ -27,6 +27,7 @@ title: API 速查表
 | `logger` | `Logger` | 静默（空操作） | 自定义日志器实现 |
 | `timeouts.health` | `number` (ms) | `3000` | 健康检查超时 |
 | `timeouts.preflight` | `number` (ms) | `10000` | 预检 / 模板查询超时 |
+| `wssEnabled` | `boolean` | `false` | 启用 WSS 安全连接模式 |
 | `timeouts.print` | `number` (ms) | `60000` | 打印执行超时 |
 
 ```typescript

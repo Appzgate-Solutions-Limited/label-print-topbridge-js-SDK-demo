@@ -56,24 +56,19 @@ Topbridge App (本地桌面应用)
 
 SDK 内部处理所有 WebSocket 通信。你只需与高级模块 API 交互——无需手动管理连接、解析协议消息或处理数据转换。
 
-## 内部架构
+## SDK 模块
 
-SDK 按四个概念层组织：
+SDK 提供 7 个独立模块，均通过 `TopBridgeClient` 访问：
 
-```
-公共 API 层          TopBridgeClient（门面）
-                         │
-功能模块层           health · benefits · printers · templates · print · preflight · launch
-                         │
-传输层              与 Topbridge App 通信（短连接模型）
-                         │
-工具层              数据转换 · 输入校验 · 唤起编排
-```
-
-- **公共 API 层** — `TopBridgeClient` 是唯一入口，编排所有模块并隐藏内部复杂性。
-- **功能模块层** — 7 个独立模块，各负责一个业务领域。所有公共方法均为异步，返回类型化响应。
-- **传输层** — 使用短连接模型（每次调用独立建立→发送→接收→关闭）处理与 Topbridge App 的通信。
-- **工具层** — 提供模块内部使用的数据转换、输入校验和唤起编排功能。
+| 模块 | 访问方式 | 说明 |
+|------|---------|------|
+| health | `client.health` | Topbridge App 健康检查 |
+| benefits | `client.benefits` | 权益与配额验证 |
+| printers | `client.printers` | 已同步的打印机列表 |
+| templates | `client.templates` | 模板列表与字段定义 |
+| print | `client.print` | 执行标签打印（自动数据转换） |
+| preflight | `client.preflight` | 编排：health → benefits → printers |
+| launch | `client.launch` | Topbridge App 唤起与重试 |
 
 ## 包信息
 

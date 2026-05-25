@@ -27,6 +27,7 @@ title: API Quick Reference
 | `logger` | `Logger` | Silent (no-op) | Custom logger implementation |
 | `timeouts.health` | `number` (ms) | `3000` | Health check timeout |
 | `timeouts.preflight` | `number` (ms) | `10000` | Preflight / template query timeout |
+| `wssEnabled` | `boolean` | `false` | Enable WSS secure connection mode |
 | `timeouts.print` | `number` (ms) | `60000` | Print execution timeout |
 
 ```typescript
