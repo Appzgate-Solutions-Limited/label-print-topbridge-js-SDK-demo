@@ -22,7 +22,7 @@ title: API 速查表
 
 | 字段 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `source` | `'Core-SDK' \| 'React-SDK' \| 'Nextjs-SDK'` | `'Core-SDK'` | SDK 来源标识 |
+| `source` | `string` | `'（内置）'` | SDK 来源标识（由 SDK 内部自动设置，无需手动配置） |
 | `debug` | `boolean` | `false` | 启用控制台日志（前缀：`[TopBridge]`） |
 | `logger` | `Logger` | 静默（空操作） | 自定义日志器实现 |
 | `timeouts.health` | `number` (ms) | `3000` | 健康检查超时 |
@@ -34,7 +34,6 @@ title: API 速查表
 import type { TopBridgeClientConfig } from '@appzgatenz/label-print-topbridge-js'
 
 const client = new TopBridgeClient({
-  source: 'Core-SDK',
   debug: true,
   timeouts: { health: 5000, print: 120000 },
 })

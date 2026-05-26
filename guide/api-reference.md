@@ -22,7 +22,7 @@ title: API Quick Reference
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `source` | `'Core-SDK' \| 'React-SDK' \| 'Nextjs-SDK'` | `'Core-SDK'` | SDK source identifier |
+| `source` | `string` | `'(internal)'` | SDK source identifier (set internally, do not configure manually) |
 | `debug` | `boolean` | `false` | Enable console logging (prefix: `[TopBridge]`) |
 | `logger` | `Logger` | Silent (no-op) | Custom logger implementation |
 | `timeouts.health` | `number` (ms) | `3000` | Health check timeout |
@@ -34,7 +34,6 @@ title: API Quick Reference
 import type { TopBridgeClientConfig } from '@appzgatenz/label-print-topbridge-js'
 
 const client = new TopBridgeClient({
-  source: 'Core-SDK',
   debug: true,
   timeouts: { health: 5000, print: 120000 },
 })

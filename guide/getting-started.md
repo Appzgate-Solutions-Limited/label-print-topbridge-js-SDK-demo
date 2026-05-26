@@ -74,7 +74,6 @@ console.log(`Printed ${result.data.printedCopies} copies`)
 
 ```typescript
 const client = new TopBridgeClient({
-  source: 'Core-SDK',             // SDK source identifier
   debug: true,                     // Enable console logging
   logger: customLogger,            // Custom logger implementation
   timeouts: {
@@ -87,7 +86,7 @@ const client = new TopBridgeClient({
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `source` | `'Core-SDK' \| 'React-SDK' \| 'Nextjs-SDK'` | `'Core-SDK'` | SDK source identifier |
+| `source` | `string` | `'(internal)'` | SDK source identifier (set internally, do not configure manually) |
 | `debug` | `boolean` | `false` | Enable console logging (prefix: `[TopBridge]`) |
 | `logger` | `Logger` | Silent (no-op) | Custom logger implementation |
 | `timeouts.health` | `number` (ms) | `3000` | Health check timeout |

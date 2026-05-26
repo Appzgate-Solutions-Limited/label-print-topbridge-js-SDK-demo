@@ -74,7 +74,6 @@ console.log(`已打印 ${result.data.printedCopies} 份`)
 
 ```typescript
 const client = new TopBridgeClient({
-  source: 'Core-SDK',             // SDK 来源标识
   debug: true,                     // 开启控制台日志
   logger: customLogger,            // 自定义日志器实现
   timeouts: {
@@ -87,7 +86,7 @@ const client = new TopBridgeClient({
 
 | 字段 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `source` | `'Core-SDK' \| 'React-SDK' \| 'Nextjs-SDK'` | `'Core-SDK'` | SDK 来源标识 |
+| `source` | `string` | `'（内置）'` | SDK 来源标识（由 SDK 内部自动设置，无需手动配置） |
 | `debug` | `boolean` | `false` | 启用控制台日志（前缀：`[TopBridge]`） |
 | `logger` | `Logger` | 静默（空操作） | 自定义日志器实现 |
 | `timeouts.health` | `number` (ms) | `3000` | 健康检查超时 |

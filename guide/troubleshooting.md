@@ -6,7 +6,7 @@ title: Troubleshooting
 
 ## Q: TopBridgeConnectionError thrown when calling API
 
-**Cause**: Cannot connect to TopBridge App. The SDK communicates with TopBridge App via a fixed WebSocket address.
+**Cause**: Cannot connect to TopBridge App. The SDK communicates with TopBridge App via an internal local communication channel.
 
 **Troubleshooting**:
 1. Confirm TopBridge App is installed ([download](https://service.topsale.co.nz/self-service/download/topbridge)) and running
