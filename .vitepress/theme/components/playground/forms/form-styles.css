@@ -22,20 +22,39 @@
   color: var(--vp-c-text-2);
   text-align: right;
 }
-.pg-form-row select,
-.pg-form-row input {
-  padding: 6px 10px;
+.pg-form-row input,
+.pg-form-row select {
+  box-sizing: border-box;
+  height: 36px;
+  padding: 0 12px;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 13px;
   background: var(--vp-c-bg);
   color: var(--vp-c-text-1);
   max-width: 200px;
+  line-height: 20px;
 }
-.pg-form-row select:focus,
-.pg-form-row input:focus {
+.pg-form-row input {
+  background-image: none;
+}
+.pg-form-row input::-webkit-calendar-picker-indicator {
+  display: none;
+}
+.pg-form-row select {
+  min-width: 160px;
+  padding-right: 32px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+.pg-form-row input:focus,
+.pg-form-row select:focus {
   outline: none;
   border-color: var(--vp-c-brand-1);
+  box-shadow: 0 0 0 2px var(--vp-c-brand-soft);
 }
 .pg-btn {
   padding: 6px 16px;

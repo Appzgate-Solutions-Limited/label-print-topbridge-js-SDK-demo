@@ -23,7 +23,11 @@ const productCopies = ref('1')
 watch(
   () => props.templates,
   (t) => {
-    if (!selectedTemplate.value) selectedTemplate.value = t[0]?.code || t[0]?.id || ''
+    const firstTemplate = t[0]?.code || t[0]?.id || ''
+    const hasSelectedTemplate = t.some((x) => (x.code || x.id) === selectedTemplate.value)
+    if (firstTemplate && (!selectedTemplate.value || !hasSelectedTemplate)) {
+      selectedTemplate.value = firstTemplate
+    }
   },
   { immediate: true },
 )
@@ -59,21 +63,21 @@ function emitPrint() {
     <div class="pg-form-title">2. Print Settings</div>
     <div class="pg-form-row">
       <label>Template</label>
-      <input v-model="selectedTemplate" type="text" list="basic-template-options">
-      <datalist id="basic-template-options">
+      <select v-model="selectedTemplate">
+        <option v-if="!templates.length" :value="selectedTemplate">{{ selectedTemplate }}</option>
         <option v-for="t in templates" :key="t.code || t.id" :value="t.code || t.id">
           {{ t.name }}
         </option>
-      </datalist>
+      </select>
     </div>
     <div class="pg-form-row">
       <label>Printer</label>
-      <input v-model="selectedPrinter" type="text" list="basic-printer-options">
-      <datalist id="basic-printer-options">
+      <select v-model="selectedPrinter">
+        <option value="" disabled>-- select printer --</option>
         <option v-for="p in printers" :key="p.name" :value="p.name">
           {{ p.name }}{{ p.isDefault ? ' (default)' : '' }}
         </option>
-      </datalist>
+      </select>
     </div>
     <div class="pg-form-row">
       <label>Name</label>
