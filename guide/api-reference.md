@@ -15,7 +15,7 @@ title: API Quick Reference
 | `templates` | [`schema(template)`](/guide/integration-tutorial#step-2-get-templates) | `Promise<TemplateSchemaResponse>` | Template field definitions |
 | `print` | [`execute(request)`](/guide/integration-tutorial#step-3-execute-print) | `Promise<PrintResponse>` | Execute print |
 | `preflight` | [`run(options?)`](/guide/integration-tutorial#step-1-preflight) | `Promise<PreflightResult>` | Preflight orchestration |
-| `launch` | [`trigger()`](/guide/launch-module#trigger) | `void` | Trigger Topbridge App launch |
+| `launch` | [`trigger()`](/guide/launch-module#trigger) | `void` | Trigger TopBridge App launch |
 | `launch` | [`ensureRunning(fn, options?)`](/guide/launch-module#ensurerunning-fn-options) | `Promise<T>` | Launch + retry orchestration |
 
 ### TopBridgeClientConfig

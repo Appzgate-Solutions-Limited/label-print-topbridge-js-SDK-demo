@@ -10,13 +10,13 @@ title: Core Concepts
 
 | Module | Responsibility | Primary Methods |
 |--------|----------------|-----------------|
-| `health` | Check Topbridge App running status | `check()` |
+| `health` | Check TopBridge App running status | `check()` |
 | `benefits` | Validate user print entitlements and quota | `check()` |
 | `printers` | Get configured printer list | `list()` |
 | `templates` | Get template list and field definitions | `list()`, `schema()` |
 | `print` | Execute print jobs (schema-driven data conversion) | `execute()` |
 | `preflight` | Orchestrate the full preflight check | `run()` |
-| `launch` | Topbridge App launch & retry orchestration | `trigger()`, `ensureRunning()` |
+| `launch` | TopBridge App launch & retry orchestration | `trigger()`, `ensureRunning()` |
 
 ## Short-Connection Model
 
@@ -74,7 +74,7 @@ A **DataField** (represented as `dataField` in the SDK) is the **data source fie
 // Each key in the product object is a DataField
 const product = {
   name: 'Apple',      // DataField: "name"
-  price: 3.99,        // DataField: "price"
+  price: { value: 3.99 },  // DataField: "price"
   barcode: '12345',   // DataField: "barcode"
   copies: 2,          // Reserved DataField
 }

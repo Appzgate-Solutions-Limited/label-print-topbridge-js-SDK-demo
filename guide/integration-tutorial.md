@@ -8,21 +8,21 @@ This section walks through an end-to-end example, demonstrating how to integrate
 
 ## Step 1: Preflight {#step-1-preflight}
 
-Before printing, confirm three things: Topbridge App is running and the user is logged in, entitlements are valid, and printers are available. `preflight.run()` completes these checks in one go.
+Before printing, confirm three things: TopBridge App is running and the user is logged in, entitlements are valid, and printers are available. `preflight.run()` completes these checks in one go.
 
-> **Prerequisite**: Topbridge App >= 1.0.45 must be installed ([download](https://service.topsale.co.nz/self-service/download/topbridge)).
+> **Prerequisite**: TopBridge App >= 1.0.45 must be installed ([download](https://service.topsale.co.nz/self-service/download/topbridge)).
 
 :::tip Prefer a no-code solution?
-[Try the TopSale label printing solution](https://topsale.biz/solution/label-printing/) — start printing labels in minutes without any development.
+[Try the TOPSALE label printing solution](https://topsale.biz/solution/label-printing/) — start printing labels in minutes without any development.
 :::
 
 > `preflight` is the recommended best practice but not mandatory — you can also call `print.execute()` directly. However, using preflight allows you to discover and handle issues before printing, providing a better user experience.
 >
-> Note: `preflight.run()` does not automatically launch Topbridge App. For auto-launch, wrap it with `client.launch.ensureRunning()`.
+> Note: `preflight.run()` does not automatically launch TopBridge App. For auto-launch, wrap it with `client.launch.ensureRunning()`.
 
 ```typescript
 try {
-  // Use ensureRunning wrapper for automatic Topbridge App launch and retry
+  // Use ensureRunning wrapper for automatic TopBridge App launch and retry
   const preflight = await client.launch.ensureRunning(
     () => client.preflight.run({
       onStepChange: (step) => {
@@ -114,13 +114,13 @@ const schema = await client.templates.schema('PRICE_LABEL')
 Use the printer and template information from preflight to build the print request:
 
 ```typescript
-// Input: flat product data
+// Input: product data
 const result = await client.print.execute({
   template: 'PRICE_LABEL',
   printer: preflight.printers.data.defaultPrinter,
   products: [
-    { name: 'Apple', price: 3.99, currency: '$', unit: '/kg', copies: 2 },
-    { name: 'Banana', price: 1.99, currency: '$', copies: 1 },
+    { name: 'Apple', price: { value: 3.99, currency: '$', unit: '/kg' }, copies: 2 },
+    { name: 'Banana', price: { value: 1.99, currency: '$' }, copies: 1 },
   ],
 })
 
@@ -138,7 +138,7 @@ const result = await client.print.execute({
 
 **Key Points**:
 
-- `products` is a flat JSON object — the SDK auto-fetches the template schema and converts data based on fieldType
+- `products` is a JSON object — the SDK auto-fetches the template schema and converts data based on fieldType
 - `template` accepts a template ID (`'1'`) or Code (`'PRICE_LABEL'`)
 - `printer` is a printer name string
 - `copies` defaults to 1, range [1, 9999]
@@ -162,7 +162,7 @@ const client = new TopBridgeClient({ debug: true })
 
 async function printPriceLabels() {
   try {
-    // 1. Ensure Topbridge App is running + preflight
+    // 1. Ensure TopBridge App is running + preflight
     const preflight = await client.launch.ensureRunning(
       () => client.preflight.run({
         onStepChange: (step) => console.log(`Checking: ${step}`)
@@ -175,8 +175,8 @@ async function printPriceLabels() {
       template: 'PRICE_LABEL',
       printer: preflight.printers.data.defaultPrinter,
       products: [
-        { name: 'Apple', price: 3.99, currency: '$', unit: '/kg', copies: 2 },
-        { name: 'Banana', price: 1.99, currency: '$', copies: 1 },
+        { name: 'Apple', price: { value: 3.99, currency: '$', unit: '/kg' }, copies: 2 },
+        { name: 'Banana', price: { value: 1.99, currency: '$' }, copies: 1 },
       ],
     })
 
@@ -191,12 +191,12 @@ async function printPriceLabels() {
         const updateUrl = err.storeUrl ?? err.downloadUrl
         if (updateUrl) window.open(updateUrl)
       } else {
-        console.error('Please log in to Topbridge App first')
+        console.error('Please log in to TopBridge App first')
       }
     } else if (err instanceof TopBridgeQuotaError) {
       console.error('Print quota insufficient:', err.reason)
     } else if (err instanceof TopBridgePrinterError) {
-      console.error('Printer error, please check printer configuration in Topbridge App')
+      console.error('Printer error, please check printer configuration in TopBridge App')
     } else if (err instanceof TopBridgePrintError) {
       console.error('Print failed:', err.message)
     } else {

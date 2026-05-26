@@ -20,9 +20,7 @@ const result = await client.print.execute({
   printer: preflight.printers.data?.defaultPrinter,
   products: [{
     name: 'Test Product',
-    price: 3.99,
-    currency: '$',
-    unit: '/kg',
+    price: { value: 3.99, currency: '$', unit: '/kg' },
     copies: 1
   }]
 })
@@ -221,9 +219,9 @@ const result = await client.print.execute({
   template: 'PRICE_LABEL',
   printer: preflight.printers.data?.defaultPrinter,
   products: [
-    { name: 'Apple', price: 3.99, currency: '$', unit: '/kg', copies: 2 },
-    { name: 'Banana', price: 1.99, currency: '$', unit: '/lb', copies: 1 },
-    { name: 'Orange', price: 4.50, currency: '$', unit: '/kg', copies: 3 },
+    { name: 'Apple', price: { value: 3.99, currency: '$', unit: '/kg' }, copies: 2 },
+    { name: 'Banana', price: { value: 1.99, currency: '$', unit: '/lb' }, copies: 1 },
+    { name: 'Orange', price: { value: 4.50, currency: '$', unit: '/kg' }, copies: 3 },
   ]
 })
 

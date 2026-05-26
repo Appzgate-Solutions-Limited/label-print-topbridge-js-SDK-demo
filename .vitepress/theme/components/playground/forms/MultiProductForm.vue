@@ -56,18 +56,22 @@ function emitPrint() {
   const allProducts = [
     {
       name: productName.value,
-      price: parseFloat(productPrice.value),
-      currency: productCurrency.value,
-      unit: productUnit.value,
+      price: {
+        value: parseFloat(productPrice.value),
+        currency: productCurrency.value,
+        unit: productUnit.value,
+      },
       copies: Number.parseInt(productCopies.value, 10) || 1,
     },
     ...extraProducts.value
       .filter((p) => p.name)
       .map((p) => ({
         name: p.name,
-        price: parseFloat(p.price),
-        currency: p.currency,
-        unit: p.unit,
+        price: {
+          value: parseFloat(p.price),
+          currency: p.currency,
+          unit: p.unit,
+        },
         copies: Number.parseInt(p.copies, 10) || 1,
       })),
   ]

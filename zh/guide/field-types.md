@@ -4,9 +4,13 @@ title: 数据转换
 
 # 数据转换
 
-SDK 自动将你的扁平产品数据转换为 Topbridge App 所需的结构化格式。这是**schema 驱动**的：当你调用 `print.execute()` 时，SDK 内部自动获取模板 schema，并根据每个字段的 `fieldType` 应用转换。
+SDK 自动将你的产品数据转换为 TopBridge App 所需的结构化格式。这是**schema 驱动**的：当你调用 `print.execute()` 时，SDK 内部自动获取模板 schema，并根据每个字段的 `fieldType` 应用转换。
 
 你**不需要**手动指定字段类型——SDK 自动处理一切。
+
+::: warning
+**扁平自动分组写法已移除。** `price`、`currency`、`unit` 作为同级键的扁平产品数据格式不再支持。请使用[嵌套对象语法](#nested-object-syntax)或[点路径语法](#dot-path-syntax)。
+:::
 
 ## 工作原理
 
@@ -18,7 +22,7 @@ print.execute({ template, printer, products })
   │     ├─ Protocol 字段: integer
   │     └─ Layout 字段: line (跳过)
   ├─ 3. 转换每个产品的数据
-  └─ 4. 向 Topbridge App 发送打印指令
+  └─ 4. 向 TopBridge App 发送打印指令
 ```
 
 `print.execute()` 自动完成整个流程——你只需提供正确字段名的产品数据。
@@ -29,11 +33,9 @@ print.execute({ template, printer, products })
 |-----------|------|------|------|
 | `text` | `'Apple\n有机水果'` | `'Apple'` | 截取第一行 + 警告 |
 | `textfield` | `'第一行\n第二行'` | `'第一行\n第二行'` | 保留换行，过滤 `=`/`=@` |
-| `price` | `3.99` | `{ value: 3.99 }` | 标量自动包装 |
-| `price` | `3.99, currency: '$', unit: '/kg'` | `{ value: 3.99, currency: '$', unit: '/kg' }` | 扁平字段自动分组 |
+| `price` | `{ value: 3.99 }` | `{ value: 3.99 }` | 标量自动包装 |
 | `price` | `{ value: 3.99, currency: '$' }` | `{ value: 3.99, currency: '$' }` | 嵌套对象保留 |
-| `weight` | `0.5` | `{ value: 0.5 }` | 标量自动包装 |
-| `weight` | `0.5, unit: 'kg'` | `{ value: 0.5, unit: 'kg' }` | 扁平字段自动分组 |
+| `weight` | `{ value: 0.5 }` | `{ value: 0.5 }` | 标量自动包装 |
 | `barcode` | `12345` | `'12345'` | 强制转字符串 |
 | `barcode` | `null` | `''` | null → 空字符串 |
 | `qrcode` | `'https://...'` | `'https://...'` | 强制转字符串 |
@@ -42,25 +44,18 @@ print.execute({ template, printer, products })
 
 ## 产品数据格式
 
-Products 是扁平 JSON 对象。你可以混合使用扁平值和嵌套对象：
+Products 是 JSON 对象。结构化字段使用嵌套对象或点路径语法：
 
 ```typescript
 const products = [
-  // 扁平值 — SDK 根据 schema 的 fieldType 自动分组
-  { name: 'Apple', price: 3.99, currency: '$', unit: '/kg', barcode: 12345, copies: 2 },
-  { name: 'Banana', price: 1.99, currency: '$', copies: 1 },
+  { name: 'Apple', price: { value: 3.99, currency: '$', unit: '/kg' }, barcode: 12345, copies: 2 },
+  { name: 'Banana', price: { value: 1.99, currency: '$' }, copies: 1 },
 ]
-
-// SDK 转换后（price fieldType 会自动分组 currency 和 unit）：
-// [
-//   { name: 'Apple', price: { value: 3.99, currency: '$', unit: '/kg' }, barcode: '12345', copies: 2 },
-//   { name: 'Banana', price: { value: 1.99, currency: '$' }, copies: 1 },
-// ]
 ```
 
 ### 嵌套对象语法
 
-对于结构化字段（price、weight），可以直接使用嵌套对象：
+对于结构化字段（price、weight），使用嵌套对象：
 
 ```typescript
 const products = [
@@ -70,7 +65,7 @@ const products = [
 
 ### 点路径语法
 
-对于结构化字段（仅限 price 和 weight），可以使用点路径键：
+对于结构化字段（price、weight），可以使用点路径键：
 
 ```typescript
 const products = [
@@ -116,7 +111,7 @@ TSPL 协议按行解析指令。`text` 类型字段值中的换行符（`\n`、`
 | code | reason | 来源 | 说明 |
 |------|--------|------|------|
 | `DATA_FORMAT` | `newline_truncated` | SDK 客户端 | `text` 字段包含换行符，已自动截取第一行 |
-| `DPI_MISMATCH` | — | Topbridge App | 打印机 DPI 与模板设计 DPI 不匹配 |
+| `DPI_MISMATCH` | — | TopBridge App | 打印机 DPI 与模板设计 DPI 不匹配 |
 
 两者合并到响应的 `warnings[]` 数组中。这些是非致命警告——打印任务仍会正常执行。
 
@@ -148,6 +143,6 @@ await client.print.execute({
 await client.print.execute({
   template: 'PRICE_LABEL',
   printer: 'TSC DA220',
-  products: [{ name: 'Apple', price: 3.99, currency: '$', unit: '/kg' }],
+  products: [{ name: 'Apple', price: { value: 3.99, currency: '$', unit: '/kg' } }],
 })
 ```

@@ -4,7 +4,7 @@ title: Widget 类型
 
 # Widget 类型
 
-Widget 类型（在 schema 中也叫 `fieldType`）定义了 SDK 如何转换你的产品数据后再发送给 Topbridge App。模板 schema 中的每个字段都有一个 `type`，决定了其转换行为。
+Widget 类型（在 schema 中也叫 `fieldType`）定义了 SDK 如何转换你的产品数据后再发送给 TopBridge App。模板 schema 中的每个字段都有一个 `type`，决定了其转换行为。
 
 ## 分类
 
@@ -25,7 +25,7 @@ Widget 类型分为三大类：
 ```typescript
 // 输入
 { name: 'Apple' }
-// 输出（发送给 Topbridge App）
+// 输出（发送给 TopBridge App）
 { name: 'Apple' }
 
 // 如果输入包含换行符：
@@ -50,20 +50,10 @@ Widget 类型分为三大类：
 构建包含 `value`、`currency`、`unit` 的结构化对象。
 
 ```typescript
-// 输入（扁平）
-{ price: 3.99, currency: '$', unit: '/kg' }
-// 输出
-{ price: { value: 3.99, currency: '$', unit: '/kg' } }
-
-// 输入（嵌套）
+// 输入
 { price: { value: 3.99, currency: '$', unit: '/kg' } }
 // 输出
 { price: { value: 3.99, currency: '$', unit: '/kg' } }
-
-// 输入（标量简写 — 自动包装为 { value })
-{ price: 3.99 }
-// 输出
-{ price: { value: 3.99 } }
 ```
 
 ### `weight` — 重量结构
@@ -71,15 +61,10 @@ Widget 类型分为三大类：
 构建包含 `value`、`unit` 的结构化对象。
 
 ```typescript
-// 输入（扁平）
-{ weight: 0.5, unit: 'kg' }
+// 输入
+{ weight: { value: 0.5, unit: 'kg' } }
 // 输出
 { weight: { value: 0.5, unit: 'kg' } }
-
-// 输入（标量简写）
-{ weight: 0.5 }
-// 输出
-{ weight: { value: 0.5 } }
 ```
 
 ### `barcode` — 条形码

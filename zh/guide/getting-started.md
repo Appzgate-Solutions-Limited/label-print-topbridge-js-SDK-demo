@@ -15,15 +15,15 @@ npm install @appzgatenz/label-print-topbridge-js
 | # | 条件 | 说明 |
 |---|------|------|
 | 1 | 支持 WebSocket 的现代浏览器 | Chrome 16+, Firefox 11+, Safari 7+, Edge 12+ |
-| 2 | Topbridge App >= 1.0.45 已安装 | [下载](https://service.topsale.co.nz/self-service/download/topbridge) |
-| 3 | Topbridge App 正在运行 | 健康检查返回 `pong` |
-| 4 | 用户已登录 Topbridge App | `data.isLoggedIn === true` |
+| 2 | TopBridge App >= 1.0.45 已安装 | [下载](https://service.topsale.co.nz/self-service/download/topbridge) |
+| 3 | TopBridge App 正在运行 | 健康检查返回 `pong` |
+| 4 | 用户已登录 TopBridge App | `data.isLoggedIn === true` |
 | 5 | 打印权益有效 | 权益验证通过 |
 | 6 | 至少一台打印机已配置协议（TSPL/ZPL） | 打印机列表非空 |
 | 7 | CSP 允许 `topsale:` 协议（使用 launch 时） | 详见 [CSP 配置](/zh/guide/csp) |
 
 :::tip 不想写代码？
-试试 [TopSale 标签打印方案](https://topsale.biz/solution/label-printing/)，无需集成即可使用。
+试试 [TOPSALE 标签打印方案](https://topsale.biz/solution/label-printing/)，无需集成即可使用。
 :::
 
 ## 初始化
@@ -34,12 +34,12 @@ import { TopBridgeClient } from '@appzgatenz/label-print-topbridge-js'
 const client = new TopBridgeClient()
 ```
 
-SDK 通过本地 WebSocket 与 Topbridge App 通信，无需配置。
+SDK 通过本地 WebSocket 与 TopBridge App 通信，无需配置。
 
 ## 完整打印流程
 
 ```typescript
-// 0. 可选：确保 Topbridge App 正在运行
+// 0. 可选：确保 TopBridge App 正在运行
 const { printers } = await client.launch.ensureRunning(
   () => client.preflight.run({
     onStepChange: (step) => console.log(`正在检查 ${step}...`)
@@ -60,8 +60,8 @@ const result = await client.print.execute({
   template: 'PRICE_LABEL',       // 模板 ID 或 Code
   printer: 'TSC DA220',          // 打印机名称
   products: [
-    { name: 'Apple', price: 3.99, currency: '$', unit: '/kg', copies: 2 },
-    { name: 'Banana', price: 1.99, currency: '$', copies: 1 },
+    { name: 'Apple', price: { value: 3.99, currency: '$', unit: '/kg' }, copies: 2 },
+    { name: 'Banana', price: { value: 1.99, currency: '$' }, copies: 1 },
   ],
 })
 
@@ -127,7 +127,7 @@ try {
   await client.print.execute({ /* ... */ })
 } catch (err) {
   if (err instanceof TopBridgeConnectionError) {
-    // Topbridge App 未运行或连接超时
+    // TopBridge App 未运行或连接超时
   } else if (err instanceof TopBridgeAuthError) {
     // 未登录或需要更新
     if (err.code === 'UPDATE_REQUIRED') {
@@ -140,7 +140,7 @@ try {
   } else if (err instanceof TopBridgeTemplateError) {
     // 模板不存在或无权限
   } else if (err instanceof TopBridgeNetworkError) {
-    // Topbridge App 在线，但云端网络断开
+    // TopBridge App 在线，但云端网络断开
   } else if (err instanceof TopBridgeSourceError) {
     // 来源验证失败
   } else if (err instanceof TopBridgePrintError) {

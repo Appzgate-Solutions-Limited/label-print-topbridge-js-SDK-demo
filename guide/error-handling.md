@@ -26,12 +26,12 @@ All SDK errors inherit from the `TopBridgeError` base class:
 
 ```
 TopBridgeError (Base)
-├── TopBridgeConnectionError     Connection failed / timed out / Topbridge App not running
+├── TopBridgeConnectionError     Connection failed / timed out / TopBridge App not running
 ├── TopBridgeAuthError           Authentication issue
 │     .code: 'NOT_AUTHENTICATED'
 │     .storeUrl?: string         Update link
 │     .downloadUrl?: string      Download link
-├── TopBridgeVersionError        Topbridge App version too low
+├── TopBridgeVersionError        TopBridge App version too low
 │     .code: 'UPDATE_REQUIRED'
 │     .storeUrl?: string         Update link
 │     .downloadUrl?: string      Download link
@@ -70,14 +70,14 @@ try {
   await client.print.execute({ /* ... */ })
 } catch (err) {
   if (err instanceof TopBridgeConnectionError) {
-    // Topbridge App is not running or network is unreachable
+    // TopBridge App is not running or network is unreachable
   }
   else if (err instanceof TopBridgeAuthError) {
     // User is not logged in
     if (err.storeUrl) console.log('Store:', err.storeUrl)
   }
   else if (err instanceof TopBridgeVersionError) {
-    // Topbridge App version is too low — guide user to update
+    // TopBridge App version is too low — guide user to update
     if (err.storeUrl) window.open(err.storeUrl)
   }
   else if (err instanceof TopBridgeQuotaError) {
@@ -90,7 +90,7 @@ try {
     // Template does not exist or no permission
   }
   else if (err instanceof TopBridgeNetworkError) {
-    // Topbridge App is online, but cloud network is disconnected
+    // TopBridge App is online, but cloud network is disconnected
   }
   else if (err instanceof TopBridgeSourceError) {
     // Origin verification failed
@@ -140,9 +140,9 @@ try {
 
 | Scenario | Error Type | Suggested Handling |
 |----------|------------|--------------------|
-| Topbridge App not installed / not running | `TopBridgeConnectionError` | Use `client.launch.ensureRunning()` for auto-launch and retry |
-| User not logged in | `TopBridgeAuthError` | Guide user to log in to Topbridge App |
-| Topbridge App version too low | `TopBridgeVersionError` | Use `err.storeUrl` to guide update |
+| TopBridge App not installed / not running | `TopBridgeConnectionError` | Use `client.launch.ensureRunning()` for auto-launch and retry |
+| User not logged in | `TopBridgeAuthError` | Guide user to log in to TopBridge App |
+| TopBridge App version too low | `TopBridgeVersionError` | Use `err.storeUrl` to guide update |
 | Print quota exhausted | `TopBridgeQuotaError` | Display `err.reason`, guide to renew |
 | Invalid SDK configuration | `TopBridgeConfigError` | Check initialization parameters |
 | Printer offline | `TopBridgePrinterError` | Check printer connection and protocol configuration |

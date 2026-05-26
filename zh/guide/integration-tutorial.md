@@ -8,21 +8,21 @@ title: 完整集成教程
 
 ## 第一步：预检（Preflight） {#step-1-preflight}
 
-在执行打印之前，需要确认三件事：Topbridge App 在运行且用户已登录、权益有效、打印机可用。`preflight.run()` 一次性完成这些检查。
+在执行打印之前，需要确认三件事：TopBridge App 在运行且用户已登录、权益有效、打印机可用。`preflight.run()` 一次性完成这些检查。
 
-> **前置条件**：需安装 Topbridge App >= 1.0.45（[下载](https://service.topsale.co.nz/self-service/download/topbridge)）。
+> **前置条件**：需安装 TopBridge App >= 1.0.45（[下载](https://service.topsale.co.nz/self-service/download/topbridge)）。
 
 :::tip 更倾向免代码方案？
-[试试 TopSale 标签打印方案](https://topsale.biz/solution/label-printing/) —— 无需任何开发，几分钟即可开始打印标签。
+[试试 TOPSALE 标签打印方案](https://topsale.biz/solution/label-printing/) —— 无需任何开发，几分钟即可开始打印标签。
 :::
 
 > `preflight` 是推荐的最佳实践但非强制——你也可以直接调用 `print.execute()`。不过，使用 preflight 可以在打印前提前发现并处理问题，提供更好的用户体验。
 >
-> 注意：`preflight.run()` 不会自动唤起 Topbridge App。如需自动唤起，使用 `client.launch.ensureRunning()` 包装。
+> 注意：`preflight.run()` 不会自动唤起 TopBridge App。如需自动唤起，使用 `client.launch.ensureRunning()` 包装。
 
 ```typescript
 try {
-  // 使用 ensureRunning 包装，自动处理 Topbridge App 唤起和重试
+  // 使用 ensureRunning 包装，自动处理 TopBridge App 唤起和重试
   const preflight = await client.launch.ensureRunning(
     () => client.preflight.run({
       onStepChange: (step) => {
@@ -114,13 +114,13 @@ const schema = await client.templates.schema('PRICE_LABEL')
 使用预检获得的打印机和模板信息，构建打印请求：
 
 ```typescript
-// 输入: 扁平产品数据
+// 输入: 产品数据
 const result = await client.print.execute({
   template: 'PRICE_LABEL',
   printer: preflight.printers.data.defaultPrinter,
   products: [
-    { name: 'Apple', price: 3.99, currency: '$', unit: '/kg', copies: 2 },
-    { name: 'Banana', price: 1.99, currency: '$', copies: 1 },
+    { name: 'Apple', price: { value: 3.99, currency: '$', unit: '/kg' }, copies: 2 },
+    { name: 'Banana', price: { value: 1.99, currency: '$' }, copies: 1 },
   ],
 })
 
@@ -138,7 +138,7 @@ const result = await client.print.execute({
 
 **关键点**：
 
-- `products` 是扁平 JSON 对象，SDK 自动获取模板 schema 并根据 fieldType 转换数据
+- `products` 是 JSON 对象，SDK 自动获取模板 schema 并根据 fieldType 转换数据
 - `template` 可以传模板 ID（`'1'`）或 Code（`'PRICE_LABEL'`）
 - `printer` 传打印机名称字符串
 - `copies` 默认为 1，范围 [1, 9999]
@@ -162,7 +162,7 @@ const client = new TopBridgeClient({ debug: true })
 
 async function printPriceLabels() {
   try {
-    // 1. 确保 Topbridge App 运行 + 预检
+    // 1. 确保 TopBridge App 运行 + 预检
     const preflight = await client.launch.ensureRunning(
       () => client.preflight.run({
         onStepChange: (step) => console.log(`检查: ${step}`)
@@ -175,8 +175,8 @@ async function printPriceLabels() {
       template: 'PRICE_LABEL',
       printer: preflight.printers.data.defaultPrinter,
       products: [
-        { name: 'Apple', price: 3.99, currency: '$', unit: '/kg', copies: 2 },
-        { name: 'Banana', price: 1.99, currency: '$', copies: 1 },
+        { name: 'Apple', price: { value: 3.99, currency: '$', unit: '/kg' }, copies: 2 },
+        { name: 'Banana', price: { value: 1.99, currency: '$' }, copies: 1 },
       ],
     })
 
@@ -191,12 +191,12 @@ async function printPriceLabels() {
         const updateUrl = err.storeUrl ?? err.downloadUrl
         if (updateUrl) window.open(updateUrl)
       } else {
-        console.error('请先登录 Topbridge App')
+        console.error('请先登录 TopBridge App')
       }
     } else if (err instanceof TopBridgeQuotaError) {
       console.error('打印配额不足:', err.reason)
     } else if (err instanceof TopBridgePrinterError) {
-      console.error('打印机错误，请在 Topbridge App 中检查打印机配置')
+      console.error('打印机错误，请在 TopBridge App 中检查打印机配置')
     } else if (err instanceof TopBridgePrintError) {
       console.error('打印失败:', err.message)
     } else {

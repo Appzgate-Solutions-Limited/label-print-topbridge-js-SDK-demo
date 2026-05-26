@@ -4,9 +4,13 @@ title: Data Transformation (fieldTypes)
 
 # Data Transformation
 
-The SDK automatically transforms your flat product data into the structured format Topbridge App expects. This is done **schema-driven**: when you call `print.execute()`, the SDK internally fetches the template schema and applies transformations based on each field's `fieldType`.
+The SDK automatically transforms your product data into the structured format TopBridge App expects. This is done **schema-driven**: when you call `print.execute()`, the SDK internally fetches the template schema and applies transformations based on each field's `fieldType`.
 
 You do **not** need to manually specify field types — the SDK handles everything automatically.
+
+::: warning
+**Flat auto-grouping notation removed.** The format where `price`, `currency`, and `unit` are separate sibling keys is no longer supported. Use [Nested Object Syntax](#nested-object-syntax) or [Dot-Path Syntax](#dot-path-syntax) instead.
+:::
 
 ## How It Works
 
@@ -18,7 +22,7 @@ print.execute({ template, printer, products })
   │     ├─ Protocol fields: integer
   │     └─ Layout fields: line (skipped)
   ├─ 3. Transform each product's data
-  └─ 4. Send print command to Topbridge App
+  └─ 4. Send print command to TopBridge App
 ```
 
 `print.execute()` handles the entire pipeline automatically — you only need to provide the product data with the correct field names.
@@ -29,11 +33,9 @@ print.execute({ template, printer, products })
 |-----------|-------|--------|-------|
 | `text` | `'Apple\nOrganic'` | `'Apple'` | Truncates to first line + warning |
 | `textfield` | `'Line 1\nLine 2'` | `'Line 1\nLine 2'` | Preserves newlines, strips `=`/`=@` |
-| `price` | `3.99` | `{ value: 3.99 }` | Scalar auto-wrap |
-| `price` | `3.99, currency: '$', unit: '/kg'` | `{ value: 3.99, currency: '$', unit: '/kg' }` | Flat fields auto-grouped |
+| `price` | `{ value: 3.99 }` | `{ value: 3.99 }` | Scalar auto-wrap |
 | `price` | `{ value: 3.99, currency: '$' }` | `{ value: 3.99, currency: '$' }` | Nested object preserved |
-| `weight` | `0.5` | `{ value: 0.5 }` | Scalar auto-wrap |
-| `weight` | `0.5, unit: 'kg'` | `{ value: 0.5, unit: 'kg' }` | Flat fields auto-grouped |
+| `weight` | `{ value: 0.5 }` | `{ value: 0.5 }` | Scalar auto-wrap |
 | `barcode` | `12345` | `'12345'` | Force string |
 | `barcode` | `null` | `''` | null → empty string |
 | `qrcode` | `'https://...'` | `'https://...'` | Force string |
@@ -42,25 +44,18 @@ print.execute({ template, printer, products })
 
 ## Product Data Format
 
-Products are flat JSON objects. You can mix flat values with nested objects:
+Products are JSON objects. Use nested objects or dot-path syntax for structured fields:
 
 ```typescript
 const products = [
-  // Flat values — SDK auto-groups based on schema fieldType
-  { name: 'Apple', price: 3.99, currency: '$', unit: '/kg', barcode: 12345, copies: 2 },
-  { name: 'Banana', price: 1.99, currency: '$', copies: 1 },
+  { name: 'Apple', price: { value: 3.99, currency: '$', unit: '/kg' }, barcode: 12345, copies: 2 },
+  { name: 'Banana', price: { value: 1.99, currency: '$' }, copies: 1 },
 ]
-
-// After SDK transformation (price fieldType groups currency+unit):
-// [
-//   { name: 'Apple', price: { value: 3.99, currency: '$', unit: '/kg' }, barcode: '12345', copies: 2 },
-//   { name: 'Banana', price: { value: 1.99, currency: '$' }, copies: 1 },
-// ]
 ```
 
 ### Nested Object Syntax
 
-For structured fields (price, weight), you can explicitly use nested objects:
+For structured fields (price, weight), use nested objects:
 
 ```typescript
 const products = [
@@ -70,7 +65,7 @@ const products = [
 
 ### Dot-Path Syntax
 
-For structured fields (price, weight only), you can use dot-path keys:
+For structured fields (price, weight), you can use dot-path keys:
 
 ```typescript
 const products = [
@@ -116,7 +111,7 @@ This only applies to fields with `text` fieldType in the schema. `textfield` pre
 | code | reason | Source | Description |
 |------|--------|--------|-------------|
 | `DATA_FORMAT` | `newline_truncated` | SDK client | A `text` field contained newlines; auto-truncated to first line |
-| `DPI_MISMATCH` | — | Topbridge App | Printer DPI does not match the template design DPI |
+| `DPI_MISMATCH` | — | TopBridge App | Printer DPI does not match the template design DPI |
 
 Both are merged into a single `warnings[]` array on the response. These are non-fatal — the print job still executes.
 
@@ -148,6 +143,6 @@ await client.print.execute({
 await client.print.execute({
   template: 'PRICE_LABEL',
   printer: 'TSC DA220',
-  products: [{ name: 'Apple', price: 3.99, currency: '$', unit: '/kg' }],
+  products: [{ name: 'Apple', price: { value: 3.99, currency: '$', unit: '/kg' } }],
 })
 ```

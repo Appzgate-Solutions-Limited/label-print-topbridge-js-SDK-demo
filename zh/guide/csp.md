@@ -12,7 +12,7 @@ title: CSP 配置
 
 ## 为什么需要配置
 
-Topbridge App 使用自定义协议（`topsale://`）实现自动唤起。SDK 通过创建隐藏 iframe 并设置 `src="topsale://callback"` 来触发唤起。如果你的页面有 CSP 限制 frame 来源，iframe 加载会被静默阻止——Topbridge App 无法唤起，`ensureRunning()` 会失败。
+TopBridge App 使用自定义协议（`topsale://`）实现自动唤起。SDK 通过创建隐藏 iframe 并设置 `src="topsale://callback"` 来触发唤起。如果你的页面有 CSP 限制 frame 来源，iframe 加载会被静默阻止——TopBridge App 无法唤起，`ensureRunning()` 会失败。
 
 ## 必要配置
 
@@ -105,7 +105,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 ### 唤起静默失败
 
-**症状**：`ensureRunning()` 不断重试但 Topbridge App 没有打开。
+**症状**：`ensureRunning()` 不断重试但 TopBridge App 没有打开。
 
 **原因**：CSP 阻止了 `topsale:` 协议。检查控制台中是否有 CSP 违规消息。
 

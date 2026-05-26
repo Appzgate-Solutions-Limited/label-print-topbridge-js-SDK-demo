@@ -15,15 +15,15 @@ npm install @appzgatenz/label-print-topbridge-js
 | # | Requirement | Details |
 |---|-------------|---------|
 | 1 | Modern browser with WebSocket support | Chrome 16+, Firefox 11+, Safari 7+, Edge 12+ |
-| 2 | Topbridge App >= 1.0.45 installed | [Download](https://service.topsale.co.nz/self-service/download/topbridge) |
-| 3 | Topbridge App is running | Health check returns `pong` |
-| 4 | User is logged in to Topbridge App | `data.isLoggedIn === true` |
+| 2 | TopBridge App >= 1.0.45 installed | [Download](https://service.topsale.co.nz/self-service/download/topbridge) |
+| 3 | TopBridge App is running | Health check returns `pong` |
+| 4 | User is logged in to TopBridge App | `data.isLoggedIn === true` |
 | 5 | Print entitlement is valid | Benefits check passes |
 | 6 | At least one printer configured with protocol (TSPL/ZPL) | Printer list is non-empty |
 | 7 | CSP allows `topsale:` protocol (if using `launch`) | See [CSP Configuration](/guide/csp) |
 
 :::tip Don't want to write code?
-Try the [TopSale label printing solution](https://topsale.biz/solution/label-printing/) — no integration needed.
+Try the [TOPSALE label printing solution](https://topsale.biz/solution/label-printing/) — no integration needed.
 :::
 
 ## Initialization
@@ -34,12 +34,12 @@ import { TopBridgeClient } from '@appzgatenz/label-print-topbridge-js'
 const client = new TopBridgeClient()
 ```
 
-The SDK communicates with Topbridge App via local WebSocket. No configuration required.
+The SDK communicates with TopBridge App via local WebSocket. No configuration required.
 
 ## Complete Print Workflow
 
 ```typescript
-// 0. Optional: ensure Topbridge App is running
+// 0. Optional: ensure TopBridge App is running
 const { printers } = await client.launch.ensureRunning(
   () => client.preflight.run({
     onStepChange: (step) => console.log(`Checking ${step}...`)
@@ -60,8 +60,8 @@ const result = await client.print.execute({
   template: 'PRICE_LABEL',       // Template ID or Code
   printer: 'TSC DA220',          // Printer name
   products: [
-    { name: 'Apple', price: 3.99, currency: '$', unit: '/kg', copies: 2 },
-    { name: 'Banana', price: 1.99, currency: '$', copies: 1 },
+    { name: 'Apple', price: { value: 3.99, currency: '$', unit: '/kg' }, copies: 2 },
+    { name: 'Banana', price: { value: 1.99, currency: '$' }, copies: 1 },
   ],
 })
 
@@ -127,7 +127,7 @@ try {
   await client.print.execute({ /* ... */ })
 } catch (err) {
   if (err instanceof TopBridgeConnectionError) {
-    // Topbridge App is not running or connection timed out
+    // TopBridge App is not running or connection timed out
   } else if (err instanceof TopBridgeAuthError) {
     // Not logged in or update required
     if (err.code === 'UPDATE_REQUIRED') {
@@ -140,7 +140,7 @@ try {
   } else if (err instanceof TopBridgeTemplateError) {
     // Template does not exist or no permission
   } else if (err instanceof TopBridgeNetworkError) {
-    // Topbridge App is online, but cloud network is disconnected
+    // TopBridge App is online, but cloud network is disconnected
   } else if (err instanceof TopBridgeSourceError) {
     // Origin verification failed
   } else if (err instanceof TopBridgePrintError) {

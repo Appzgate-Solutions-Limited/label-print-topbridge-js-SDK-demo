@@ -4,7 +4,7 @@ title: Widget Types
 
 # Widget Types
 
-Widget Types (also called `fieldType` in the schema) define how the SDK transforms your product data before sending it to Topbridge App. Each field in a template schema has a `type` that determines its transformation behavior.
+Widget Types (also called `fieldType` in the schema) define how the SDK transforms your product data before sending it to TopBridge App. Each field in a template schema has a `type` that determines its transformation behavior.
 
 ## Classification
 
@@ -25,7 +25,7 @@ Static text display. Newlines are automatically truncated to the first line.
 ```typescript
 // Input
 { name: 'Apple' }
-// Output (sent to Topbridge App)
+// Output (sent to TopBridge App)
 { name: 'Apple' }
 
 // If input contains newlines:
@@ -50,20 +50,10 @@ Editable text input. Preserves newlines and strips formula-injection prefixes (`
 Builds a structured object with `value`, `currency`, and `unit`.
 
 ```typescript
-// Input (flat)
-{ price: 3.99, currency: '$', unit: '/kg' }
-// Output
-{ price: { value: 3.99, currency: '$', unit: '/kg' } }
-
-// Input (nested)
+// Input
 { price: { value: 3.99, currency: '$', unit: '/kg' } }
 // Output
 { price: { value: 3.99, currency: '$', unit: '/kg' } }
-
-// Input (scalar shorthand — auto-wraps to { value })
-{ price: 3.99 }
-// Output
-{ price: { value: 3.99 } }
 ```
 
 ### `weight` — Weight Structure
@@ -71,15 +61,10 @@ Builds a structured object with `value`, `currency`, and `unit`.
 Builds a structured object with `value` and `unit`.
 
 ```typescript
-// Input (flat)
-{ weight: 0.5, unit: 'kg' }
+// Input
+{ weight: { value: 0.5, unit: 'kg' } }
 // Output
 { weight: { value: 0.5, unit: 'kg' } }
-
-// Input (scalar shorthand)
-{ weight: 0.5 }
-// Output
-{ weight: { value: 0.5 } }
 ```
 
 ### `barcode` — Barcode

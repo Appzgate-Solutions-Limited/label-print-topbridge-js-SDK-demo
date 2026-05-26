@@ -15,7 +15,7 @@ title: API 速查表
 | `templates` | [`schema(template)`](/zh/guide/integration-tutorial#step-2-get-templates) | `Promise<TemplateSchemaResponse>` | 模板字段定义 |
 | `print` | [`execute(request)`](/zh/guide/integration-tutorial#step-3-execute-print) | `Promise<PrintResponse>` | 执行打印 |
 | `preflight` | [`run(options?)`](/zh/guide/integration-tutorial#step-1-preflight) | `Promise<PreflightResult>` | 预检编排 |
-| `launch` | [`trigger()`](/zh/guide/launch-module#trigger) | `void` | 触发 Topbridge App 唤起 |
+| `launch` | [`trigger()`](/zh/guide/launch-module#trigger) | `void` | 触发 TopBridge App 唤起 |
 | `launch` | [`ensureRunning(fn, options?)`](/zh/guide/launch-module#ensurerunning-fn-options) | `Promise<T>` | 唤起 + 重试编排 |
 
 ### TopBridgeClientConfig

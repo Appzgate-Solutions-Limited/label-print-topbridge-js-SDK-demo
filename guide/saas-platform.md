@@ -2,9 +2,9 @@
 title: SaaS Platform
 ---
 
-# TopSale SaaS Platform
+# TOPSALE SaaS Platform
 
-TopSale provides a complete label printing SaaS solution alongside the open-source SDK. Whether you want to integrate via code or get started immediately without development, we have you covered.
+TOPSALE provides a complete label printing SaaS solution alongside the open-source SDK. Whether you want to integrate via code or get started immediately without development, we have you covered.
 
 ## Choose Your Path
 
@@ -16,11 +16,11 @@ TopSale provides a complete label printing SaaS solution alongside the open-sour
 
 ## Platform Resources
 
-### [TopSale Official Website](https://topsale.biz/solution/label-printing/)
+### [TOPSALE Official Website](https://topsale.biz/solution/label-printing/)
 
-Learn about the full TopSale label printing solution, including features, pricing, and use cases.
+Learn about the full TOPSALE label printing solution, including features, pricing, and use cases.
 
-### [Self-Service Portal](https://service.topsale.co.nz/self-service)
+### [TOPSALE Self-Service](https://service.topsale.co.nz/self-service)
 
 Manage your account, configure printers and templates, and access support resources.
 
@@ -28,7 +28,7 @@ Manage your account, configure printers and templates, and access support resour
 
 Download the latest version of TopBridge desktop app for Windows and macOS.
 
-### [App Store](https://service.topsale.co.nz/store)
+### [TOPSALE App Store](https://service.topsale.co.nz/store)
 
 Browse and purchase label printing plans, printer accessories, and subscription packages.
 
@@ -43,7 +43,7 @@ Import spreadsheets and batch print labels with custom field mapping.
 ## Getting Started
 
 1. [Download TopBridge](https://service.topsale.co.nz/self-service/download/topbridge) and install on your local machine
-2. Sign up at the [Self-Service Portal](https://service.topsale.co.nz/self-service)
+2. Sign up at the [TOPSALE Self-Service](https://service.topsale.co.nz/self-service)
 3. Design labels in the [Label Designer](https://service.topsale.co.nz/self-service/label-template), or use [Excel Print](https://service.topsale.co.nz/self-service/excel-print) for batch jobs
 
 :::tip Need more control?

@@ -26,12 +26,12 @@ SDK 采用**分层继承 + 协议错误码 + 结构化元数据**的三层模型
 
 ```
 TopBridgeError (基类)
-├── TopBridgeConnectionError     连接失败 / 超时 / Topbridge App 未运行
+├── TopBridgeConnectionError     连接失败 / 超时 / TopBridge App 未运行
 ├── TopBridgeAuthError           认证问题
 │     .code: 'NOT_AUTHENTICATED'
 │     .storeUrl?: string         更新链接
 │     .downloadUrl?: string      下载链接
-├── TopBridgeVersionError        Topbridge App 版本过低
+├── TopBridgeVersionError        TopBridge App 版本过低
 │     .code: 'UPDATE_REQUIRED'
 │     .storeUrl?: string         更新链接
 │     .downloadUrl?: string      下载链接
@@ -70,14 +70,14 @@ try {
   await client.print.execute({ /* ... */ })
 } catch (err) {
   if (err instanceof TopBridgeConnectionError) {
-    // Topbridge App 未运行或网络不通
+    // TopBridge App 未运行或网络不通
   }
   else if (err instanceof TopBridgeAuthError) {
     // 用户未登录
     if (err.storeUrl) console.log('Store:', err.storeUrl)
   }
   else if (err instanceof TopBridgeVersionError) {
-    // Topbridge App 版本过低 — 引导用户更新
+    // TopBridge App 版本过低 — 引导用户更新
     if (err.storeUrl) window.open(err.storeUrl)
   }
   else if (err instanceof TopBridgeQuotaError) {
@@ -90,7 +90,7 @@ try {
     // 模板不存在或无权限
   }
   else if (err instanceof TopBridgeNetworkError) {
-    // Topbridge App 在线，但云端网络断开
+    // TopBridge App 在线，但云端网络断开
   }
   else if (err instanceof TopBridgeSourceError) {
     // 来源验证失败
@@ -140,9 +140,9 @@ try {
 
 | 场景 | 错误类型 | 处理建议 |
 |------|---------|---------|
-| Topbridge App 未安装/未运行 | `TopBridgeConnectionError` | 使用 `client.launch.ensureRunning()` 自动唤起重试 |
-| 用户未登录 | `TopBridgeAuthError` | 引导用户登录 Topbridge App |
-| Topbridge App 版本过低 | `TopBridgeVersionError` | 使用 `err.storeUrl` 引导更新 |
+| TopBridge App 未安装/未运行 | `TopBridgeConnectionError` | 使用 `client.launch.ensureRunning()` 自动唤起重试 |
+| 用户未登录 | `TopBridgeAuthError` | 引导用户登录 TopBridge App |
+| TopBridge App 版本过低 | `TopBridgeVersionError` | 使用 `err.storeUrl` 引导更新 |
 | 打印配额耗尽 | `TopBridgeQuotaError` | 展示 `err.reason`，引导续费 |
 | SDK 配置无效 | `TopBridgeConfigError` | 检查初始化参数 |
 | 打印机离线 | `TopBridgePrinterError` | 检查打印机连接和协议配置 |

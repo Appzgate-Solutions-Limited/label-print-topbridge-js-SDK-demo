@@ -1,16 +1,16 @@
 ---
-title: Topbridge App Launch
+title: TopBridge App Launch
 ---
 
-# Topbridge App Launch (LaunchModule)
+# TopBridge App Launch (LaunchModule)
 
-The `launch` module is responsible for launching Topbridge App and orchestrating connection retries.
+The `launch` module is responsible for launching TopBridge App and orchestrating connection retries.
 
 > **Prerequisite**: If your page uses CSP, it must allow the `topsale:` custom protocol. See [CSP Configuration](/guide/csp) for details.
 
 ## trigger()
 
-Triggers Topbridge App launch. Loads the `topsale://callback` custom protocol via a hidden iframe. This method is fire-and-forget and does not return a Promise.
+Triggers TopBridge App launch. Loads the `topsale://callback` custom protocol via a hidden iframe. This method is fire-and-forget and does not return a Promise.
 
 ```typescript
 client.launch.trigger()
@@ -18,12 +18,12 @@ client.launch.trigger()
 
 Use cases:
 - You want to manually control the launch timing
-- Proactively launch when detecting Topbridge App is not running
+- Proactively launch when detecting TopBridge App is not running
 - Custom retry logic
 
 ## ensureRunning(fn, options?)
 
-Ensures Topbridge App is running before executing the specified operation. Encapsulates the complete launch → wait → retry flow.
+Ensures TopBridge App is running before executing the specified operation. Encapsulates the complete launch → wait → retry flow.
 
 ```typescript
 const result = await client.launch.ensureRunning(
@@ -40,7 +40,7 @@ ensureRunning(fn)
   ├─ fn() throws non-ConnectionError → Throw immediately
   └─ fn() throws ConnectionError
        ├─ options.onLaunching() callback
-       ├─ trigger() launches Topbridge App
+       ├─ trigger() launches TopBridge App
        ├─ Wait 3 seconds
        ├─ fn() retry → succeeds → Return result
        ├─ fn() retry → non-ConnectionError → Throw

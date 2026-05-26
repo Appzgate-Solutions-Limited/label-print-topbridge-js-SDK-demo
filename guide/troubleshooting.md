@@ -6,27 +6,27 @@ title: Troubleshooting
 
 ## Q: TopBridgeConnectionError thrown when calling API
 
-**Cause**: Cannot connect to Topbridge App. The SDK communicates with Topbridge App via a fixed WebSocket address.
+**Cause**: Cannot connect to TopBridge App. The SDK communicates with TopBridge App via a fixed WebSocket address.
 
 **Troubleshooting**:
-1. Confirm Topbridge App is installed ([download](https://service.topsale.co.nz/self-service/download/topbridge)) and running
+1. Confirm TopBridge App is installed ([download](https://service.topsale.co.nz/self-service/download/topbridge)) and running
 2. Check if the app is blocked by firewall
 3. Confirm app version >= 1.0.45 (supports V2 API)
-4. Use `client.launch.ensureRunning()` to automatically handle Topbridge App launch and retry
+4. Use `client.launch.ensureRunning()` to automatically handle TopBridge App launch and retry
 
 :::tip Still having issues?
-Visit the [TopSale Self-Service Portal](https://service.topsale.co.nz/self-service) for support resources and account management.
+Visit the [TOPSALE Self-Service Portal](https://service.topsale.co.nz/self-service) for support resources and account management.
 :::
 
 ## Q: TopBridgeAuthError(code: 'NOT_AUTHENTICATED') thrown
 
-**Cause**: Topbridge App is running but the user is not logged in.
+**Cause**: TopBridge App is running but the user is not logged in.
 
-**Handling**: Guide the user to open Topbridge App and complete login, then retry.
+**Handling**: Guide the user to open TopBridge App and complete login, then retry.
 
 ## Q: TopBridgeAuthError(code: 'UPDATE_REQUIRED') thrown
 
-**Cause**: The installed Topbridge App version is below the minimum requirement.
+**Cause**: The installed TopBridge App version is below the minimum requirement.
 
 **Handling**: Use `err.storeUrl` (Microsoft Store) or `err.downloadUrl` (direct download) to guide the user to update.
 
@@ -39,10 +39,10 @@ Visit the [TopSale Self-Service Portal](https://service.topsale.co.nz/self-servi
 
 ## Q: TopBridgePrinterError thrown but user confirms printer is connected
 
-**Cause**: Topbridge App requires the printer to have a communication protocol (TSPL / ZPL) configured. Simply connecting is not enough.
+**Cause**: TopBridge App requires the printer to have a communication protocol (TSPL / ZPL) configured. Simply connecting is not enough.
 
 **Troubleshooting**:
-1. Confirm the printer is synced in Topbridge App
+1. Confirm the printer is synced in TopBridge App
 2. Confirm a TSPL or ZPL protocol has been configured for the printer
 3. Printers without a configured protocol will not appear in `printers.list()` results
 

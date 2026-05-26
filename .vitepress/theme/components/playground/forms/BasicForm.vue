@@ -48,9 +48,11 @@ function emitPrint() {
     products: [
       {
         name: productName.value,
-        price: parseFloat(productPrice.value),
-        currency: productCurrency.value,
-        unit: productUnit.value,
+        price: {
+          value: parseFloat(productPrice.value),
+          currency: productCurrency.value,
+          unit: productUnit.value,
+        },
         copies: Number.parseInt(productCopies.value, 10) || 1,
       },
     ],

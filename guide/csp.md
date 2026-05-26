@@ -10,9 +10,9 @@ title: CSP Configuration
 
 > **Learn more**: [MDN — Content Security Policy (CSP)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 
-## Why Topbridge Needs CSP
+## Why TopBridge Needs CSP
 
-Topbridge App uses a custom protocol (`topsale://`) for auto-launch. The SDK triggers this by creating a hidden iframe with `src="topsale://callback"". If your page has a CSP that restricts frame sources, this iframe load will be silently blocked — Topbridge App won't launch and `ensureRunning()` will fail.
+TopBridge App uses a custom protocol (`topsale://`) for auto-launch. The SDK triggers this by creating a hidden iframe with `src="topsale://callback"". If your page has a CSP that restricts frame sources, this iframe load will be silently blocked — TopBridge App won't launch and `ensureRunning()` will fail.
 
 ## Required Configuration
 
@@ -105,7 +105,7 @@ To verify your CSP is correctly configured:
 
 ### Launch silently fails
 
-**Symptom**: `ensureRunning()` keeps retrying but Topbridge App doesn't open.
+**Symptom**: `ensureRunning()` keeps retrying but TopBridge App doesn't open.
 
 **Cause**: CSP is blocking the `topsale:` protocol. Check the Console for CSP violation messages.
 

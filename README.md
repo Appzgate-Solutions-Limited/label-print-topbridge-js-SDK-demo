@@ -1,10 +1,10 @@
-# TopSale Label Printing
+# TOPSALE Label Printing
 
 [![npm](https://img.shields.io/npm/v/@appzgatenz/label-print-topbridge-js)](https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js) [![docs](https://img.shields.io/badge/docs-label--printing.topsale.biz-blue)](https://label-printing.topsale.biz/)
 
 **Cloud-based label printing for any printer, anywhere.**
 
-TopSale is a cloud-based label printing platform that lets you design, manage, and print labels from your browser. Connect any TSPL or ZPL printer via the lightweight TopBridge desktop app — no server setup, no middleware.
+TOPSALE is a cloud-based label printing platform that lets you design, manage, and print labels from your browser. Connect any TSPL or ZPL printer via the lightweight TopBridge desktop app — no server setup, no middleware.
 
 ### Key Features
 
@@ -21,8 +21,8 @@ TopSale is a cloud-based label printing platform that lets you design, manage, a
 | Platform | Description |
 |----------|-------------|
 | 🌐 [Official Website](https://topsale.biz/solution/label-printing/) | Product overview, features, and pricing |
-| 🛠️ [Self-Service Portal](https://service.topsale.co.nz/self-service) | Label Designer, Excel Print, Download Centre, and more |
-| 🛍️ [App Store](https://service.topsale.co.nz/store) | Print service packages — subscription & pay-as-you-go |
+| 🛠️ [TOPSALE Self-Service](https://service.topsale.co.nz/self-service) | Label Designer, Excel Print, Download Centre, and more |
+| 🛍️ [TOPSALE App Store](https://service.topsale.co.nz/store) | Print service packages — subscription & pay-as-you-go |
 | 📖 [Documentation](https://label-printing.topsale.biz/) | SDK guides, API reference, and interactive examples |
 | ⬇️ [Download TopBridge](https://service.topsale.co.nz/self-service/download/topbridge) | Desktop app — connects your TSPL/ZPL printers to the cloud |
 
@@ -30,11 +30,11 @@ TopSale is a cloud-based label printing platform that lets you design, manage, a
 
 ## Get Started
 
-### For Business Users — Self-Service Platform
+### For Business Users — TOPSALE Self-Service
 
 No code required. Design and print labels directly from your browser:
 
-1. **Sign up** at the [Self-Service Portal](https://service.topsale.co.nz/self-service)
+1. **Sign up** at the [TOPSALE Self-Service](https://service.topsale.co.nz/self-service)
 2. **Design labels** — Use the WYSIWYG Label Designer with TSPL/ZPL support, barcodes, and dynamic data
 3. **Print** — [Download TopBridge](https://service.topsale.co.nz/self-service/download/topbridge) to connect your printer, or use Excel batch printing for bulk jobs
 
@@ -63,7 +63,7 @@ await client.print.execute({
   template: 'PRICE_LABEL',
   printer: preflight.printers.data.defaultPrinter,
   products: [
-    { name: 'Example', price: 9.99, currency: '$', unit: '/ea', copies: 1 },
+    { name: 'Example', price: { value: 9.99, currency: '$', unit: '/ea' }, copies: 1 },
   ],
 })
 ```

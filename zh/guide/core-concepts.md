@@ -10,13 +10,13 @@ title: 核心概念
 
 | 模块 | 职责 | 主要方法 |
 |------|------|---------|
-| `health` | 检查 Topbridge App 运行状态 | `check()` |
+| `health` | 检查 TopBridge App 运行状态 | `check()` |
 | `benefits` | 验证用户打印权益和配额 | `check()` |
 | `printers` | 获取已配置的打印机列表 | `list()` |
 | `templates` | 获取模板列表和字段定义 | `list()`, `schema()` |
 | `print` | 执行打印任务（schema 驱动数据转换） | `execute()` |
 | `preflight` | 编排前三步的完整预检 | `run()` |
-| `launch` | Topbridge App 唤起与重试编排 | `trigger()`, `ensureRunning()` |
+| `launch` | TopBridge App 唤起与重试编排 | `trigger()`, `ensureRunning()` |
 
 ## 短连接模型
 
@@ -74,7 +74,7 @@ interface SdkWarning {
 // product 对象中的每个键就是一个 DataField
 const product = {
   name: 'Apple',      // DataField: "name"
-  price: 3.99,        // DataField: "price"
+  price: { value: 3.99 },  // DataField: "price"
   barcode: '12345',   // DataField: "barcode"
   copies: 2,          // 保留 DataField
 }
