@@ -111,10 +111,11 @@ const schema = await client.templates.schema('PRICE_LABEL')
 
 ## Step 3: Execute Print {#step-3-execute-print}
 
-Use the printer and template information from preflight to build the print request:
+Use the printer and template information from preflight to build the print request. Structured fields (price, weight) support two syntaxes:
+
+**Nested Object Syntax** (recommended):
 
 ```typescript
-// Input: product data
 const result = await client.print.execute({
   template: 'PRICE_LABEL',
   printer: preflight.printers.data.defaultPrinter,
@@ -135,6 +136,21 @@ const result = await client.print.execute({
 //   }
 // }
 ```
+
+**Dot-Path Syntax**:
+
+```typescript
+const result = await client.print.execute({
+  template: 'PRICE_LABEL',
+  printer: preflight.printers.data.defaultPrinter,
+  products: [
+    { name: 'Apple', 'price.value': 3.99, 'price.currency': '$', 'price.unit': '/kg', copies: 2 },
+    { name: 'Banana', 'price.value': 1.99, 'price.currency': '$', copies: 1 },
+  ],
+})
+```
+
+Both syntaxes produce identical output.
 
 **Key Points**:
 

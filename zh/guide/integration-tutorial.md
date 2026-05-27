@@ -111,10 +111,11 @@ const schema = await client.templates.schema('PRICE_LABEL')
 
 ## 第三步：执行打印 {#step-3-execute-print}
 
-使用预检获得的打印机和模板信息，构建打印请求：
+使用预检获得的打印机和模板信息，构建打印请求。结构化字段（price、weight）支持两种语法：
+
+**嵌套对象语法**（推荐）：
 
 ```typescript
-// 输入: 产品数据
 const result = await client.print.execute({
   template: 'PRICE_LABEL',
   printer: preflight.printers.data.defaultPrinter,
@@ -135,6 +136,21 @@ const result = await client.print.execute({
 //   }
 // }
 ```
+
+**点路径语法**：
+
+```typescript
+const result = await client.print.execute({
+  template: 'PRICE_LABEL',
+  printer: preflight.printers.data.defaultPrinter,
+  products: [
+    { name: 'Apple', 'price.value': 3.99, 'price.currency': '$', 'price.unit': '/kg', copies: 2 },
+    { name: 'Banana', 'price.value': 1.99, 'price.currency': '$', copies: 1 },
+  ],
+})
+```
+
+两种语法产生完全相同的输出。
 
 **关键点**：
 

@@ -15,7 +15,7 @@ title: Troubleshooting
 4. Use `client.launch.ensureRunning()` to automatically handle TopBridge App launch and retry
 
 :::tip Still having issues?
-Visit the [TOPSALE Self-Service Portal](https://service.topsale.co.nz/self-service) for support resources and account management.
+Visit the [TOPSALE Self-Service](https://service.topsale.co.nz/self-service) for support resources and account management.
 :::
 
 ## Q: TopBridgeAuthError(code: 'NOT_AUTHENTICATED') thrown

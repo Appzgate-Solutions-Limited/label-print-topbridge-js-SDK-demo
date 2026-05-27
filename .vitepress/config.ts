@@ -62,7 +62,7 @@ const guideSections: {
     zh: '参考手册',
     items: [
       { en: 'Error Handling', zh: '错误处理', slug: 'error-handling' },
-      { en: 'Topbridge App Launch', zh: 'Topbridge App 唤起', slug: 'launch-module' },
+      { en: 'TopBridge App Launch', zh: 'TopBridge App 唤起', slug: 'launch-module' },
       { en: 'Debugging & Logging', zh: '调试与日志', slug: 'debugging' },
       { en: 'Troubleshooting', zh: '故障排查', slug: 'troubleshooting' },
       { en: 'Security Model', zh: '安全模型', slug: 'security' },
@@ -71,7 +71,7 @@ const guideSections: {
   {
     en: 'SaaS Platform',
     zh: 'SaaS 平台',
-    items: [{ en: 'TopSale SaaS Platform', zh: 'TopSale SaaS 平台', slug: 'saas-platform' }],
+    items: [{ en: 'TOPSALE SaaS Platform', zh: 'TOPSALE SaaS 平台', slug: 'saas-platform' }],
   },
 ]
 
@@ -103,8 +103,8 @@ function buildExampleSidebar(locale: 'en' | 'zh', prefix: string): SidebarGroup[
 const saasNavItems = {
   en: [
     { text: 'Official Website', link: 'https://topsale.biz/solution/label-printing/' },
-    { text: 'App Store', link: 'https://service.topsale.co.nz/store' },
-    { text: 'Self-Service Portal', link: 'https://service.topsale.co.nz/self-service' },
+    { text: 'TOPSALE App Store', link: 'https://service.topsale.co.nz/store' },
+    { text: 'TOPSALE Self-Service', link: 'https://service.topsale.co.nz/self-service' },
     {
       text: 'TopBridge Download',
       link: 'https://service.topsale.co.nz/self-service/download/topbridge',
