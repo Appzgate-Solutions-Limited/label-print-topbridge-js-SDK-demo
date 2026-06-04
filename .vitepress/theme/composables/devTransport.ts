@@ -70,6 +70,13 @@ const MOCK_RESPONSES: Record<string, () => SdkResponse<any>> = {
       userId: 'dev-user',
     },
     message: 'OK',
+    warnings: [
+      {
+        code: 'SIZE_MISMATCH',
+        reason: 'size_mismatch',
+        message: "Template size does not match the printer's loaded media size.",
+      },
+    ],
   }),
   version: () => ({
     status: 'ok',

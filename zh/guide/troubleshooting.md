@@ -66,6 +66,24 @@ useEffect(() => {
 
 ## Q: 打印成功但响应中包含 warnings
 
-**原因**：SDK 在数据转换过程中检测到非致命的格式问题并自动处理，打印仍然正常执行。
+**原因**：SDK 或 TopBridge Tray App 检测到非致命问题。打印仍然正常执行，但输出效果可能与预期不符。
+
+**常见警告**：
+
+| code | 含义 | 建议处理 |
+|------|------|---------|
+| `DPI_MISMATCH` | 打印机 DPI 与模板预设 DPI 不匹配 | 检查打印机 DPI 设置是否正确，可能出现缩放或对齐偏移 |
+| `SIZE_MISMATCH` | 模板尺寸与打印机装载的介质尺寸不匹配 | 检查装载的标签纸尺寸是否与模板设计尺寸一致，可能出现内容截断或偏移（目前仅 Brother 打印机） |
+| `DATA_FORMAT` | SDK 自动修复了数据格式问题（如截断换行符） | 通常可安全忽略，查看 `w.message` 了解详情 |
+
+```typescript
+if (result.warnings?.length) {
+  for (const w of result.warnings) {
+    if (w.code === 'SIZE_MISMATCH' || w.code === 'DPI_MISMATCH') {
+      console.warn(`打印质量警告: ${w.message}`)
+    }
+  }
+}
+```
 
 详见[警告处理](/zh/guide/error-handling#warning-handling)。

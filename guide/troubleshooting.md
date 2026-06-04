@@ -66,6 +66,24 @@ Or use the `'use client'` directive to ensure the component is only rendered on 
 
 ## Q: Print succeeded but response contains warnings
 
-**Cause**: The SDK detected non-fatal format issues during data conversion and automatically handled them. Printing still executed normally.
+**Cause**: The SDK or the TopBridge Tray App detected non-fatal issues. Printing still executed normally, but the output may not match expectations.
+
+**Common warnings**:
+
+| code | Meaning | Suggested Action |
+|------|---------|-----------------|
+| `DPI_MISMATCH` | Printer DPI does not match template DPI | Check if the printer DPI setting is correct; expect possible scaling or alignment offset |
+| `SIZE_MISMATCH` | Template size does not match the printer's loaded media size | Check if the loaded label media matches the template design size; content may be truncated or offset (currently only Brother printers) |
+| `DATA_FORMAT` | SDK automatically fixed a data format issue (e.g., truncated newlines) | Usually safe to ignore; review `w.message` for details |
+
+```typescript
+if (result.warnings?.length) {
+  for (const w of result.warnings) {
+    if (w.code === 'SIZE_MISMATCH' || w.code === 'DPI_MISMATCH') {
+      console.warn(`Print quality warning: ${w.message}`)
+    }
+  }
+}
+```
 
 See [Warning Handling](/guide/error-handling#warning-handling) for details.

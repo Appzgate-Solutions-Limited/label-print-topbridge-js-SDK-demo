@@ -79,7 +79,7 @@ This repository hosts the documentation and interactive demo site. To run it loc
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) >= 22
-- [pnpm](https://pnpm.io/) 10.33.4 (see `packageManager` in `package.json`)
+- [pnpm](https://pnpm.io/) 11.4.0 (see `packageManager` in `package.json`)
 
 ### Setup
 

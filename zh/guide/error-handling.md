@@ -160,8 +160,16 @@ SDK 可能在成功响应中返回非致命警告，不会阻止执行：
 const result = await client.print.execute({ /* ... */ })
 if (result.warnings?.length) {
   for (const w of result.warnings) {
-    if (w.code === 'DATA_FORMAT' && w.reason === 'newline_truncated') {
-      console.warn(`数据格式提示: ${w.message}`)
+    switch (w.code) {
+      case 'DPI_MISMATCH':
+        console.warn(`DPI 不匹配: ${w.message}`)
+        break
+      case 'SIZE_MISMATCH':
+        console.warn(`尺寸不匹配: ${w.message}`)
+        break
+      case 'DATA_FORMAT':
+        console.warn(`数据格式提示: ${w.message}`)
+        break
     }
   }
 }
@@ -169,6 +177,8 @@ if (result.warnings?.length) {
 
 | code | reason | 触发条件 |
 |------|--------|---------|
+| `DPI_MISMATCH` | `dpi_mismatch` | 打印机 DPI 与模板预设 DPI 不匹配，可能导致打印内容的缩放或对齐发生偏移 |
+| `SIZE_MISMATCH` | `size_mismatch` | 模板设计的尺寸与打印机当前装载的物理介质尺寸不匹配，可能导致内容被截断或发生偏移（目前仅针对 Brother 打印机有效） |
 | `DATA_FORMAT` | `newline_truncated` | schema 中 `text` 类型的字段值包含换行符，SDK 已自动截取第一行 |
 
 ## 业界最佳实践对比

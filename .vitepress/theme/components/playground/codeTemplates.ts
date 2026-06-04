@@ -176,6 +176,37 @@ simulateAndHandle('source')
 simulateAndHandle('config')
 simulateAndHandle('print')
 simulateAndHandle('validation')
+
+// ── Warning handling (non-fatal) ──
+// Print may succeed with warnings. Check result.warnings for details.
+console.log('\\n--- Warning Handling ---')
+const printResult = await client.print.execute({
+  template: 'PRICE_LABEL',
+  printer: 'Test Printer',
+  products: [{ name: 'Demo', price: { value: 9.99, currency: '$' }, copies: 1 }]
+})
+if (printResult.warnings?.length) {
+  for (const w of printResult.warnings) {
+    switch (w.code) {
+      case 'DPI_MISMATCH':
+        console.warn('[DPI_MISMATCH]', w.message)
+        console.log('  Action: check printer DPI settings')
+        break
+      case 'SIZE_MISMATCH':
+        console.warn('[SIZE_MISMATCH]', w.message)
+        console.log('  Action: verify label media size matches template')
+        break
+      case 'DATA_FORMAT':
+        console.warn('[DATA_FORMAT]', w.message)
+        break
+      default:
+        console.warn(\`[\${w.code}] \${w.message}\`)
+    }
+  }
+} else {
+  console.log('No warnings')
+}
+console.log(\`Printed: \${printResult.data.printedCopies} copies\`)
 `,
 
   'template-schema': `import { TopBridgeClient } from '@appzgatenz/label-print-topbridge-js'

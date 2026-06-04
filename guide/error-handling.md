@@ -160,8 +160,16 @@ The SDK may return non-fatal warnings alongside successful responses. These do n
 const result = await client.print.execute({ /* ... */ })
 if (result.warnings?.length) {
   for (const w of result.warnings) {
-    if (w.code === 'DATA_FORMAT' && w.reason === 'newline_truncated') {
-      console.warn(`Data format hint: ${w.message}`)
+    switch (w.code) {
+      case 'DPI_MISMATCH':
+        console.warn(`DPI mismatch: ${w.message}`)
+        break
+      case 'SIZE_MISMATCH':
+        console.warn(`Size mismatch: ${w.message}`)
+        break
+      case 'DATA_FORMAT':
+        console.warn(`Data format hint: ${w.message}`)
+        break
     }
   }
 }
@@ -169,6 +177,8 @@ if (result.warnings?.length) {
 
 | code | reason | Trigger Condition |
 |------|--------|-------------------|
+| `DPI_MISMATCH` | `dpi_mismatch` | Printer DPI does not match template DPI, which may cause printed content scaling or alignment offset |
+| `SIZE_MISMATCH` | `size_mismatch` | Template design size does not match the printer's loaded media size, which may cause content to be truncated or offset (currently effective only for Brother printers) |
 | `DATA_FORMAT` | `newline_truncated` | A `text` field in the schema contains newlines; SDK automatically truncated to first line |
 
 ## Industry Best Practice Comparison
