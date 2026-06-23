@@ -1,6 +1,6 @@
 # TOPSALE Label Printing
 
-[![npm](https://img.shields.io/npm/v/@appzgatenz/label-print-topbridge-js)](https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js) [![docs](https://img.shields.io/badge/docs-label--printing.topsale.biz-blue)](https://label-printing.topsale.biz/)
+[![npm](https://img.shields.io/npm/v/@appzgatenz/label-print-topbridge-js)](https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js) [![docs](https://img.shields.io/badge/docs-label--printing.topsale.biz-blue)](https://label-printing.topsale.co.nz/)
 
 **Cloud-based label printing for any printer, anywhere.**
 
@@ -23,7 +23,7 @@ TOPSALE is a cloud-based label printing platform that lets you design, manage, a
 | 🌐 [Official Website](https://topsale.biz/solution/label-printing/) | Product overview, features, and pricing |
 | 🛠️ [TOPSALE Self-Service](https://service.topsale.co.nz/self-service) | Label Designer, Excel Print, Download Centre, and more |
 | 🛍️ [TOPSALE App Store](https://service.topsale.co.nz/store) | Print service packages — subscription & pay-as-you-go |
-| 📖 [Documentation](https://label-printing.topsale.biz/) | SDK guides, API reference, and interactive examples |
+| 📖 [Documentation](https://label-printing.topsale.co.nz/) | SDK guides, API reference, and interactive examples |
 | ⬇️ [Download TopBridge](https://service.topsale.co.nz/self-service/download/topbridge) | Desktop app — connects your TSPL/ZPL printers to the cloud |
 
 ---
@@ -68,7 +68,7 @@ await client.print.execute({
 })
 ```
 
-See the [full documentation](https://label-printing.topsale.biz/) for API reference, integration tutorials, and interactive examples.
+See the [full documentation](https://label-printing.topsale.co.nz/) for API reference, integration tutorials, and interactive examples.
 
 ---
 
