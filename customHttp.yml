@@ -1,0 +1,25 @@
+# 公开站点(SDK playground / 文档):无鉴权,允许从任意网站链接、跳转、iframe 嵌入、跨域加载资源。
+# 与 Shopify embedded app 那种"限制 iframe 来源"相反 —— 这里刻意全放开。
+customHeaders:
+  - pattern: '**'
+    headers:
+      # 显式允许被任意来源 iframe 嵌入:不设 X-Frame-Options;CSP 只放开 frame-ancestors,
+      # 不限制脚本/样式(故不影响 cdn.jsdelivr.net 等外链加载)。
+      - key: 'Content-Security-Policy'
+        value: 'frame-ancestors *;'
+      - key: 'X-Content-Type-Options'
+        value: 'nosniff'
+
+  # 静态资源(VitePress 带内容 hash,可长期强缓存)+ 允许任意来源跨域加载(JS/CSS/字体等)
+  - pattern: '/assets/**'
+    headers:
+      - key: 'Cache-Control'
+        value: 'public, max-age=31536000, immutable'
+      - key: 'Access-Control-Allow-Origin'
+        value: '*'
+
+  # HTML 不长缓存,保证内容更新即时可见
+  - pattern: '**/*.html'
+    headers:
+      - key: 'Cache-Control'
+        value: 'public, max-age=0, must-revalidate'
