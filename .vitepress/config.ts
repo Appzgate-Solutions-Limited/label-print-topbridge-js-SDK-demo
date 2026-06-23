@@ -173,7 +173,7 @@ export default defineConfig({
   base: '/',
   themeConfig: {
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/youngming/label-print-topbridge-js-SDK-demo' },
+      { icon: 'github', link: 'https://github.com/Appzgate-Solutions-Limited/label-print-topbridge-js-SDK-demo' },
     ],
     search: {
       provider: 'local',
