@@ -43,6 +43,7 @@ const guideSections: {
     items: [
       { en: 'Installation & Setup', zh: '安装与初始化', slug: 'getting-started' },
       { en: 'CSP Configuration', zh: 'CSP 配置', slug: 'csp' },
+      { en: 'Migrating to 0.6', zh: '迁移到 0.6', slug: 'migration-0.6' },
     ],
   },
   {
@@ -78,6 +79,7 @@ const guideSections: {
 const exampleItems: { en: string; zh: string; slug: string }[] = [
   { en: 'Basic Printing', zh: '基础打印', slug: 'basic' },
   { en: 'Error Handling', zh: '错误处理', slug: 'error-handling' },
+  { en: 'Session Management', zh: 'Session 管理', slug: 'session-management' },
   { en: 'Template Schema', zh: '模板查询', slug: 'template-schema' },
   { en: 'Multi-Product', zh: '批量打印', slug: 'multi-product' },
   { en: 'Preflight Only', zh: '仅预检', slug: 'preflight-only' },

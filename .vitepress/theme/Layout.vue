@@ -2,6 +2,7 @@
 import { useData } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import { computed } from 'vue'
+import BetaBanner from './components/BetaBanner.vue'
 import ComingSoonOverlay from './components/ComingSoonOverlay.vue'
 import SdkSwitcher from './components/SdkSwitcher.vue'
 import { provideSdkType } from './composables/useSdkType'
@@ -20,6 +21,7 @@ const locale = computed(() => (lang.value === 'zh-CN' ? ('zh' as const) : ('en' 
       <SdkSwitcher :locale="locale" />
     </template>
     <template #layout-top>
+      <BetaBanner :locale="locale" />
       <ComingSoonOverlay :sdk-type="sdkType" :locale="locale" />
     </template>
   </Layout>

@@ -8,34 +8,52 @@ title: API Quick Reference
 
 | Module | Method | Return Type | Description |
 |--------|--------|-------------|-------------|
-| `health` | [`check()`](/guide/integration-tutorial#step-1-preflight) | `Promise<HealthResponse>` | Health check |
-| `benefits` | [`check()`](/guide/integration-tutorial#step-1-preflight) | `Promise<BenefitsResponse>` | Entitlement validation |
-| `printers` | [`list()`](/guide/integration-tutorial#step-1-preflight) | `Promise<PrintersResponse>` | Printer list |
-| `templates` | [`list()`](/guide/integration-tutorial#step-2-get-templates) | `Promise<TemplatesListResponse>` | Template list |
-| `templates` | [`schema(template)`](/guide/integration-tutorial#step-2-get-templates) | `Promise<TemplateSchemaResponse>` | Template field definitions |
-| `print` | [`execute(request)`](/guide/integration-tutorial#step-3-execute-print) | `Promise<PrintResponse>` | Execute print |
-| `preflight` | [`run(options?)`](/guide/integration-tutorial#step-1-preflight) | `Promise<PreflightResult>` | Preflight orchestration |
-| `launch` | [`trigger()`](/guide/launch-module#trigger) | `void` | Trigger TopBridge App launch |
-| `launch` | [`ensureRunning(fn, options?)`](/guide/launch-module#ensurerunning-fn-options) | `Promise<T>` | Launch + retry orchestration |
+| `health` | `check()` | `Promise<HealthResponse>` | Health check |
+| `whoami` | `check()` | `Promise<WhoAmIResponse>` | Current login status |
+| `benefits` | `check()` | `Promise<BenefitsResponse>` | Entitlement validation |
+| `benefits` | `refreshBenefit()` | `Promise<BenefitsResponse>` | Force-refresh benefit cache |
+| `printers` | `list()` | `Promise<PrintersResponse>` | Printer list |
+| `templates` | `list()` | `Promise<TemplatesListResponse>` | Template list |
+| `templates` | `schema(template)` | `Promise<TemplateSchemaResponse>` | Template field definitions |
+| `templates` | `json(templateIds)` | `Promise<TemplatesJsonResponse>` | Batch-fetch template JSON |
+| `templates` | `refreshTemplates(...)` | overload | Force template-cache sync |
+| `print` | `execute(request)` | `Promise<PrintResponse>` | Execute print |
+| `preflight` | `run(options?)` | `Promise<PreflightResult>` | Preflight orchestration |
+| `launch` | `trigger()` | `void` | Trigger TopBridge App launch |
+| `launch` | `ensureRunning(fn, options?)` | `Promise<T>` | Launch + retry orchestration |
+| `printerSetup` | `load()` | `Promise<PrinterSetupLoadResult>` | Options + installed printers |
+| `printerSetup` | `configure(req, opts?)` | `Promise<ConfigureResult>` | Save protocol config (may await BPAC) |
+| `printerSetup` | `getOptions()` / `listInstalled()` / `getBpacStatus()` | `Promise<SdkResponse<...>>` | Read setup dictionaries / status |
+| `printerSetup` | `addCharset()` / `deleteCharset()` / `addFont()` / `deleteFont()` | `Promise<SdkResponse<...>>` | Charset / font CRUD |
+| `printerSetup` | `reset(printerName)` | `Promise<ResetPrinterResult>` | Clear protocol config (no default-printer change) |
+| `session` | `kickSession(sessionIds)` | `Promise<KickSessionResponse>` | Kick sessions to clear SessionBlocked |
+| `client` | `connect()` / `close()` / `getConnectionState()` | — | Shared connection lifecycle |
+| `client.events` | `on(name, handler)` / `off(name, handler)` | unsubscribe / void | Push + connection events |
+
+:::tip
+`printerSetup` and `events` deep guides are coming. For the session-limit flow, see the interactive [Session Management example](/examples/session-management). For everything else, use this table plus the [migration guide](/guide/migration-0.6).
+:::
 
 ### TopBridgeClientConfig
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `source` | `string` | `'(internal)'` | SDK source identifier (set internally, do not configure manually) |
-| `debug` | `boolean` | `false` | Enable console logging (prefix: `[TopBridge]`) |
-| `logger` | `Logger` | Silent (no-op) | Custom logger implementation |
+| `source` | `'Core-SDK' \| 'React-SDK' \| 'Nextjs-SDK'` | `'Core-SDK'` | SDK source identifier |
+| `debug` | `boolean` | `false` | Enable console logging |
+| `logger` | `Logger` | Silent (no-op) | Custom logger |
+| `wssEnabled` | `boolean` | `false` | Use fixed WSS endpoint |
 | `timeouts.health` | `number` (ms) | `3000` | Health check timeout |
 | `timeouts.preflight` | `number` (ms) | `10000` | Preflight / template query timeout |
-| `wssEnabled` | `boolean` | `false` | Enable WSS secure connection mode |
-| `timeouts.print` | `number` (ms) | `60000` | Print execution timeout |
+| `timeouts.print` | `number` (ms) | `60000` | Print timeout |
+| `timeouts.printerSetup` | `number` (ms) | `10000` | Printer setup timeout |
+| `timeouts.refresh` | `number` (ms) | `30000` | Force-refresh timeout |
 
 ```typescript
 import type { TopBridgeClientConfig } from '@appzgatenz/label-print-topbridge-js'
 
 const client = new TopBridgeClient({
   debug: true,
-  timeouts: { health: 5000, print: 120000 },
+  timeouts: { health: 5000, print: 120000, refresh: 45000 },
 })
 ```
 
@@ -68,47 +86,119 @@ interface SyncedPrinter {
 }
 ```
 
+### Event names (`client.events`)
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `printer` | `PrinterEvent` | Printer / BPAC related push |
+| `template` | `TemplateEvent` | Template change push |
+| `user` | `UserEvent` | User / login related push |
+| `open` | `ConnectionLifecycleEvent` | Shared connection opened |
+| `reconnect` | `ConnectionLifecycleEvent` | Shared connection reconnected |
+| `close` | `ConnectionLifecycleEvent` | Shared connection closed |
+| `error` | `ConnectionLifecycleEvent` | Shared connection error |
+
+```typescript
+const off = client.events.on('printer', (event) => {
+  console.log(event)
+})
+// later
+off()
+// or
+client.events.off('printer', handler)
+```
+
+### Session limiting & force-refresh
+
+```typescript
+// Session-limit unblock: catch SESSION_LIMIT_EXCEEDED, kick stale sessions, retry.
+try {
+  await client.templates.list()
+} catch (err) {
+  if (err instanceof TopBridgeSessionError) {
+    // err.sessions[] — render a picker; isCurrent marks this device (don't kick it)
+    const toKick = (err.sessions ?? []).filter((s) => !s.isCurrent).map((s) => s.id)
+    const result = await client.session.kickSession(toKick)
+    if (result.data.withinLimit) {
+      await client.templates.list() // block cleared — no re-login needed
+    }
+  }
+}
+
+// Force-refresh benefit cache (after purchase/upgrade); throws TopBridgeQuotaError if invalid.
+const benefits = await client.benefits.refreshBenefit()
+
+// Force-sync templates — full mode (no args) vs by-ID mode (validates loggedAccount).
+await client.templates.refreshTemplates()
+await client.templates.refreshTemplates({
+  templateIds: ['tpl-1', 'tpl-2'],  // single string also accepted
+  loggedAccount: 'user@example.com', // must match the current TopBridge login
+})
+```
+
+| API | Key behavior |
+|-----|--------------|
+| `session.kickSession(ids)` | Stateless passthrough; `withinLimit === true` → block cleared; per-session failures land in `failedSessionIds` (never `SESSION_NOT_FOUND`) |
+| `benefits.refreshBenefit()` | Bypasses local cache; same shape as `check()`; `isValid === false` throws `TopBridgeQuotaError` |
+| `templates.refreshTemplates()` | Full sync (no args) vs by-ID sync (`{ templateIds, loggedAccount }`); `ACCOUNT_MISMATCH` when the account differs |
+
+### Printer protocol options
+
+`printerSetup.getOptions()` returns a protocol dictionary for rendering a dropdown:
+
+```typescript
+interface PrinterOptionsData {
+  TSPL: { label: string; charsets: PrinterCharsetOption[] }
+  ZPL: { label: string; charsets: PrinterCharsetOption[] }
+  BPAC: { label: string; sdkInstalled: boolean; paperColors: BpacOption[]; fonts: BpacOption[] }
+  UNKNOWN: { label: string } // unconfigured printer sentinel
+}
+```
+
+`UNKNOWN` is the sentinel for an unconfigured printer — render it alongside `TSPL`/`ZPL`/`BPAC` so the dropdown always offers a valid choice. Each protocol's `label` is display-ready text. `reset(printerName)` returns a printer to this `UNKNOWN` state.
+
 ## Response Types {#response-types}
 
 | Type | Key Fields |
 |------|------------|
-| `HealthResponse` | `type: 'pong'`, `isRunning: true`, `data.isLoggedIn`, `data.version`(optional), `data.networkStatus`(optional) |
+| `HealthResponse` | `type: 'pong'`, `isRunning: true`, `data.isLoggedIn`, `data.version?`, `data.networkStatus?` |
+| `WhoAmIResponse` | `data.isLoggedIn`, `data.loggedAccount?`, `data.userId?` |
 | `BenefitsResponse` | `data.isValid`, `data.remainingPrints`, `data.expiresAt`, `data.reason`, `data.hasPrintBenefit`, `data.hasSessionBenefit` |
 | `PrintersResponse` | `data.count`, `data.defaultPrinter`, `data.printers[]` |
 | `TemplatesListResponse` | `data.count`, `data.templates[]` |
 | `TemplateSchemaResponse` | `data.fields[]`, `data.code`, `data.name` |
-| `PrintResponse` | `message`(top-level), `data.printedCopies`, `data.jobId`, `data.templateName`, `data.userId`(optional), `details`(optional), `warnings`(optional) |
+| `TemplatesJsonResponse` | batch template JSON payload |
+| `PrintResponse` | `message`, `data.printedCopies`, `data.jobId`, `data.templateName`, `data.userId?`, `details?`, `warnings?` |
+| `KickSessionResponse` | `data.withinLimit`, `data.kickedSessionIds[]`, `data.failedSessionIds[]`, `data.sessions[]` |
 | `PreflightResult` | `health`, `benefits`, `printers` |
+| `ConfigureResult` | printer configure result (may include BPAC install outcome) |
 
 ### SdkResponse\<T\> {#sdk-response}
 
-All SDK methods return a unified response envelope:
-
 ```typescript
 interface SdkResponse<T> {
-  status: 'ok' | 'warning'  // Request result status
-  requestId?: string         // Request trace ID
-  data: T                    // Business data
-  message: string            // Human-readable status description
-  details?: unknown          // Extended details (optional)
-  warnings?: SdkWarning[]    // Non-fatal format hints (optional)
+  status: 'ok' | 'warning'
+  requestId?: string
+  data: T
+  message: string
+  details?: unknown
+  warnings?: SdkWarning[]
 }
 ```
 
 | Status | Behavior |
 |--------|----------|
-| `'ok'` | Request succeeded. Use `data` directly. |
-| `'warning'` | Request succeeded with hints. `data` is usable, check `message` and `warnings` for details. |
-| *(error)* | SDK throws a `TopBridgeError` subclass. No return value. |
+| `'ok'` | Succeeded. Use `data`. |
+| `'warning'` | Succeeded with hints. `data` is usable. |
+| *(error)* | Throws a `TopBridgeError` subclass. |
 
 ## Export List {#export-list}
 
 ```typescript
 // Classes
-import { TopBridgeClient } from '@appzgatenz/label-print-topbridge-js'
-import { LaunchModule } from '@appzgatenz/label-print-topbridge-js'
+import { TopBridgeClient, LaunchModule, PrinterSetupModule } from '@appzgatenz/label-print-topbridge-js'
 
-// Error Classes (11 total)
+// Error classes (1 base + 13 subclasses)
 import {
   TopBridgeError,
   TopBridgeConnectionError,
@@ -122,6 +212,8 @@ import {
   TopBridgeTemplateError,
   TopBridgeNetworkError,
   TopBridgeSourceError,
+  TopBridgePrinterSetupError,
+  TopBridgeSessionError,
 } from '@appzgatenz/label-print-topbridge-js'
 
 // Types (import on demand)
@@ -131,26 +223,28 @@ import type {
   Logger,
   SdkWarning,
   V2WarningCode,
+  SdkEvents,
   HealthResponse,
-  HealthData,
+  WhoAmIResponse,
   BenefitsResponse,
-  BenefitsData,
   PrintersResponse,
-  PrintersData,
   SyncedPrinter,
   TemplatesListResponse,
-  TemplatesListData,
-  TemplateItem,
   TemplateSchemaResponse,
-  TemplateSchema,
-  TemplateFieldSchema,
+  TemplatesJsonResponse,
   PrintResponse,
-  PrintData,
   PrintExecuteRequest,
   PrintProductInput,
   PreflightResult,
   PreflightOptions,
-  PreflightStep,
   EnsureRunningOptions,
+  PrinterSetupLoadResult,
+  ConfigureResult,
+  ConfigureOptions,
+  KickSessionResponse,
+  SessionInfo,
+  SdkEventMap,
+  ConnectionState,
+  PrinterSetupErrorCode,
 } from '@appzgatenz/label-print-topbridge-js'
 ```

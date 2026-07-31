@@ -104,6 +104,33 @@ export class DevTransport implements Transport {
       requestId: options.requestId,
     })
 
+    // ponytail: kick-session 按 payload 回传解除态；单独处理以免改全部 factory 签名。
+    // 教学性简化——真实服务端维护阻断态，这里假设踢出后立即 withinLimit。
+    if (options.action === 'kick-session') {
+      const ids = (options.payload?.sessionIds as string[]) ?? []
+      return {
+        status: 'ok',
+        data: {
+          kickedSessionIds: ids,
+          failedSessionIds: [],
+          limit: 2,
+          usedSessions: 1,
+          withinLimit: true,
+          sessions: [
+            {
+              id: 'sess-1',
+              ipAddress: '192.168.1.10',
+              started: '2026-07-30 09:00:00',
+              lastAccess: '2026-07-31 08:00:00',
+              clients: 'TopBridge_windows',
+              isCurrent: true,
+            },
+          ],
+        } as T,
+        message: 'OK',
+      }
+    }
+
     const factory = MOCK_RESPONSES[options.action]
     if (factory) {
       return factory() as SdkResponse<T>

@@ -34,14 +34,17 @@ console.log(\`  Template: \${result.data.templateName}\`)
   TopBridgeError,
   TopBridgeConnectionError,
   TopBridgeAuthError,
+  TopBridgeVersionError,
   TopBridgeQuotaError,
   TopBridgePrintError,
   TopBridgeConfigError,
   TopBridgeValidationError,
   TopBridgePrinterError,
+  TopBridgePrinterSetupError,
   TopBridgeTemplateError,
   TopBridgeNetworkError,
   TopBridgeSourceError,
+  TopBridgeSessionError,
 } from '@appzgatenz/label-print-topbridge-js'
 
 const client = new TopBridgeClient({ debug: true })
@@ -59,19 +62,22 @@ try {
     console.log('Make sure TopBridge desktop app is running')
   } else if (err instanceof TopBridgeAuthError) {
     console.error('Auth error:', err.message)
-    if (err.code === 'UPDATE_REQUIRED') {
-      console.log('Please update TopBridge')
-      if (err.storeUrl) console.log('Store URL:', err.storeUrl)
-    } else {
-      console.log('Please log in to TopBridge')
-    }
+    console.log('Please log in to TopBridge')
+  } else if (err instanceof TopBridgeVersionError) {
+    console.error('Version error:', err.message)
+    console.log('Please update TopBridge')
+    if (err.storeUrl) console.log('Store URL:', err.storeUrl)
+  } else if (err instanceof TopBridgeSessionError) {
+    console.error('Session limit:', err.message)
+    console.log(\`limit=\${err.limit} used=\${err.usedSessions}\`)
+    console.log('Call client.session.kickSession([...ids]) then retry')
   } else if (err instanceof TopBridgeQuotaError) {
     console.error('Quota error:', err.message)
-    console.log('Insufficient print quota')
     if (err.reason) console.log('Reason:', err.reason)
   } else if (err instanceof TopBridgePrinterError) {
     console.error('Printer error:', err.message)
-    console.log('Check if printer is online')
+  } else if (err instanceof TopBridgePrinterSetupError) {
+    console.error('Printer setup error:', err.message, err.code)
   } else if (err instanceof TopBridgeTemplateError) {
     console.error('Template error:', err.message)
   } else if (err instanceof TopBridgeNetworkError) {
@@ -111,12 +117,16 @@ function simulateAndHandle(errorType: string) {
         throw new TopBridgeConnectionError('TopBridge App is not running')
       case 'auth-not-authenticated':
         throw new TopBridgeAuthError('User is not logged in', { code: 'NOT_AUTHENTICATED' })
-      case 'auth-update-required':
-        throw new TopBridgeAuthError('TopBridge App version is too low', { code: 'UPDATE_REQUIRED', storeUrl: 'https://example.com/update' })
+      case 'version-update-required':
+        throw new TopBridgeVersionError('TopBridge App version is too low', { storeUrl: 'https://example.com/update' })
       case 'quota':
         throw new TopBridgeQuotaError('Print quota exhausted', { reason: 'Monthly limit reached' })
       case 'printer':
-        throw new TopBridgePrinterError('Printer is offline')
+        throw new TopBridgePrinterError('Printer is offline', { code: 'PRINTER_OFFLINE' })
+      case 'printer-setup':
+        throw new TopBridgePrinterSetupError('Charset already exists', { code: 'CHARSET_ALREADY_EXISTS' })
+      case 'session':
+        throw new TopBridgeSessionError('Session limit exceeded', { limit: 2, usedSessions: 3 })
       case 'template':
         throw new TopBridgeTemplateError('Template not found')
       case 'network':
@@ -137,13 +147,18 @@ function simulateAndHandle(errorType: string) {
       console.log('[Simulated] ConnectionError:', err.message)
     } else if (err instanceof TopBridgeAuthError) {
       console.log('[Simulated] AuthError:', err.message, '- code:', err.code)
+    } else if (err instanceof TopBridgeVersionError) {
+      console.log('[Simulated] VersionError:', err.message, '- code:', err.code)
       if (err.storeUrl) console.log('  storeUrl:', err.storeUrl)
-      if (err.downloadUrl) console.log('  downloadUrl:', err.downloadUrl)
+    } else if (err instanceof TopBridgeSessionError) {
+      console.log('[Simulated] SessionError:', err.message, '- code:', err.code)
     } else if (err instanceof TopBridgeQuotaError) {
       console.log('[Simulated] QuotaError:', err.message)
       if (err.reason) console.log('  reason:', err.reason)
     } else if (err instanceof TopBridgePrinterError) {
-      console.log('[Simulated] PrinterError:', err.message)
+      console.log('[Simulated] PrinterError:', err.message, err.code)
+    } else if (err instanceof TopBridgePrinterSetupError) {
+      console.log('[Simulated] PrinterSetupError:', err.message, err.code)
     } else if (err instanceof TopBridgeTemplateError) {
       console.log('[Simulated] TemplateError:', err.message)
     } else if (err instanceof TopBridgeNetworkError) {
@@ -164,12 +179,13 @@ function simulateAndHandle(errorType: string) {
   }
 }
 
-// Run simulations for all error types
 simulateAndHandle('connection')
 simulateAndHandle('auth-not-authenticated')
-simulateAndHandle('auth-update-required')
+simulateAndHandle('version-update-required')
 simulateAndHandle('quota')
 simulateAndHandle('printer')
+simulateAndHandle('printer-setup')
+simulateAndHandle('session')
 simulateAndHandle('template')
 simulateAndHandle('network')
 simulateAndHandle('source')
@@ -345,5 +361,47 @@ const result = await client.print.execute({
 })
 
 console.log(\`✓ Print successful: \${result.data.printedCopies} copies\`)
+`,
+
+  'session-management': `import { TopBridgeClient, TopBridgeSessionError } from '@appzgatenz/label-print-topbridge-js'
+
+const client = new TopBridgeClient({ debug: true })
+
+// 模拟 SessionBlocked：正常业务调用抛 SESSION_LIMIT_EXCEEDED。
+// （生产环境该错误来自服务端；此处注入以演示完整解除流程。）
+function callWhileBlocked() {
+  throw new TopBridgeSessionError('Session limit exceeded', {
+    limit: 2,
+    usedSessions: 3,
+    sessions: [
+      { id: 'sess-1', ipAddress: '192.168.1.10', started: '2026-07-30 09:00:00', lastAccess: '2026-07-31 08:00:00', clients: 'TopBridge_windows', isCurrent: true },
+      { id: 'sess-2', ipAddress: '192.168.1.20', started: '2026-07-29 14:00:00', lastAccess: '2026-07-30 20:00:00', clients: 'TopBridge_windows', isCurrent: false },
+      { id: 'sess-3', ipAddress: '10.0.0.5', started: '2026-07-28 10:00:00', lastAccess: '2026-07-29 18:00:00', clients: 'TopBridge_windows', isCurrent: false },
+    ],
+  })
+}
+
+try {
+  callWhileBlocked()
+} catch (err) {
+  if (err instanceof TopBridgeSessionError) {
+    console.log(\`Blocked: \${err.usedSessions}/\${err.limit} sessions active\`)
+    err.sessions.forEach((s) =>
+      console.log(\`  \${s.id} [\${s.ipAddress}]\${s.isCurrent ? ' — current device' : ''}\`),
+    )
+
+    // 踢掉所有非当前 session（踢 isCurrent 会把本机登出！）
+    const toKick = err.sessions.filter((s) => !s.isCurrent).map((s) => s.id)
+    const result = await client.session.kickSession(toKick)
+    console.log(\`Kicked: \${result.data.kickedSessionIds.join(', ')}\`)
+    console.log(\`withinLimit: \${result.data.withinLimit}\`)
+
+    if (result.data.withinLimit) {
+      // 阻断已解除——重试原业务调用，无需重新登录
+      const templates = await client.templates.list()
+      console.log(\`Retry OK — \${templates.data.count} templates available\`)
+    }
+  }
+}
 `,
 }

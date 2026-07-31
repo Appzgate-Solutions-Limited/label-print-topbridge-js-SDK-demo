@@ -9,10 +9,12 @@ defineEmits<{
 
 const SIMULATIONS: { type: string; label: string }[] = [
   { type: 'simulate-connection', label: 'ConnectionError' },
-  { type: 'simulate-auth-not-authenticated', label: 'AuthError (Auth)' },
-  { type: 'simulate-auth-update-required', label: 'AuthError (Update)' },
+  { type: 'simulate-auth-not-authenticated', label: 'AuthError' },
+  { type: 'simulate-version-update-required', label: 'VersionError' },
   { type: 'simulate-quota', label: 'QuotaError' },
   { type: 'simulate-printer', label: 'PrinterError' },
+  { type: 'simulate-printer-setup', label: 'PrinterSetupError' },
+  { type: 'simulate-session', label: 'SessionError' },
   { type: 'simulate-template', label: 'TemplateError' },
   { type: 'simulate-network', label: 'NetworkError' },
   { type: 'simulate-source', label: 'SourceError' },

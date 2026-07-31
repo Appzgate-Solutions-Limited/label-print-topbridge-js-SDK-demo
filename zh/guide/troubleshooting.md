@@ -24,11 +24,17 @@ title: 故障排查
 
 **处理**：引导用户打开 TopBridge App 完成登录，然后重试。
 
-## Q: 抛出 TopBridgeAuthError(code: 'UPDATE_REQUIRED')
+## Q: 抛出 TopBridgeVersionError(code: 'UPDATE_REQUIRED')
 
 **原因**：用户安装的 TopBridge App 版本低于最低要求。
 
-**处理**：使用 `err.storeUrl`（Microsoft Store）或 `err.downloadUrl`（直接下载）引导用户更新。
+**处理**：使用 `err.storeUrl`（Microsoft Store）或 `err.downloadUrl`（直接下载）引导用户更新。**不要**在 `TopBridgeAuthError` 下捕获此错误。
+
+## Q: 抛出 TopBridgeSessionError(code: 'SESSION_LIMIT_EXCEEDED')
+
+**原因**：账号活跃会话数超过权益限制（SessionBlocked）。
+
+**处理**：渲染 `err.sessions`，调用 `client.session.kickSession(ids)`，然后重试原请求（无需重新登录）。
 
 ## Q: TopBridgeQuotaError 但用户确认配额充足
 
