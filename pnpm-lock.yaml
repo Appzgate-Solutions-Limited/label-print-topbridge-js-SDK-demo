@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@appzgatenz/label-print-topbridge-js':
-        specifier: ^0.3.3
-        version: 0.3.3
+        specifier: 0.6.1-beta.0
+        version: 0.6.1-beta.0
       '@codemirror/commands':
         specifier: ^6.10.3
         version: 6.10.3
@@ -127,8 +127,8 @@ packages:
     resolution: {integrity: sha512-tqZXM+54rWo4mk5jL5Z/flE11nPmNEdXwFBM5py9DkOmbjeCNemfVd45FyM97XdzfZ0dl9uOJC6PYn1FpkeyQg==}
     engines: {node: '>= 14.0.0'}
 
-  '@appzgatenz/label-print-topbridge-js@0.3.3':
-    resolution: {integrity: sha512-c8kNBl3dxJ5snGaDJMguqjqAWAfsht6RctERelkLmKhIYFBOp2ZPmizuGAgFKfKOZJem5xqSw16ITkyYBciAeg==}
+  '@appzgatenz/label-print-topbridge-js@0.6.1-beta.0':
+    resolution: {integrity: sha512-HzQP3vrmDYHss3zVljZXEFjUlmpyESurCKJoHBBWVfe9nCatnrr/+WuxD0iq63YPB7RI+ZBBrL2AvUFulTYNLQ==}
     engines: {node: '>=18'}
 
   '@babel/helper-string-parser@7.27.1':
@@ -1625,7 +1625,7 @@ snapshots:
     dependencies:
       '@algolia/client-common': 5.52.1
 
-  '@appzgatenz/label-print-topbridge-js@0.3.3': {}
+  '@appzgatenz/label-print-topbridge-js@0.6.1-beta.0': {}
 
   '@babel/helper-string-parser@7.27.1': {}
 
