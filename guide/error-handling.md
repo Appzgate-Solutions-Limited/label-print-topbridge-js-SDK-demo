@@ -6,51 +6,51 @@ title: Error Handling
 
 ## Design Philosophy
 
-The SDK adopts a three-layer error handling model: **layered inheritance + protocol error codes + structured metadata**.
+The SDK uses a **throw channel + return channel** hybrid model:
 
-1. **Layered Inheritance**: All errors extend `TopBridgeError` (which extends native `Error`), divided into 11 subclasses by business domain. Benefits:
-   - Callers can use `instanceof` to catch specific errors precisely
-   - TypeScript automatically narrows types without extra assertions
-   - Error semantics map directly to business scenarios
-
-2. **Protocol Error Codes**: The underlying V2 WebSocket protocol returns a `code` field (e.g., `NOT_AUTHENTICATED`, `UPDATE_REQUIRED`). SDK maps these to corresponding subclasses while preserving the original code on `error.code` for programmatic checks.
-
-3. **Structured Metadata**: Each error object carries, in addition to `message` and `name`:
-   - `code?` — Protocol-level error code
-   - `details?` — Extended details (type varies by error)
-   - Subclass-specific fields — e.g., `TopBridgeAuthError.storeUrl`, `TopBridgeQuotaError.reason`, `TopBridgeValidationError.field`
+1. **Throw channel** — Failures become `TopBridgeError` subclasses. Callers catch with `instanceof`.
+2. **Return channel** — Success (`ok` / `warning`) returns `SdkResponse<T>`. Warnings never block the main flow.
+3. **Protocol codes** — V2 `code` values are preserved on `error.code` for programmatic checks.
+4. **Structured metadata** — Subclass fields carry UI-ready context (`storeUrl`, `sessions`, `field`, …).
 
 ## Error Class Hierarchy
 
-All SDK errors inherit from the `TopBridgeError` base class:
-
 ```
 TopBridgeError (Base)
-├── TopBridgeConnectionError     Connection failed / timed out / TopBridge App not running
-├── TopBridgeAuthError           Authentication issue
+├── TopBridgeConnectionError     Connection failed / timed out / App not running
+├── TopBridgeAuthError           Not authenticated
 │     .code: 'NOT_AUTHENTICATED'
-│     .storeUrl?: string         Update link
-│     .downloadUrl?: string      Download link
-├── TopBridgeVersionError        TopBridge App version too low
+│     .storeUrl? / .downloadUrl?
+├── TopBridgeVersionError        App version too low
 │     .code: 'UPDATE_REQUIRED'
-│     .storeUrl?: string         Update link
-│     .downloadUrl?: string      Download link
+│     .storeUrl? / .downloadUrl?
 ├── TopBridgeQuotaError          Entitlement invalid / quota exhausted
-│     .reason?: string           Specific reason
-├── TopBridgePrintError          Print failed (when no specific error code matches)
-│     .details?: unknown         Error details
-├── TopBridgeConfigError         Configuration error (e.g., invalid source)
+│     .code: 'QUOTA_EXHAUSTED'
+│     .reason?
+├── TopBridgePrintError          Print failed (unclassified server error)
+├── TopBridgeConfigError         Invalid client configuration
 ├── TopBridgeValidationError     Input validation failed
-│     .field?: string            Field name that caused the error
-├── TopBridgePrinterError        Printer offline / protocol not configured
-├── TopBridgeTemplateError       Template does not exist or no permission
+│     .field?
+├── TopBridgePrinterError        Printer offline / not configured
+│     .code: 'PRINTER_OFFLINE' | 'PRINTER_NOT_CONFIGURED'
+├── TopBridgeTemplateError       Template missing
+│     .code: 'TEMPLATE_NOT_FOUND'
 ├── TopBridgeNetworkError        Cloud network disconnected
-└── TopBridgeSourceError         Origin verification failed
+│     .code: 'NETWORK_DISCONNECTED'
+├── TopBridgeSourceError         Source rejected by whitelist
+│     .code: 'INVALID_SOURCE'
+├── TopBridgePrinterSetupError   Printer setup CRUD failed
+│     .code: PrinterSetupErrorCode
+└── TopBridgeSessionError        Session limit exceeded (SessionBlocked)
+      .code: 'SESSION_LIMIT_EXCEEDED'
+      .limit? / .usedSessions? / .sessions?
 ```
 
-## Type-Safe Handling with instanceof
+:::warning Breaking change from older docs
+`UPDATE_REQUIRED` is **`TopBridgeVersionError`**, not `TopBridgeAuthError`. Update any `err.code === 'UPDATE_REQUIRED'` checks under `AuthError`.
+:::
 
-All error classes support `instanceof` checks. TypeScript will automatically narrow the type:
+## Type-Safe Handling with instanceof
 
 ```typescript
 import {
@@ -60,78 +60,43 @@ import {
   TopBridgeQuotaError,
   TopBridgePrintError,
   TopBridgePrinterError,
+  TopBridgePrinterSetupError,
   TopBridgeTemplateError,
   TopBridgeNetworkError,
   TopBridgeSourceError,
   TopBridgeValidationError,
+  TopBridgeSessionError,
 } from '@appzgatenz/label-print-topbridge-js'
 
 try {
   await client.print.execute({ /* ... */ })
 } catch (err) {
   if (err instanceof TopBridgeConnectionError) {
-    // TopBridge App is not running or network is unreachable
-  }
-  else if (err instanceof TopBridgeAuthError) {
+    // App not running — consider client.launch.ensureRunning()
+  } else if (err instanceof TopBridgeAuthError) {
     // User is not logged in
-    if (err.storeUrl) console.log('Store:', err.storeUrl)
-  }
-  else if (err instanceof TopBridgeVersionError) {
-    // TopBridge App version is too low — guide user to update
+  } else if (err instanceof TopBridgeVersionError) {
     if (err.storeUrl) window.open(err.storeUrl)
-  }
-  else if (err instanceof TopBridgeQuotaError) {
-    // Entitlement invalid or quota exhausted
-  }
-  else if (err instanceof TopBridgePrinterError) {
-    // Printer offline or protocol not configured
-  }
-  else if (err instanceof TopBridgeTemplateError) {
-    // Template does not exist or no permission
-  }
-  else if (err instanceof TopBridgeNetworkError) {
-    // TopBridge App is online, but cloud network is disconnected
-  }
-  else if (err instanceof TopBridgeSourceError) {
-    // Origin verification failed
-  }
-  else if (err instanceof TopBridgeValidationError) {
-    // Input validation failed
-  }
-  else if (err instanceof TopBridgePrintError) {
+  } else if (err instanceof TopBridgeSessionError) {
+    // Render err.sessions, then:
+    // await client.session.kickSession(err.sessions.map(s => s.id))
+    // Retry the original call — no re-login required
+  } else if (err instanceof TopBridgeQuotaError) {
+    // Show err.reason
+  } else if (err instanceof TopBridgePrinterError) {
+    // Offline or protocol not configured
+  } else if (err instanceof TopBridgePrinterSetupError) {
+    // Inspect err.code for charset/font/printer setup failures
+  } else if (err instanceof TopBridgeTemplateError) {
+    // Template not found
+  } else if (err instanceof TopBridgeNetworkError) {
+    // Cloud disconnected
+  } else if (err instanceof TopBridgeSourceError) {
+    // Invalid source
+  } else if (err instanceof TopBridgeValidationError) {
+    // err.field indicates the bad input
+  } else if (err instanceof TopBridgePrintError) {
     // Other print failures
-  }
-}
-```
-
-## Reading Error Details
-
-In addition to using `instanceof` to distinguish error types, you can read common and subclass-specific properties directly to build richer error messages or logging:
-
-```typescript
-try {
-  await client.print.execute({ /* ... */ })
-} catch (err) {
-  if (err instanceof TopBridgeError) {
-    // Common properties available on all SDK errors
-    console.error('Error:', err.name, '-', err.message)
-    if (err.code) console.error('Code:', err.code)
-    if (err.details) console.error('Details:', err.details)
-
-    // Subclass-specific properties
-    if (err instanceof TopBridgeAuthError) {
-      if (err.storeUrl) console.log('Store URL:', err.storeUrl)
-      if (err.downloadUrl) console.log('Download URL:', err.downloadUrl)
-    }
-    if (err instanceof TopBridgeQuotaError) {
-      if (err.reason) console.log('Quota reason:', err.reason)
-    }
-    if (err instanceof TopBridgeValidationError) {
-      if (err.field) console.log('Invalid field:', err.field)
-    }
-  } else {
-    // Non-SDK errors (runtime exceptions, bugs)
-    console.error('Unexpected error:', err)
   }
 }
 ```
@@ -140,21 +105,21 @@ try {
 
 | Scenario | Error Type | Suggested Handling |
 |----------|------------|--------------------|
-| TopBridge App not installed / not running | `TopBridgeConnectionError` | Use `client.launch.ensureRunning()` for auto-launch and retry |
-| User not logged in | `TopBridgeAuthError` | Guide user to log in to TopBridge App |
-| TopBridge App version too low | `TopBridgeVersionError` | Use `err.storeUrl` to guide update |
-| Print quota exhausted | `TopBridgeQuotaError` | Display `err.reason`, guide to renew |
-| Invalid SDK configuration | `TopBridgeConfigError` | Check initialization parameters |
-| Printer offline | `TopBridgePrinterError` | Check printer connection and protocol configuration |
-| Template does not exist | `TopBridgeTemplateError` | Check if template ID/Code is correct |
-| Cloud network disconnected | `TopBridgeNetworkError` | Check network connection |
-| Origin verification failed | `TopBridgeSourceError` | Check `source` configuration |
-| products is empty or invalid | `TopBridgeValidationError` | `err.field` indicates the problematic field |
-| Print failed (other) | `TopBridgePrintError` | Check `err.details` for details |
+| App not installed / not running | `TopBridgeConnectionError` | `client.launch.ensureRunning()` |
+| User not logged in | `TopBridgeAuthError` | Guide login in TopBridge App |
+| App version too low | `TopBridgeVersionError` | Open `err.storeUrl` / `err.downloadUrl` |
+| Session limit exceeded | `TopBridgeSessionError` | Show `err.sessions`, call `kickSession`, retry |
+| Print quota exhausted | `TopBridgeQuotaError` | Display `err.reason` |
+| Invalid SDK configuration | `TopBridgeConfigError` | Check `source` / constructor options |
+| Printer offline / not configured | `TopBridgePrinterError` | Check connection and protocol |
+| Printer setup CRUD failed | `TopBridgePrinterSetupError` | Branch on `err.code` |
+| Template missing | `TopBridgeTemplateError` | Check template ID/Code |
+| Cloud network disconnected | `TopBridgeNetworkError` | Check network |
+| Source rejected | `TopBridgeSourceError` | Use an allowed `source` |
+| Invalid products / params | `TopBridgeValidationError` | Fix `err.field` |
+| Print failed (other) | `TopBridgePrintError` | Inspect `err.details` |
 
 ## Warning Handling
-
-The SDK may return non-fatal warnings alongside successful responses. These do not block execution:
 
 ```typescript
 const result = await client.print.execute({ /* ... */ })
@@ -181,16 +146,10 @@ if (result.warnings?.length) {
 | `SIZE_MISMATCH` | `size_mismatch` | Template design size does not match the printer's loaded media size, which may cause content to be truncated or offset (currently effective only for Brother printers) |
 | `DATA_FORMAT` | `newline_truncated` | A `text` field in the schema contains newlines; SDK automatically truncated to first line |
 
-## Industry Best Practice Comparison
+## Industry Comparison
 
-Modern JS SDKs generally adopt a three-layer model: **base class + domain subclasses + error codes**. Here is a brief comparison:
-
-| SDK | Base Class Design | Error Code Mechanism | Debug Metadata | Type Discrimination |
-|-----|-------------------|---------------------|----------------|---------------------|
-| **AWS SDK v3** | `ServiceException` interface | `$metadata` + `name` | requestId, httpStatusCode, extendedRequestId | `instanceof` / `error.name` |
-| **Stripe Node.js** | `StripeError` base class | `type` field | `raw`, `headers`, `requestId`, `statusCode` | `instanceof` subclasses |
-| **Twilio Node.js** | `RestException` | `code` + `status` | `moreInfo`, `details` | `instanceof` |
-| **Prisma** | `PrismaClientKnownRequestError`, etc. | `code` (e.g., `P2002`) | `meta`, `clientVersion` | `instanceof` + `code` |
-| **TopBridge SDK** | `TopBridgeError` base class | `code` (V2 protocol codes) | `details`, subclass-specific fields | `instanceof` subclasses |
-
-**Conclusion**: TopBridge SDK's error handling design is on par with Stripe and Prisma, employing semantic class hierarchies, programmable error codes, and subclass fields that carry business context. It aligns with the mainstream direction of modern JS SDKs.
+| SDK | Base Class | Codes | Type Discrimination |
+|-----|------------|-------|---------------------|
+| Stripe Node.js | `StripeError` | `type` | `instanceof` subclasses |
+| Prisma | known request errors | `code` (e.g. `P2002`) | `instanceof` + `code` |
+| **TopBridge SDK** | `TopBridgeError` | V2 protocol `code` | `instanceof` subclasses |

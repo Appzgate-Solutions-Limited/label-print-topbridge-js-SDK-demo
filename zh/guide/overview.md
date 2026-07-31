@@ -6,25 +6,27 @@ title: 概述与架构
 
 ## 什么是 TopBridge
 
-TopBridge 是一个运行在用户本地的桌面应用（简称「TopBridge App」），负责管理标签打印机、模板和用户权益。它通过 WebSocket 协议在本地暴露 API，让浏览器应用能够发送打印指令。
+TopBridge 是运行在用户本机的桌面应用（本文称「TopBridge App」）。它管理标签打印机、模板与用户权益，并通过本地 WebSocket 协议对外提供 API，供浏览器应用发送打印指令。
 
 > **下载**：[获取 TopBridge App](https://service.topsale.co.nz/self-service/download/topbridge)
 
-:::tip 正在寻找完整解决方案？
-访问 [TOPSALE 标签打印官网](https://topsale.biz/solution/label-printing/) 了解我们的全托管平台。
+:::tip 需要完整方案？
+访问 [TOPSALE 标签打印官网](https://topsale.biz/solution/label-printing/) 了解托管式平台。
 :::
 
 ## SDK 解决什么问题
 
-`@appzgatenz/label-print-topbridge-js` 是一个 Headless（无 UI）浏览器 SDK，封装了与 TopBridge App 的全部通信细节：
+`@appzgatenz/label-print-topbridge-js` 是无 UI 的浏览器端 Headless SDK，封装与 TopBridge App 的全部通信细节：
 
-- **WebSocket 连接管理** — 短连接模型，每次调用自动建立、发送、接收、关闭
-- **TopBridge App 唤起与重试** — 通过 `launch` 模块显式触发唤起，含自动重试编排
-- **数据转换** — 根据模板 schema 自动将产品数据转换为结构化格式
-- **结构化错误** — 10 种错误类型，全部支持 `instanceof` 类型窄化
-- **预检编排** — 一行代码完成「健康检查 → 权益验证 → 打印机获取」
+- **混合 WebSocket 管理** — 轻量 API 与推送事件共享一条长连接；打印使用独立短连接
+- **TopBridge App 唤起与重试** — 通过 `launch` 模块编排启动与自动重试
+- **数据转换** — 按模板 schema 自动把产品数据转成 Tray App 所需结构
+- **结构化错误** — 14 个错误类（1 基类 + 13 子类），均支持 `instanceof` 收窄
+- **预检编排** — 一行完成「健康检查 → 权益校验 → 打印机发现」
+- **打印机配置与会话解除** — 通过 `printerSetup` / `session` 配置协议/BPAC、清除 SessionBlocked
+- **推送事件** — 通过 `client.events` 订阅打印机、模板、用户与连接生命周期事件
 
-SDK 不绑定任何 UI 框架，可在 React / Vue / Svelte / 原生 JS 中使用。
+SDK 不绑定任何 UI 框架，可用于 React / Vue / Svelte / 原生 JS。
 
 ## 架构概览
 
@@ -32,17 +34,21 @@ SDK 不绑定任何 UI 框架，可在 React / Vue / Svelte / 原生 JS 中使�
 你的浏览器应用
     │
     ▼
-TopBridgeClient (SDK 入口)
-    ├── health        健康检查
-    ├── benefits      权益与配额验证
-    ├── printers      打印机列表
-    ├── templates     模板列表 + 字段定义
-    ├── print         打印执行（schema 驱动数据转换）
-    ├── preflight     编排：health → benefits → printers
-    └── launch        TopBridge App 唤起 + 重试编排
+TopBridgeClient（SDK 入口）
+    ├── health         健康检查
+    ├── whoami         当前登录状态
+    ├── benefits       权益与配额（含 refreshBenefit）
+    ├── printers       打印机列表
+    ├── templates      模板列表 / schema / json / 刷新
+    ├── print          打印执行（schema 驱动转换）
+    ├── preflight      编排：health → benefits → printers
+    ├── launch         TopBridge App 唤起 + 重试
+    ├── printerSetup   打印机配置与 BPAC
+    ├── session        会话超限解除（kickSession）
+    └── events         推送事件 + 连接生命周期
     │
-    ▼  WebSocket (本地通信)
-TopBridge App (本地桌面应用)
+    ▼  WebSocket（默认 ws://localhost:8765/v2；可选固定 WSS）
+TopBridge App（本机桌面应用）
     │
     ▼
 标签打印机
@@ -50,33 +56,39 @@ TopBridge App (本地桌面应用)
 
 ## 工作原理
 
-1. **初始化** — 在浏览器应用中创建 `TopBridgeClient` 实例
-2. **预检** — 运行健康检查、验证权益、发现打印机
-3. **打印** — 提交包含产品数据的打印请求，SDK 自动获取模板 schema 并转换数据格式
+1. **初始化** — 在浏览器应用中创建 `TopBridgeClient`
+2. **预检** — 健康检查、校验权益、发现打印机
+3. **可选配置** — 需要时配置打印机 / 处理会话限制
+4. **打印** — 提交产品数据；SDK 获取模板 schema 并转换数据
+5. **可选事件** — 在共享连接上订阅 Tray App 推送
 
-SDK 内部处理所有 WebSocket 通信。你只需与高级模块 API 交互——无需手动管理连接、解析协议消息或处理数据转换。
+你只需使用高层模块 API，无需手写 WebSocket 帧或解析协议消息。
 
 ## SDK 模块
 
-SDK 提供 7 个独立模块，均通过 `TopBridgeClient` 访问：
-
-| 模块 | 访问方式 | 说明 |
-|------|---------|------|
+| 模块 | 访问路径 | 说明 |
+|------|----------|------|
 | health | `client.health` | TopBridge App 健康检查 |
-| benefits | `client.benefits` | 权益与配额验证 |
-| printers | `client.printers` | 已同步的打印机列表 |
-| templates | `client.templates` | 模板列表与字段定义 |
+| whoami | `client.whoami` | 当前登录状态与账号 |
+| benefits | `client.benefits` | 权益校验 + 强制刷新 |
+| printers | `client.printers` | 已同步打印机列表 |
+| templates | `client.templates` | 模板列表、schema、批量 JSON、刷新 |
 | print | `client.print` | 执行标签打印（自动数据转换） |
 | preflight | `client.preflight` | 编排：health → benefits → printers |
 | launch | `client.launch` | TopBridge App 唤起与重试 |
+| printerSetup | `client.printerSetup` | 打印机协议 / 字符集 / 字体 / BPAC |
+| session | `client.session` | 踢出会话以清除 SessionBlocked |
+| events | `client.events` | 类型化的 `on` / `off` 订阅 |
+
+客户端生命周期方法：`connect()`、`close()`、`getConnectionState()`。
 
 ## 包信息
 
 | 属性 | 值 |
 |------|-----|
 | 包名 | `@appzgatenz/label-print-topbridge-js` |
-| 体积 | ~3.2 KB gzipped |
+| 体积 | 约 9 KB gzipped |
 | 依赖 | 零运行时依赖 |
-| 格式 | ESM + CJS 双格式输出 |
+| 格式 | ESM + CJS 双格式 |
 | Tree-shaking | 支持（`sideEffects: false`） |
 | Node.js | >= 18 |

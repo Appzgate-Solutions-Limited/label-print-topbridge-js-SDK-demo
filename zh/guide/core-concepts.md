@@ -6,111 +6,122 @@ title: 核心概念
 
 ## 模块化架构
 
-`TopBridgeClient` 包含 7 个功能模块，每个模块负责一个独立的业务域：
+`TopBridgeClient` 暴露 10 个功能模块，外加类型化的事件订阅面：
 
 | 模块 | 职责 | 主要方法 |
-|------|------|---------|
+|------|------|----------|
 | `health` | 检查 TopBridge App 运行状态 | `check()` |
-| `benefits` | 验证用户打印权益和配额 | `check()` |
-| `printers` | 获取已配置的打印机列表 | `list()` |
-| `templates` | 获取模板列表和字段定义 | `list()`, `schema()` |
-| `print` | 执行打印任务（schema 驱动数据转换） | `execute()` |
-| `preflight` | 编排前三步的完整预检 | `run()` |
-| `launch` | TopBridge App 唤起与重试编排 | `trigger()`, `ensureRunning()` |
+| `whoami` | 当前登录状态与账号 | `check()` |
+| `benefits` | 校验打印权益与配额 | `check()`、`refreshBenefit()` |
+| `printers` | 获取已配置打印机列表 | `list()` |
+| `templates` | 模板列表、schema、JSON、刷新 | `list()`、`schema()`、`json()`、`refreshTemplates()` |
+| `print` | 执行打印（schema 驱动转换） | `execute()` |
+| `preflight` | 编排完整预检 | `run()` |
+| `launch` | TopBridge App 唤起与重试 | `trigger()`、`ensureRunning()` |
+| `printerSetup` | 打印机协议 / 字符集 / 字体 / BPAC | `load()`、`configure()`、… |
+| `session` | 踢出会话以清除 SessionBlocked | `kickSession()` |
+| `events` | 推送事件 + 连接生命周期 | `on()`、`off()` |
 
-## 短连接模型
+## 混合连接模型
 
-SDK 采用短连接通信：每次 API 调用都会独立创建一个 WebSocket 连接，发送请求，接收响应，然后关闭。你无需手动管理连接生命周期。
+SDK 使用**混合** WebSocket 模型（不再是纯短连接）：
+
+- **共享长连接** — 轻量请求/响应 API 与服务端推送（`printer` / `template` / `user`）共用一条连接。空闲一段时间后优雅关闭；重连使用指数退避。
+- **独立打印短连接** — `print.execute()` 使用单独短连接，避免长打印阻塞共享通道。
 
 ```
+client.health.check() / client.events.on(...)
+  → 共享长连接 WebSocket
+
 client.print.execute(...)
-  → 连接本地 WebSocket
+  → 独立短连接 WebSocket
   → 获取模板 schema
-  → 构建并发送打印数据
+  → 构建并发送打印载荷
   → 接收响应
   → 关闭连接
   → 返回 PrintResponse
 ```
 
+可选生命周期控制：
+
+```typescript
+client.connect()                 // 提前打开共享连接
+client.getConnectionState()      // 查询连接状态
+client.close()                   // 关闭共享连接（不会自动重连）
+```
+
 ## 响应结构
 
-所有 SDK 方法返回统一的响应信封：
+所有 SDK 方法返回统一响应信封：
 
 ```typescript
 interface SdkResponse<T> {
   status: 'ok' | 'warning'    // 请求结果状态
   requestId?: string           // 请求追踪 ID
   data: T                      // 业务数据
-  warnings?: SdkWarning[]      // 数据格式警告（可选）
+  message: string              // 可读状态描述
+  details?: unknown            // 扩展详情（可选）
+  warnings?: SdkWarning[]      // 非致命提示（可选）
 }
 ```
 
-- `status: 'ok'` — 请求成功，`data` 包含业务数据
-- `status: 'warning'` — 请求成功但有附加提示（例如健康检查时网络断开）。可正常使用 `data`，同时检查 `message` 获取提示详情
-- `warnings` — 非致命的数据格式提示数组。SDK 会在数据转换过程中发现潜在问题时添加，不会阻止打印执行
-- `message` — 人类可读的状态描述（如 "Print job completed"）
+- `status: 'ok'` — 成功，直接使用 `data`
+- `status: 'warning'` — 成功但有提示；`data` 仍可用
+- 失败时 SDK **抛出** `TopBridgeError` 子类，不会返回错误信封
 
-当请求失败时，SDK **不会**返回响应——而是抛出 `TopBridgeError` 子类异常。详见 [错误处理](/zh/guide/error-handling)。
-
-**SdkWarning 结构**：
+**SdkWarning**：
 
 ```typescript
 interface SdkWarning {
-  code: string      // 大类标识，如 'DATA_FORMAT'
-  reason: string    // 精确标识，如 'newline_truncated'
-  message: string   // 人类可读描述
+  code: string      // 如 'DATA_FORMAT'
+  reason: string    // 如 'newline_truncated'
+  message: string   // 可读描述
 }
 ```
 
-## DataField 与 fieldType 的区别
-
-这是理解模板 schema 的关键概念。
+## DataField 与 fieldType
 
 ### 什么是 DataField
 
-**DataField**（SDK 中表示为 `dataField`）是**数据源字段名**——即你在 `products` 数组中使用的键名。例如：`name`、`price`、`barcode`、`weight`、`description`。
+**DataField**（SDK 中的 `dataField`）是**数据源字段名**——你在 `products` 数组里使用的键。
 
 ```typescript
-// product 对象中的每个键就是一个 DataField
 const product = {
-  name: 'Apple',      // DataField: "name"
+  name: 'Apple',           // DataField: "name"
   price: { value: 3.99 },  // DataField: "price"
-  barcode: '12345',   // DataField: "barcode"
-  copies: 2,          // 保留 DataField
+  barcode: '12345',        // DataField: "barcode"
+  copies: 2,               // 保留字段
 }
 ```
 
 ### 什么是 fieldType
 
-**fieldType**（也叫 Widget Type）是 **schema 级别的数据类型声明**——它告诉 SDK 如何转换值。例如：`'text'`、`'price'`、`'barcode'`、`'weight'`、`'qrcode'`。
+**fieldType** 是 schema 层的类型声明，告诉 SDK 如何转换该值（如 `'text'`、`'price'`、`'barcode'`）。
 
 ```typescript
-// templates.schema() 返回的字段定义：
 const field = {
-  name: 'price',           // DataField（Wire 格式："name"）
-  type: 'price',           // fieldType（Wire 格式："type"）
+  name: 'price',           // DataField（协议字段 "name"）
+  type: 'price',           // fieldType（协议字段 "type"）
   required: true,
   subFields: ['value', 'currency', 'unit']
 }
 ```
 
-### 两者的关系
+### 二者如何关联
 
-模板 schema 将 DataField 映射到 fieldType。当你调用 `print.execute()` 时，SDK：
+调用 `print.execute()` 时，SDK 会：
 
-1. 自动获取模板 schema
-2. 从 schema 中查找每个 DataField 对应的 fieldType
-3. 根据 fieldType 应用相应的数据转换
+1. 获取模板 schema
+2. 查找每个 DataField 的 fieldType
+3. 按类型执行转换
 
-你**不需要**手动指定如何转换每个字段——SDK 从 schema 中读取 fieldType 并自动处理。
-
-| DataField（你的数据键） | fieldType（来自 schema） | SDK 转换行为 |
-|------------------------|------------------------|-------------|
-| `name` | `'text'` | 保持原值，截断换行符 |
+| DataField | fieldType | SDK 转换 |
+|-----------|-----------|----------|
+| `name` | `'text'` | 原样保留，截断换行 |
 | `price` | `'price'` | 构建 `{ value, currency?, unit? }` |
 | `weight` | `'weight'` | 构建 `{ value, unit? }` |
-| `barcode` | `'barcode'` | 强制转字符串 |
-| `qrcode` | `'qrcode'` | 强制转字符串 |
-| `copies` | `'integer'` | 规范化到 [1, 9999] |
+| `barcode` | `'barcode'` | 强制为字符串 |
+| `qrcode` | `'qrcode'` | 强制为字符串 |
+| `copies` | `'integer'` | 规范到 [1, 9999] |
 
-详见 [Widget 类型](/zh/guide/widgets)了解各 fieldType 的详细说明，以及[数据转换](/zh/guide/field-types)了解转换规则。
+详见 [Widget 类型](/zh/guide/widgets) 与 [数据转换](/zh/guide/field-types)。

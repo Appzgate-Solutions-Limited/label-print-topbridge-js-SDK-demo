@@ -10,17 +10,22 @@ title: 安装与初始化
 npm install @appzgatenz/label-print-topbridge-js
 ```
 
+:::tip
+`@appzgatenz/label-print-topbridge-js@0.6.1` 已发布到 npm。本站文档所述 API 已稳定；从 0.5.x 升级请参阅[迁移指南](/zh/guide/migration-0.6)。
+:::
+
 ## 前置条件
 
 | # | 条件 | 说明 |
 |---|------|------|
-| 1 | 支持 WebSocket 的现代浏览器 | Chrome 16+, Firefox 11+, Safari 7+, Edge 12+ |
-| 2 | TopBridge App >= 1.0.45 已安装 | [下载](https://service.topsale.co.nz/self-service/download/topbridge) |
+| 1 | 支持 WebSocket 的现代浏览器 | Chrome、Firefox、Safari、Edge（ES2020+） |
+| 2 | 已安装 TopBridge App | [下载](https://service.topsale.co.nz/self-service/download/topbridge) |
 | 3 | TopBridge App 正在运行 | 健康检查返回 `pong` |
 | 4 | 用户已登录 TopBridge App | `data.isLoggedIn === true` |
 | 5 | 打印权益有效 | 权益验证通过 |
 | 6 | 至少一台打印机已配置协议（TSPL/ZPL） | 打印机列表非空 |
-| 7 | CSP 允许 `topsale:` 协议（使用 launch 时） | 详见 [CSP 配置](/zh/guide/csp) |
+| 7 | Tray App 支持 WebSocket API V2 | 统一入口 `/v2` |
+| 8 | CSP 允许 `topsale:` 协议（使用 launch 时） | 详见 [CSP 配置](/zh/guide/csp) |
 
 :::tip 不想写代码？
 试试 [TOPSALE 标签打印方案](https://topsale.biz/solution/label-printing/)，无需集成即可使用。
@@ -34,7 +39,7 @@ import { TopBridgeClient } from '@appzgatenz/label-print-topbridge-js'
 const client = new TopBridgeClient()
 ```
 
-SDK 通过本地 WebSocket 与 TopBridge App 通信，无需配置。
+SDK 默认连接 `ws://localhost:8765`（内部自动拼接 `/v2`）。设置 `wssEnabled: true` 可使用固定 WSS 端点 `wss://topbridge.topsale.co.nz:8764/v2`。
 
 ## 完整打印流程
 
@@ -68,34 +73,41 @@ const result = await client.print.execute({
 console.log(`已打印 ${result.data.printedCopies} 份`)
 ```
 
-> SDK 自动获取模板 schema 并转换产品数据，无需手动指定字段类型。
+> SDK 会自动获取模板 schema 并转换产品数据，无需手动指定字段类型。
+
+会话限制、打印机配置与推送事件详见 [API 速查表](/zh/guide/api-reference) 与 [迁移到 0.6](/zh/guide/migration-0.6)。专题指南将在后续更新中提供。
 
 ## 配置选项
 
 ```typescript
 const client = new TopBridgeClient({
+  source: 'Core-SDK',              // SDK 来源标识（默认值）
   debug: true,                     // 开启控制台日志
-  logger: customLogger,            // 自定义日志器实现
+  wssEnabled: false,               // 使用固定 WSS 端点
+  logger: customLogger,            // 自定义日志实现
   timeouts: {
     health: 3000,                  // 健康检查超时（ms）
-    preflight: 10000,              // 预检超时（ms）
+    preflight: 10000,              // 预检 / 模板查询超时（ms）
     print: 60000,                  // 打印超时（ms）
+    printerSetup: 10000,           // 打印机配置超时（ms）
+    refresh: 30000,                // 模板/权益强制刷新超时（ms）
   },
 })
 ```
 
 | 字段 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `source` | `string` | `'（内置）'` | SDK 来源标识（由 SDK 内部自动设置，无需手动配置） |
-| `debug` | `boolean` | `false` | 启用控制台日志（前缀：`[TopBridge]`） |
-| `logger` | `Logger` | 静默（空操作） | 自定义日志器实现 |
-| `timeouts.health` | `number` (ms) | `3000` | 健康检查超时 |
-| `timeouts.preflight` | `number` (ms) | `10000` | 预检 / 模板查询超时 |
-| `timeouts.print` | `number` (ms) | `60000` | 打印执行超时 |
+| `source` | `'Core-SDK' \| 'React-SDK' \| 'Nextjs-SDK'` | `'Core-SDK'` | SDK 来源标识（供上层包装 SDK 使用） |
+| `debug` | `boolean` | `false` | 开启控制台日志（前缀：`[TopBridge]`） |
+| `wssEnabled` | `boolean` | `false` | 使用固定 WSS 端点（不接受自定义 URL） |
+| `logger` | `Logger` | 静默（no-op） | 自定义日志实现 |
+| `timeouts.health` | `number`（ms） | `3000` | 健康检查超时 |
+| `timeouts.preflight` | `number`（ms） | `10000` | 预检 / 模板查询超时 |
+| `timeouts.print` | `number`（ms） | `60000` | 打印执行超时 |
+| `timeouts.printerSetup` | `number`（ms） | `10000` | 打印机配置超时 |
+| `timeouts.refresh` | `number`（ms） | `30000` | 模板/权益强制刷新超时 |
 
 ### Logger
-
-你可以提供自定义日志器，对接监控服务（如 Sentry、Datadog）：
 
 ```typescript
 interface Logger {
@@ -106,7 +118,7 @@ interface Logger {
 }
 ```
 
-日志器优先级：自定义 `logger` > `debug: true` 控制台日志 > 静默（默认）。
+日志优先级：自定义 `logger` > `debug: true` 控制台日志 > 静默（默认）。
 
 ## 错误处理
 
@@ -114,12 +126,17 @@ interface Logger {
 import {
   TopBridgeConnectionError,
   TopBridgeAuthError,
+  TopBridgeVersionError,
   TopBridgeQuotaError,
   TopBridgePrintError,
+  TopBridgeConfigError,
+  TopBridgeValidationError,
   TopBridgePrinterError,
+  TopBridgePrinterSetupError,
   TopBridgeTemplateError,
   TopBridgeNetworkError,
   TopBridgeSourceError,
+  TopBridgeSessionError,
 } from '@appzgatenz/label-print-topbridge-js'
 
 try {
@@ -128,24 +145,31 @@ try {
   if (err instanceof TopBridgeConnectionError) {
     // TopBridge App 未运行或连接超时
   } else if (err instanceof TopBridgeAuthError) {
-    // 未登录或需要更新
-    if (err.code === 'UPDATE_REQUIRED') {
-      window.open(err.storeUrl) // 引导用户更新
-    }
+    // 未登录
+  } else if (err instanceof TopBridgeVersionError) {
+    // 版本过低 — 用 err.storeUrl / err.downloadUrl 引导更新
+  } else if (err instanceof TopBridgeSessionError) {
+    // 会话超限 — 渲染 err.sessions，再调用 kickSession
   } else if (err instanceof TopBridgeQuotaError) {
     // 权益无效或配额耗尽
   } else if (err instanceof TopBridgePrinterError) {
     // 打印机离线或未配置协议
+  } else if (err instanceof TopBridgePrinterSetupError) {
+    // 打印机配置 CRUD 失败 — 查看 err.code
   } else if (err instanceof TopBridgeTemplateError) {
     // 模板不存在或无权限
   } else if (err instanceof TopBridgeNetworkError) {
-    // TopBridge App 在线，但云端网络断开
+    // Tray App 在线，但云端网络断开
   } else if (err instanceof TopBridgeSourceError) {
-    // 来源验证失败
+    // source 不在 Tray App 白名单中
+  } else if (err instanceof TopBridgeValidationError) {
+    // 输入校验失败 — err.field 指向具体字段
   } else if (err instanceof TopBridgePrintError) {
     // 打印失败
+  } else if (err instanceof TopBridgeConfigError) {
+    // 客户端配置错误
   }
 }
 ```
 
-完整错误处理参考请见[错误处理](/zh/guide/error-handling)。
+完整说明见 [错误处理](/zh/guide/error-handling)。

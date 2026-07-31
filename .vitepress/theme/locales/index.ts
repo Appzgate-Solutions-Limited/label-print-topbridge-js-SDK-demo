@@ -172,3 +172,21 @@ export const sdkVersionLabels: Record<Locale, { label: string; source: string }>
   en: { label: 'SDK', source: 'Source' },
   zh: { label: 'SDK', source: '来源' },
 }
+
+export const betaBannerLabels: Record<
+  Locale,
+  { message: string; dismiss: string; sourceFallback: string }
+> = {
+  en: {
+    message:
+      'Docs preview for @appzgatenz/label-print-topbridge-js@{version} ({source}). APIs may change — do not use for production.',
+    dismiss: 'Dismiss',
+    sourceFallback: 'pre-release',
+  },
+  zh: {
+    message:
+      '当前文档预览对应 @appzgatenz/label-print-topbridge-js@{version}（{source}）。API 可能变更，请勿用于生产环境。',
+    dismiss: '关闭',
+    sourceFallback: '预发布源',
+  },
+}

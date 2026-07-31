@@ -24,11 +24,17 @@ Visit the [TOPSALE Self-Service](https://service.topsale.co.nz/self-service) for
 
 **Handling**: Guide the user to open TopBridge App and complete login, then retry.
 
-## Q: TopBridgeAuthError(code: 'UPDATE_REQUIRED') thrown
+## Q: TopBridgeVersionError(code: 'UPDATE_REQUIRED') thrown
 
 **Cause**: The installed TopBridge App version is below the minimum requirement.
 
-**Handling**: Use `err.storeUrl` (Microsoft Store) or `err.downloadUrl` (direct download) to guide the user to update.
+**Handling**: Use `err.storeUrl` (Microsoft Store) or `err.downloadUrl` (direct download) to guide the user to update. Do **not** catch this under `TopBridgeAuthError`.
+
+## Q: TopBridgeSessionError(code: 'SESSION_LIMIT_EXCEEDED') thrown
+
+**Cause**: The account has too many active sessions (SessionBlocked).
+
+**Handling**: Render `err.sessions`, call `client.session.kickSession(ids)`, then retry the original request without re-login.
 
 ## Q: TopBridgeQuotaError but user confirms quota is sufficient
 

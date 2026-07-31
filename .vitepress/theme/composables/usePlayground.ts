@@ -12,10 +12,13 @@ import {
   TopBridgeNetworkError,
   TopBridgePrintError,
   TopBridgePrinterError,
+  TopBridgePrinterSetupError,
   TopBridgeQuotaError,
+  TopBridgeSessionError,
   TopBridgeSourceError,
   TopBridgeTemplateError,
   TopBridgeValidationError,
+  TopBridgeVersionError,
 } from '@appzgatenz/label-print-topbridge-js'
 import { transform } from 'sucrase'
 import { ref, shallowRef } from 'vue'
@@ -47,20 +50,41 @@ const ERROR_CONSTRUCTORS: Record<string, () => Error> = {
   connection: () => new TopBridgeConnectionError('TopBridge App is not running'),
   'auth-not-authenticated': () =>
     new TopBridgeAuthError('User is not logged in', { code: 'NOT_AUTHENTICATED' }),
+  'version-update-required': () =>
+    new TopBridgeVersionError('TopBridge App version is too low', {
+      storeUrl: 'https://example.com/update',
+    }),
+  // Keep legacy key so old bookmarks / snippets still resolve
   'auth-update-required': () =>
-    new TopBridgeAuthError('TopBridge App version is too low', {
-      code: 'UPDATE_REQUIRED',
+    new TopBridgeVersionError('TopBridge App version is too low', {
       storeUrl: 'https://example.com/update',
     }),
   quota: () =>
     new TopBridgeQuotaError('Print quota exhausted', { reason: 'Monthly limit reached' }),
-  printer: () => new TopBridgePrinterError('Printer is offline'),
+  printer: () => new TopBridgePrinterError('Printer is offline', { code: 'PRINTER_OFFLINE' }),
   template: () => new TopBridgeTemplateError('Template not found'),
   network: () => new TopBridgeNetworkError('Cloud network disconnected'),
   source: () => new TopBridgeSourceError('Origin verification failed'),
   config: () => new TopBridgeConfigError('Invalid configuration'),
   print: () => new TopBridgePrintError('Print job failed', { details: { jobId: '12345' } }),
   validation: () => new TopBridgeValidationError('Invalid input', 'products'),
+  'printer-setup': () =>
+    new TopBridgePrinterSetupError('Charset already exists', { code: 'CHARSET_ALREADY_EXISTS' }),
+  session: () =>
+    new TopBridgeSessionError('Session limit exceeded', {
+      limit: 2,
+      usedSessions: 3,
+      sessions: [
+        {
+          id: 'sess-1',
+          ipAddress: '127.0.0.1',
+          started: '2026-01-01T00:00:00Z',
+          lastAccess: '2026-01-01T01:00:00Z',
+          clients: 'topbridge',
+          isCurrent: true,
+        },
+      ],
+    }),
 }
 
 export function usePlayground() {
@@ -292,6 +316,12 @@ export function usePlayground() {
     addLog(`✗ ${name}: ${err.message}`, 'error')
     if (err.code) addLog(`  code: ${err.code}`)
     if (err.storeUrl) addLog(`  Update: ${err.storeUrl}`)
+    if (err.downloadUrl) addLog(`  Download: ${err.downloadUrl}`)
+    if (err.reason) addLog(`  reason: ${err.reason}`)
+    if (err.field) addLog(`  field: ${err.field}`)
+    if (err.limit != null) addLog(`  limit: ${err.limit}`)
+    if (err.usedSessions != null) addLog(`  usedSessions: ${err.usedSessions}`)
+    if (err.sessions) addLog(`  sessions: ${err.sessions.length}`)
   }
 
   async function executeUserCode(code: string) {
@@ -326,14 +356,17 @@ export function usePlayground() {
       TopBridgeClient,
       TopBridgeConnectionError,
       TopBridgeAuthError,
+      TopBridgeVersionError,
       TopBridgeQuotaError,
       TopBridgePrintError,
       TopBridgeValidationError,
       TopBridgePrinterError,
+      TopBridgePrinterSetupError,
       TopBridgeTemplateError,
       TopBridgeNetworkError,
       TopBridgeSourceError,
       TopBridgeConfigError,
+      TopBridgeSessionError,
       TopBridgeError,
     }
   }
