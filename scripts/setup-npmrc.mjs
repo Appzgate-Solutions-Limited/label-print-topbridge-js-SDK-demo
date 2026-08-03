@@ -2,6 +2,7 @@
 
 import { execSync } from 'node:child_process'
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
+import { homedir } from 'node:os'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -103,6 +104,54 @@ function isPnpmDevPreinstall() {
   return process.env.npm_lifecycle_event === 'pnpm:devPreinstall'
 }
 
+// 检测用户级/全局 npmrc 中残留的 @appzgatenz scope 路由。
+// 设计约定：路由由项目级 .npmrc 负责，用户级 ~/.npmrc 只提供认证凭据。
+// 用户级路由行会覆盖项目配置，导致 main 分支仍请求 CodeArtifact（token 过期时报 401）。
+function findScopeRegistryConflicts() {
+  const candidates = [resolve(homedir(), '.npmrc')]
+
+  try {
+    const globalConfig = execSync('npm config get globalconfig', { encoding: 'utf8' }).trim()
+    if (globalConfig && globalConfig !== 'undefined') {
+      candidates.push(globalConfig)
+    }
+  } catch {
+    // 无法获取全局配置路径时跳过，不影响主流程
+  }
+
+  const conflicts = []
+
+  for (const candidate of candidates) {
+    if (!existsSync(candidate)) continue
+
+    for (const rawLine of readFileSync(candidate, 'utf8').split(/\r?\n/)) {
+      const line = rawLine.trim()
+      if (!line || line.startsWith('#') || line.startsWith(';')) continue
+      if (/^@appzgatenz:registry\s*=/.test(line)) {
+        conflicts.push({ path: candidate, line })
+      }
+    }
+  }
+
+  return conflicts
+}
+
+function warnScopeRegistryConflicts() {
+  const conflicts = findScopeRegistryConflicts()
+  if (conflicts.length === 0) return
+
+  console.warn('[setup-npmrc] WARNING: @appzgatenz:registry found in user/global npmrc:')
+  for (const { path, line } of conflicts) {
+    console.warn(`[setup-npmrc]   ${path}: ${line}`)
+  }
+  console.warn(
+    '[setup-npmrc] User-level routing overrides project config and can cause 401 on public npm.',
+  )
+  console.warn(
+    '[setup-npmrc] Remove the line; registry routing belongs to the project-level .npmrc.',
+  )
+}
+
 const branch = getBranch()
 const isDevelop = branch === 'develop'
 const existingNpmrc = readExistingNpmrc()
@@ -118,6 +167,7 @@ if (!isDevelop) {
   } else {
     console.log(`[setup-npmrc] Branch: ${branch} -> no .npmrc needed; using public npm.`)
   }
+  warnScopeRegistryConflicts()
   process.exit(0)
 }
 

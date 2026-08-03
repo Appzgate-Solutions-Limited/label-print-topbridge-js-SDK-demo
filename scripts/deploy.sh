@@ -134,7 +134,7 @@ BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 case "$BRANCH" in
   main)
     if [[ -f "pnpm-lock.yaml" ]] && grep -q "codeartifact" pnpm-lock.yaml; then
-      error "Lockfile on main branch contains CodeArtifact URLs. Regenerate it (see docs/archived/codeartifact-switching-guide.md)"
+      error "Lockfile on main branch contains CodeArtifact URLs. Regenerate it (see docs/codeartifact-switching-guide.md)"
     fi
     ok "Branch: main → production deploy"
     ;;
