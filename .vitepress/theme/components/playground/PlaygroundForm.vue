@@ -5,9 +5,8 @@ import type {
   PlaygroundTemplateItem,
 } from '../../composables/usePlayground'
 import AdvancedForm from './forms/AdvancedForm.vue'
-import BasicForm from './forms/BasicForm.vue'
 import ErrorHandlingForm from './forms/ErrorHandlingForm.vue'
-import MultiProductForm from './forms/MultiProductForm.vue'
+import ProductForm from './forms/ProductForm.vue'
 import TemplateSchemaForm from './forms/TemplateSchemaForm.vue'
 
 defineProps<{
@@ -45,7 +44,7 @@ const PREFLIGHT_TEMPLATES = ['basic', 'multi-product', 'preflight-only', 'advanc
       </div>
     </div>
 
-    <BasicForm
+    <ProductForm
       v-if="template === 'basic'"
       :is-loading="isLoading"
       :templates="templates"
@@ -53,8 +52,9 @@ const PREFLIGHT_TEMPLATES = ['basic', 'multi-product', 'preflight-only', 'advanc
       @print="$emit('print', $event)"
     />
 
-    <MultiProductForm
-      v-if="template === 'multi-product'"
+    <ProductForm
+      v-else-if="template === 'multi-product'"
+      :multi="true"
       :is-loading="isLoading"
       :templates="templates"
       :printers="printers"
@@ -62,13 +62,13 @@ const PREFLIGHT_TEMPLATES = ['basic', 'multi-product', 'preflight-only', 'advanc
     />
 
     <ErrorHandlingForm
-      v-if="template === 'error-handling'"
+      v-else-if="template === 'error-handling'"
       :is-loading="isLoading"
       @error-test="$emit('error-test', $event)"
     />
 
     <TemplateSchemaForm
-      v-if="template === 'template-schema'"
+      v-else-if="template === 'template-schema'"
       :is-loading="isLoading"
       :templates="templates"
       @fetch-templates="$emit('fetch-templates')"
@@ -76,7 +76,7 @@ const PREFLIGHT_TEMPLATES = ['basic', 'multi-product', 'preflight-only', 'advanc
     />
 
     <AdvancedForm
-      v-if="template === 'advanced-form'"
+      v-else-if="template === 'advanced-form'"
       :is-loading="isLoading"
       :templates="templates"
       :printers="printers"
@@ -84,6 +84,10 @@ const PREFLIGHT_TEMPLATES = ['basic', 'multi-product', 'preflight-only', 'advanc
       @print="$emit('print', $event)"
       @query-schema="$emit('query-schema', $event)"
     />
+
+    <div v-else class="pg-form-section" style="color: var(--vp-text-2)">
+      <p>This example is code-driven. Switch to <strong>Advanced Mode</strong> to edit and run the demo code.</p>
+    </div>
   </div>
 </template>
 

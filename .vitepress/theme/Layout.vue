@@ -5,12 +5,14 @@ import { computed } from 'vue'
 import BetaBanner from './components/BetaBanner.vue'
 import ComingSoonOverlay from './components/ComingSoonOverlay.vue'
 import SdkSwitcher from './components/SdkSwitcher.vue'
+import { provideDevMode } from './composables/useDevMode'
 import { provideSdkType } from './composables/useSdkType'
 
 const { Layout } = DefaultTheme
 const { lang } = useData()
 
 const { sdkType } = provideSdkType()
+provideDevMode()
 
 const locale = computed(() => (lang.value === 'zh-CN' ? ('zh' as const) : ('en' as const)))
 </script>

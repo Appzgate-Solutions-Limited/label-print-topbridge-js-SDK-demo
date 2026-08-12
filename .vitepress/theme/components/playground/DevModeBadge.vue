@@ -1,6 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { useData } from 'vitepress'
+import { computed, ref } from 'vue'
 import { useDevMode } from '../../composables/useDevMode'
+import { devModeLabels } from '../../locales'
+
+const { lang } = useData()
+const locale = computed(() => (lang.value === 'zh-CN' ? 'zh' : 'en'))
+const labels = computed(() => devModeLabels[locale.value])
 
 const { isDevMode, deactivate } = useDevMode()
 const expanded = ref(false)
@@ -10,9 +16,9 @@ const expanded = ref(false)
   <div v-if="isDevMode" class="dev-badge" @click="expanded = !expanded">
     <span class="dev-badge-label">DEV</span>
     <div v-if="expanded" class="dev-badge-popup" @click.stop>
-      <div class="dev-badge-title">开发模式</div>
-      <div class="dev-badge-desc">SDK 请求已拦截，数据输出到 Log 面板</div>
-      <button class="dev-badge-close" @click="deactivate(); expanded = false">关闭</button>
+      <div class="dev-badge-title">{{ labels.title }}</div>
+      <div class="dev-badge-desc">{{ labels.description }}</div>
+      <button class="dev-badge-close" @click="deactivate(); expanded = false">{{ labels.close }}</button>
     </div>
   </div>
 </template>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ERROR_SIMULATIONS } from '../../../composables/useErrorDemo'
+
 defineProps<{
   isLoading: boolean
 }>()
@@ -7,21 +9,7 @@ defineEmits<{
   'error-test': [type: string]
 }>()
 
-const SIMULATIONS: { type: string; label: string }[] = [
-  { type: 'simulate-connection', label: 'ConnectionError' },
-  { type: 'simulate-auth-not-authenticated', label: 'AuthError' },
-  { type: 'simulate-version-update-required', label: 'VersionError' },
-  { type: 'simulate-quota', label: 'QuotaError' },
-  { type: 'simulate-printer', label: 'PrinterError' },
-  { type: 'simulate-printer-setup', label: 'PrinterSetupError' },
-  { type: 'simulate-session', label: 'SessionError' },
-  { type: 'simulate-template', label: 'TemplateError' },
-  { type: 'simulate-network', label: 'NetworkError' },
-  { type: 'simulate-source', label: 'SourceError' },
-  { type: 'simulate-config', label: 'ConfigError' },
-  { type: 'simulate-print', label: 'PrintError' },
-  { type: 'simulate-validation', label: 'ValidationError' },
-]
+const visibleSimulations = ERROR_SIMULATIONS.filter((s) => !s.hidden)
 </script>
 
 <template>
@@ -42,11 +30,11 @@ const SIMULATIONS: { type: string; label: string }[] = [
     <div class="pg-form-title">Simulate Errors (instanceof narrowing demo)</div>
     <div class="pg-form-row" style="flex-wrap: wrap;">
       <button
-        v-for="sim in SIMULATIONS"
-        :key="sim.type"
+        v-for="sim in visibleSimulations"
+        :key="sim.key"
         class="pg-btn pg-btn-sm"
         :disabled="isLoading"
-        @click="$emit('error-test', sim.type)"
+        @click="$emit('error-test', `simulate-${sim.key}`)"
       >
         {{ sim.label }}
       </button>

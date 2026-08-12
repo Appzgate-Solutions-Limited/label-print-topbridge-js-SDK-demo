@@ -52,8 +52,7 @@ export function provideSdkType() {
 }
 
 export function useSdkType() {
-  return inject(SDK_TYPE_KEY, {
-    sdkType: ref<SdkType>('js-core'),
-    switchSdkType: () => {},
-  })
+  const ctx = inject(SDK_TYPE_KEY, null)
+  if (!ctx) throw new Error('useSdkType() called without provideSdkType()')
+  return ctx
 }

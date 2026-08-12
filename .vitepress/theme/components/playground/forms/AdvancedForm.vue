@@ -5,6 +5,7 @@ import type {
   PlaygroundSchemaField,
   PlaygroundTemplateItem,
 } from '../../../composables/usePlayground'
+import { useTemplatePrinterSelection } from '../../../composables/useTemplatePrinterSelection'
 
 const props = defineProps<{
   isLoading: boolean
@@ -18,32 +19,13 @@ const emit = defineEmits<{
   'query-schema': [templateCode: string]
 }>()
 
-const selectedTemplate = ref('PRICE_LABEL')
-const selectedPrinter = ref('')
+const { selectedTemplate, selectedPrinter } = useTemplatePrinterSelection(
+  () => props.templates,
+  () => props.printers,
+)
 const schemaFormData = ref<
   Record<string, string | number | { value: string | number; currency?: string; unit?: string }>
 >({})
-
-watch(
-  () => props.templates,
-  (t) => {
-    const firstTemplate = t[0]?.code || t[0]?.id || ''
-    const hasSelectedTemplate = t.some((x) => (x.code || x.id) === selectedTemplate.value)
-    if (firstTemplate && (!selectedTemplate.value || !hasSelectedTemplate)) {
-      selectedTemplate.value = firstTemplate
-    }
-  },
-  { immediate: true },
-)
-
-watch(
-  () => props.printers,
-  (p) => {
-    if (!selectedPrinter.value)
-      selectedPrinter.value = p.find((x) => x.isDefault)?.name || p[0]?.name || ''
-  },
-  { immediate: true },
-)
 
 watch(
   () => props.schemaFields,

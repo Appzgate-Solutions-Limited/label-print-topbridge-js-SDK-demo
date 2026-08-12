@@ -1,409 +1,44 @@
-import type {
-  SyncedPrinter,
-  TemplateFieldSchema,
-  TemplateItem,
-} from '@appzgatenz/label-print-topbridge-js'
-import {
-  TopBridgeAuthError,
-  TopBridgeClient,
-  TopBridgeConfigError,
-  TopBridgeConnectionError,
-  TopBridgeError,
-  TopBridgeNetworkError,
-  TopBridgePrintError,
-  TopBridgePrinterError,
-  TopBridgePrinterSetupError,
-  TopBridgeQuotaError,
-  TopBridgeSessionError,
-  TopBridgeSourceError,
-  TopBridgeTemplateError,
-  TopBridgeValidationError,
-  TopBridgeVersionError,
-} from '@appzgatenz/label-print-topbridge-js'
-import { transform } from 'sucrase'
-import { ref, shallowRef } from 'vue'
-import type { CapturedRequest } from './devTransport'
-import { DevTransport } from './devTransport'
+import { useCodeRunner } from './useCodeRunner'
 import { useDevMode } from './useDevMode'
+import { useErrorDemo } from './useErrorDemo'
+import { useLogPanel } from './useLogPanel'
+import { useSdkOps } from './useSdkOps'
+
+export type { AddLogFn, LogEntry } from './useLogPanel'
+export type { PlaygroundPrinter, PlaygroundSchemaField, PlaygroundTemplateItem } from './useSdkOps'
 
 /**
- * 错误传播约定:
- * - runPreflight / runHealthCheck:catch 后 addLog 再 throw,允许调用方根据成功/失败做后续编排
- *   (例如 preflightDone 状态切换、advanced-form 自动 querySchema)
- * - print / fetchTemplates / querySchema / runErrorTest / executeUserCode:
- *   内部 catch 后仅 addLog,**永不向外抛**——这些函数的语义是"日志面板自洽展示",
- *   调用方不需要也不应该 try/catch 它们
+ * 组合根——组合 4 个聚焦 composable，对外保持与旧 usePlayground 相同的接口。
+ *
+ * 错误传播约定（与各子 composable 内部一致）:
+ * - runPreflight / runHealthCheck: catch 后 addLog 再 throw，允许调用方做后续编排
+ * - print / fetchTemplates / querySchema / runErrorTest / executeUserCode: 仅 addLog，不外抛
  */
-
-export type PlaygroundPrinter = SyncedPrinter
-export type PlaygroundTemplateItem = TemplateItem
-export type PlaygroundSchemaField = TemplateFieldSchema
-
-export interface LogEntry {
-  time: string
-  message: string
-  type: 'info' | 'success' | 'error'
-  data?: { title: string; content: string }
-}
-
-const ERROR_CONSTRUCTORS: Record<string, () => Error> = {
-  connection: () => new TopBridgeConnectionError('TopBridge App is not running'),
-  'auth-not-authenticated': () =>
-    new TopBridgeAuthError('User is not logged in', { code: 'NOT_AUTHENTICATED' }),
-  'version-update-required': () =>
-    new TopBridgeVersionError('TopBridge App version is too low', {
-      storeUrl: 'https://example.com/update',
-    }),
-  // Keep legacy key so old bookmarks / snippets still resolve
-  'auth-update-required': () =>
-    new TopBridgeVersionError('TopBridge App version is too low', {
-      storeUrl: 'https://example.com/update',
-    }),
-  quota: () =>
-    new TopBridgeQuotaError('Print quota exhausted', { reason: 'Monthly limit reached' }),
-  printer: () => new TopBridgePrinterError('Printer is offline', { code: 'PRINTER_OFFLINE' }),
-  template: () => new TopBridgeTemplateError('Template not found'),
-  network: () => new TopBridgeNetworkError('Cloud network disconnected'),
-  source: () => new TopBridgeSourceError('Origin verification failed'),
-  config: () => new TopBridgeConfigError('Invalid configuration'),
-  print: () => new TopBridgePrintError('Print job failed', { details: { jobId: '12345' } }),
-  validation: () => new TopBridgeValidationError('Invalid input', 'products'),
-  'printer-setup': () =>
-    new TopBridgePrinterSetupError('Charset already exists', { code: 'CHARSET_ALREADY_EXISTS' }),
-  session: () =>
-    new TopBridgeSessionError('Session limit exceeded', {
-      limit: 2,
-      usedSessions: 3,
-      sessions: [
-        {
-          id: 'sess-1',
-          ipAddress: '127.0.0.1',
-          started: '2026-01-01T00:00:00Z',
-          lastAccess: '2026-01-01T01:00:00Z',
-          clients: 'topbridge',
-          isCurrent: true,
-        },
-      ],
-    }),
-}
-
 export function usePlayground() {
   const { isDevMode } = useDevMode()
-  const client = shallowRef<TopBridgeClient | null>(null)
-  let clientIsDevMode: boolean | null = null
-  const logs = ref<LogEntry[]>([])
-  const isLoading = ref(false)
-  const printers = ref<PlaygroundPrinter[]>([])
-  const templates = ref<PlaygroundTemplateItem[]>([])
-  const schemaFields = ref<PlaygroundSchemaField[]>([])
+  const { logs, addLog, clearLogs } = useLogPanel()
 
-  function addLog(message: string, type: LogEntry['type'] = 'info', data?: LogEntry['data']) {
-    logs.value.push({
-      time: new Date().toLocaleTimeString(),
-      message,
-      type,
-      data,
-    })
-  }
-
-  function clearLogs() {
-    logs.value = []
-  }
-
-  function onTransportRequest(request: CapturedRequest) {
-    addLog(`→ Transport: ${request.action}`, 'info', {
-      title: `Transport Request: ${request.action}`,
-      content: JSON.stringify(request, null, 2),
-    })
-  }
-
-  function ensureClient() {
-    const devMode = isDevMode.value
-    if (!client.value || clientIsDevMode !== devMode) {
-      if (devMode) {
-        client.value = new TopBridgeClient({ transport: new DevTransport(onTransportRequest) })
-      } else {
-        client.value = new TopBridgeClient({ debug: true })
-      }
-      clientIsDevMode = devMode
-    }
-    return client.value
-  }
-
-  async function withLoading<T>(fn: () => Promise<T>): Promise<T> {
-    isLoading.value = true
-    try {
-      return await fn()
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  async function runPreflight() {
-    return withLoading(async () => {
-      try {
-        if (isDevMode.value) {
-          addLog('⚡ [Dev Mode] Skipping preflight — injecting mock data', 'info')
-          printers.value = [{ name: 'Mock Printer', isDefault: true, protocol: 'TSPL' }]
-          templates.value = [
-            { id: '1', name: 'Price Label', code: 'PRICE_LABEL', isEnabled: true },
-            { id: '2', name: 'Product Tag', code: 'PRODUCT_TAG', isEnabled: true },
-          ]
-          addLog('✓ Preflight passed (mock)', 'success')
-          addLog('  Printers: 1, default: Mock Printer')
-          addLog('  Templates: 2 available')
-          return {
-            health: {
-              status: 'ok' as const,
-              type: 'pong' as const,
-              isRunning: true as const,
-              data: { isLoggedIn: true, version: '0.0.0-dev' },
-              message: 'OK',
-            },
-            benefits: { status: 'ok' as const, data: { isValid: true }, message: 'OK' },
-            printers: { status: 'ok' as const, data: printers.value, message: 'OK' },
-          }
-        }
-
-        const c = ensureClient()
-        const result = await c.launch.ensureRunning(
-          () =>
-            c.preflight.run({
-              onStepChange: (step: string) => addLog(`  Step: ${step}...`),
-            }),
-          { onLaunching: () => addLog('  Launching TopBridge...') },
-        )
-
-        addLog('✓ Preflight passed', 'success')
-        printers.value = result.printers.data?.printers ?? []
-        addLog(
-          `  Printers: ${result.printers.data?.count}, default: ${result.printers.data?.defaultPrinter}`,
-        )
-
-        const tplResult = await c.templates.list()
-        templates.value = tplResult.data.templates ?? []
-        addLog(`  Templates: ${tplResult.data.templates?.length ?? 0} available`)
-
-        return result
-      } catch (err: any) {
-        addLog(`✗ Preflight failed: ${err.message}`, 'error')
-        throw err
-      }
-    })
-  }
-
-  async function runHealthCheck() {
-    return withLoading(async () => {
-      try {
-        const health = await ensureClient().health.check()
-        addLog(
-          `✓ TopBridge App ${health.isRunning ? 'running' : 'not running'}`,
-          health.isRunning ? 'success' : 'error',
-        )
-        if (health.data?.isLoggedIn !== undefined)
-          addLog(`  Logged in: ${health.data.isLoggedIn ? 'Yes' : 'No'}`)
-        if (health.data?.version) addLog(`  Version: ${health.data.version}`)
-        return health
-      } catch (err: any) {
-        addLog(`✗ Health check failed: ${err.message}`, 'error')
-        throw err
-      }
-    })
-  }
-
-  async function print(params: any) {
-    return withLoading(async () => {
-      try {
-        if (isDevMode.value) {
-          addLog('⚡ [Dev Mode] SDK Params:', 'info', {
-            title: 'SDK Params',
-            content: JSON.stringify(params, null, 2),
-          })
-        }
-        const result = await ensureClient().print.execute(params)
-        addLog('✓ Print successful', 'success')
-        addLog(`  Copies: ${result.data.printedCopies}`)
-        addLog(`  Template: ${result.data.templateName}`)
-        if (result.data.jobId) addLog(`  Job ID: ${result.data.jobId}`)
-        if (result.warnings?.length) {
-          for (const w of result.warnings) {
-            addLog(`  Warning: [${w.code}] ${w.message}`, 'error')
-          }
-        }
-      } catch (err: any) {
-        addLog(`✗ Print failed: ${err.message}`, 'error')
-        if (err.field) addLog(`  Field: ${err.field}`)
-      }
-    })
-  }
-
-  async function fetchTemplates() {
-    return withLoading(async () => {
-      try {
-        const result = await ensureClient().templates.list()
-        templates.value = result.data.templates ?? []
-        addLog(`✓ Found ${result.data.count} templates`, 'success')
-      } catch (err: any) {
-        addLog(`✗ Failed: ${err.message}`, 'error')
-      }
-    })
-  }
-
-  async function querySchema(templateCode: string) {
-    return withLoading(async () => {
-      try {
-        const schema = await ensureClient().templates.schema(templateCode)
-        schemaFields.value = schema.data.fields ?? []
-        addLog(`✓ Schema: ${schema.data.name} (${schema.data.code})`, 'success')
-        addLog(`  Fields: ${schema.data.fields?.length ?? 0}`)
-        for (const f of schema.data.fields ?? []) {
-          if (f.fieldType !== 'line') {
-            addLog(`    ${f.dataField}: ${f.fieldType}${f.required ? ' (required)' : ''}`)
-          }
-        }
-      } catch (err: any) {
-        schemaFields.value = []
-        addLog(`✗ Schema failed: ${err.message}`, 'error')
-      }
-    })
-  }
-
-  async function runErrorTest(type: string) {
-    return withLoading(async () => {
-      if (type === 'preflight') {
-        addLog('--- Preflight with error handling ---')
-        try {
-          const result = await ensureClient().preflight.run({
-            onStepChange: (step: string) => addLog(`  Step: ${step}...`),
-          })
-          addLog('✓ Preflight passed', 'success')
-          addLog(`  Printer: ${result.printers.data?.defaultPrinter}`)
-        } catch (err: any) {
-          logErrorDetail(err)
-        }
-      } else if (type === 'validation') {
-        addLog('--- Empty product list test ---')
-        try {
-          await ensureClient().print.execute({
-            template: 'PRICE_LABEL',
-            printer: 'Test',
-            products: [],
-          })
-        } catch (err: any) {
-          logErrorDetail(err)
-        }
-      } else if (type.startsWith('simulate-')) {
-        const errorType = type.replace('simulate-', '')
-        addLog(`--- Simulated ${errorType} ---`)
-        const ctor = ERROR_CONSTRUCTORS[errorType]
-        try {
-          throw ctor ? ctor() : new TopBridgeError('Unknown simulated error')
-        } catch (err: any) {
-          addLog(`✗ [Simulated] ${err.constructor?.name || 'Error'}: ${err.message}`, 'error')
-          if (err.code) addLog(`  code: ${err.code}`)
-          if (err.storeUrl) addLog(`  storeUrl: ${err.storeUrl}`)
-          if (err.downloadUrl) addLog(`  downloadUrl: ${err.downloadUrl}`)
-          if (err.reason) addLog(`  reason: ${err.reason}`)
-          if (err.field) addLog(`  field: ${err.field}`)
-          if (err.details) addLog(`  details: ${JSON.stringify(err.details)}`)
-        }
-      }
-    })
-  }
-
-  function logErrorDetail(err: any) {
-    const name = err.constructor?.name || 'Error'
-    addLog(`✗ ${name}: ${err.message}`, 'error')
-    if (err.code) addLog(`  code: ${err.code}`)
-    if (err.storeUrl) addLog(`  Update: ${err.storeUrl}`)
-    if (err.downloadUrl) addLog(`  Download: ${err.downloadUrl}`)
-    if (err.reason) addLog(`  reason: ${err.reason}`)
-    if (err.field) addLog(`  field: ${err.field}`)
-    if (err.limit != null) addLog(`  limit: ${err.limit}`)
-    if (err.usedSessions != null) addLog(`  usedSessions: ${err.usedSessions}`)
-    if (err.sessions) addLog(`  sessions: ${err.sessions.length}`)
-  }
-
-  async function executeUserCode(code: string) {
-    return withLoading(async () => {
-      addLog('--- Executing user code ---')
-      try {
-        const stripped = stripSdkImports(code)
-        const js = transform(stripped, { transforms: ['typescript'] }).code
-
-        const devMode = isDevMode.value
-        const exports = devMode ? buildDevSdkExports() : buildRealSdkExports()
-        const paramNames = Object.keys(exports)
-        const paramValues = Object.values(exports)
-
-        const customConsole = {
-          log: (...args: any[]) => addLog(args.map(String).join(' ')),
-          error: (...args: any[]) => addLog(args.map(String).join(' '), 'error'),
-          warn: (...args: any[]) => addLog(args.map(String).join(' ')),
-        }
-
-        const fn = new Function(...paramNames, 'console', `return (async () => { ${js} })()`)
-        await fn(...paramValues, customConsole)
-        addLog('--- Execution complete ---', 'success')
-      } catch (err: any) {
-        addLog(`✗ Execution error: ${err.message}`, 'error')
-      }
-    })
-  }
-
-  function buildRealSdkExports() {
-    return {
-      TopBridgeClient,
-      TopBridgeConnectionError,
-      TopBridgeAuthError,
-      TopBridgeVersionError,
-      TopBridgeQuotaError,
-      TopBridgePrintError,
-      TopBridgeValidationError,
-      TopBridgePrinterError,
-      TopBridgePrinterSetupError,
-      TopBridgeTemplateError,
-      TopBridgeNetworkError,
-      TopBridgeSourceError,
-      TopBridgeConfigError,
-      TopBridgeSessionError,
-      TopBridgeError,
-    }
-  }
-
-  function buildDevSdkExports() {
-    return {
-      ...buildRealSdkExports(),
-      TopBridgeClient: class extends TopBridgeClient {
-        constructor(config?: any) {
-          super({ ...config, transport: new DevTransport(onTransportRequest) })
-        }
-      },
-    }
-  }
-
-  function stripSdkImports(code: string) {
-    return code.replace(
-      /^\s*import[\s\S]*?from\s+['"]@appzgatenz\/label-print-topbridge-js['"];?\s*$/gm,
-      '',
-    )
-  }
+  const sdk = useSdkOps(addLog, isDevMode)
+  const { runErrorTest } = useErrorDemo(addLog, sdk.ensureClient, sdk.withLoading)
+  const { executeUserCode } = useCodeRunner(
+    addLog,
+    isDevMode,
+    sdk.withLoading,
+    sdk.onTransportRequest,
+  )
 
   return {
-    client,
     logs,
-    isLoading,
-    printers,
-    templates,
-    schemaFields,
-    addLog,
     clearLogs,
-    ensureClient,
-    runPreflight,
-    runHealthCheck,
-    print,
-    fetchTemplates,
-    querySchema,
+    isLoading: sdk.isLoading,
+    printers: sdk.printers,
+    templates: sdk.templates,
+    schemaFields: sdk.schemaFields,
+    runPreflight: sdk.runPreflight,
+    runHealthCheck: sdk.runHealthCheck,
+    print: sdk.print,
+    fetchTemplates: sdk.fetchTemplates,
+    querySchema: sdk.querySchema,
     runErrorTest,
     executeUserCode,
   }

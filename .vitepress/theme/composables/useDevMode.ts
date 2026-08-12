@@ -1,8 +1,14 @@
-import { ref, watch } from 'vue'
+import { type InjectionKey, inject, provide, type Ref, ref, watch } from 'vue'
 
 const STORAGE_KEY = '__tb_dev__'
 
-const isDevMode = ref(false)
+export interface DevModeContext {
+  isDevMode: Ref<boolean>
+  activate: () => void
+  deactivate: () => void
+}
+
+export const DEVMODE_KEY: InjectionKey<DevModeContext> = Symbol('devMode')
 
 function readStorage(): boolean {
   try {
@@ -24,7 +30,7 @@ function writeStorage(value: boolean) {
   }
 }
 
-function installGlobal() {
+function installGlobal(isDevMode: Ref<boolean>) {
   if (typeof window === 'undefined') return
 
   ;(window as any).__tb_dev__ = (value?: boolean) => {
@@ -36,25 +42,34 @@ function installGlobal() {
   }
 }
 
-function activate() {
-  isDevMode.value = true
-}
+export function provideDevMode() {
+  const isDevMode = ref(readStorage())
 
-function deactivate() {
-  isDevMode.value = false
-}
+  watch(isDevMode, (v) => {
+    writeStorage(v)
+    console.log(
+      `%c[TopBridge Dev Mode] ${v ? 'ON' : 'OFF'}`,
+      `color: ${v ? '#f59e0b' : '#999'}; font-weight: bold`,
+    )
+  })
 
-export function useDevMode() {
+  installGlobal(isDevMode)
+
+  function activate() {
+    isDevMode.value = true
+  }
+
+  function deactivate() {
+    isDevMode.value = false
+  }
+
+  provide(DEVMODE_KEY, { isDevMode, activate, deactivate })
+
   return { isDevMode, activate, deactivate }
 }
 
-// 模块加载时一次性初始化
-isDevMode.value = readStorage()
-watch(isDevMode, (v) => {
-  writeStorage(v)
-  console.log(
-    `%c[TopBridge Dev Mode] ${v ? 'ON' : 'OFF'}`,
-    `color: ${v ? '#f59e0b' : '#999'}; font-weight: bold`,
-  )
-})
-installGlobal()
+export function useDevMode() {
+  const ctx = inject(DEVMODE_KEY)
+  if (!ctx) throw new Error('useDevMode() called without provideDevMode()')
+  return ctx
+}

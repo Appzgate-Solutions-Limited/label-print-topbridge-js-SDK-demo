@@ -190,3 +190,17 @@ export const betaBannerLabels: Record<
     sourceFallback: '预发布源',
   },
 }
+
+export const devModeLabels: Record<Locale, { title: string; description: string; close: string }> =
+  {
+    en: {
+      title: 'Dev Mode',
+      description: 'SDK requests intercepted. Data output goes to the Log panel.',
+      close: 'Close',
+    },
+    zh: {
+      title: '开发模式',
+      description: 'SDK 请求已拦截，数据输出到 Log 面板',
+      close: '关闭',
+    },
+  }

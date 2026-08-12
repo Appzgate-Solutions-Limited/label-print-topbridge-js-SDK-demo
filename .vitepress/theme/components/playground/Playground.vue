@@ -24,7 +24,6 @@ const {
   printers,
   templates,
   schemaFields,
-  addLog,
   clearLogs,
   runPreflight,
   runHealthCheck,
