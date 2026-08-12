@@ -91,4 +91,4 @@ Lifecycle helpers on the client: `connect()`, `close()`, `getConnectionState()`.
 | Dependencies | Zero runtime dependencies |
 | Formats | ESM + CJS dual output |
 | Tree-shaking | Supported (`sideEffects: false`) |
-| Node.js | >= 18 |
+| Node.js (build toolchain) | >= 18 |

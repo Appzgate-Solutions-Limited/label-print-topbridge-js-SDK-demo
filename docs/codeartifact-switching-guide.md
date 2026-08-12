@@ -78,16 +78,16 @@ grep codeartifact ~/.npmrc
 
 **这是最容易被忽略的步骤。** semver 对 `0.x` 版本的 `^` 约束把 minor 当 breaking：
 
-| 约束 | 实际范围 | 能否匹配 0.3.1 |
+| 约束 | 实际范围 | 能否匹配 0.6.1 |
 |------|----------|----------------|
-| `^0.2.0` | `>=0.2.0 <0.3.0` | 不能 |
-| `^0.3.0` | `>=0.3.0 <0.4.0` | 能 |
-| `^0.3.1` | `>=0.3.1 <0.4.0` | 能 |
+| `^0.5.0` | `>=0.5.0 <0.6.0` | 不能 |
+| `^0.6.0` | `>=0.6.0 <0.7.0` | 能 |
+| `^0.6.1` | `>=0.6.1 <0.7.0` | 能 |
 
 将 `package.json` 中的版本约束更新为 CodeArtifact 上的目标版本：
 
 ```json
-"@appzgatenz/label-print-topbridge-js": "^0.3.1"
+"@appzgatenz/label-print-topbridge-js": "^0.6.0"
 ```
 
 ### 4. 安装依赖
@@ -105,7 +105,7 @@ rm pnpm-lock.yaml
 pnpm run install:deps
 ```
 
-删除旧 lockfile 是必要的——旧 lockfile 锁定了 0.2.0，pnpm 会认为"Lockfile is up to date"直接跳过解析。
+删除旧 lockfile 是必要的——旧 lockfile 锁定了旧版本，pnpm 会认为"Lockfile is up to date"直接跳过解析。
 
 如果直接运行 `pnpm install`，首次生成或更新 `.npmrc` 后可能看到如下提示：
 
@@ -131,7 +131,7 @@ pnpm build    # 验证构建通过
 
 ### 6. 合并回 main
 
-**前置条件**：SDK 0.3.1 必须已发布到公共 NPM。
+**前置条件**：SDK 目标版本必须已发布到公共 NPM。
 
 ```bash
 git checkout main
@@ -192,7 +192,7 @@ grep '@appzgatenz:registry' ~/.npmrc
 
 两个原因：
 
-1. **版本约束未更新**——`^0.2.0` 匹配不到 `0.3.1`，更新 `package.json`
+1. **版本约束未更新**——`^0.5.0` 匹配不到 `0.6.1`，更新 `package.json`
 2. **lockfile 缓存**——输出 "Lockfile is up to date, resolution step is skipped"，删除 `pnpm-lock.yaml` 重装
 
 ### 切回 main 后 install 报 404

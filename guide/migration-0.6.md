@@ -4,7 +4,7 @@ title: Migrating to 0.6
 
 # Migrating to 0.6
 
-This guide helps you move from documentation and integrations based on the ~0.3 SDK surface to `@appzgatenz/label-print-topbridge-js@0.6.x`.
+This guide helps you move from documentation and integrations based on the ~0.3 to 0.5.x SDK surface to `@appzgatenz/label-print-topbridge-js@0.6.x`.
 
 :::tip
 `@appzgatenz/label-print-topbridge-js@0.6.1` is published to npm. The 0.6.x API surface is stable.

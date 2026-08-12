@@ -169,6 +169,7 @@ import {
   TopBridgeClient,
   TopBridgeConnectionError,
   TopBridgeAuthError,
+  TopBridgeVersionError,
   TopBridgeQuotaError,
   TopBridgePrinterError,
   TopBridgePrintError,
@@ -202,13 +203,11 @@ async function printPriceLabels() {
     if (err instanceof TopBridgeConnectionError) {
       console.error('Cannot connect to TopBridge, please confirm the app is running')
     } else if (err instanceof TopBridgeAuthError) {
-      if (err.code === 'UPDATE_REQUIRED') {
-        console.error('TopBridge version is too low, please update')
-        const updateUrl = err.storeUrl ?? err.downloadUrl
-        if (updateUrl) window.open(updateUrl)
-      } else {
-        console.error('Please log in to TopBridge App first')
-      }
+      console.error('Please log in to TopBridge App first')
+    } else if (err instanceof TopBridgeVersionError) {
+      console.error('TopBridge version is too low, please update')
+      const updateUrl = err.storeUrl ?? err.downloadUrl
+      if (updateUrl) window.open(updateUrl)
     } else if (err instanceof TopBridgeQuotaError) {
       console.error('Print quota insufficient:', err.reason)
     } else if (err instanceof TopBridgePrinterError) {

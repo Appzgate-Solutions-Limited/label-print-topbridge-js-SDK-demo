@@ -8,7 +8,7 @@ SDK 自动将你的产品数据转换为 TopBridge App 所需的结构化格式�
 
 你**不需要**手动指定字段类型——SDK 自动处理一切。
 
-::: warning
+:::warning
 **扁平自动分组写法已移除。** `price`、`currency`、`unit` 作为同级键的扁平产品数据格式不再支持。请使用[嵌套对象语法](#nested-object-syntax)或[点路径语法](#dot-path-syntax)。
 :::
 
@@ -111,13 +111,14 @@ TSPL 协议按行解析指令。`text` 类型字段值中的换行符（`\n`、`
 | code | reason | 来源 | 说明 |
 |------|--------|------|------|
 | `DATA_FORMAT` | `newline_truncated` | SDK 客户端 | `text` 字段包含换行符，已自动截取第一行 |
-| `DPI_MISMATCH` | — | TopBridge App | 打印机 DPI 与模板设计 DPI 不匹配 |
+| `DPI_MISMATCH` | `dpi_mismatch` | TopBridge App | 打印机 DPI 与模板设计 DPI 不匹配 |
+| `SIZE_MISMATCH` | `size_mismatch` | TopBridge App | 标签尺寸与模板不匹配（仅 Brother 打印机） |
 
-两者合并到响应的 `warnings[]` 数组中。这些是非致命警告——打印任务仍会正常执行。
+全部合并到响应的 `warnings[]` 数组中。这些是非致命警告——打印任务仍会正常执行。
 
 ## 公式注入防护
 
-对于 `textfield` 类型字段，SDK 自动从输入值中剥离公式注入前缀（`=` 和 `=@`。这是内置的安全防护——开发者无需手动清洗数据。
+对于 `textfield` 类型字段，SDK 自动从输入值中剥离公式注入前缀（`=` 和 `=@`）。这是内置的安全防护——开发者无需手动清洗数据。
 
 ```
 输入:  '=SUM(A1:A10)'   →   输出: 'SUM(A1:A10)'
@@ -126,7 +127,7 @@ TSPL 协议按行解析指令。`text` 类型字段值中的换行符（`\n`、`
 
 ## 已废弃的参数
 
-::: warning
+:::warning
 `fieldTypes` 和 `rawProducts` 参数已被移除。传入会抛出 `TopBridgeValidationError`。
 :::
 

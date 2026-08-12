@@ -169,6 +169,7 @@ import {
   TopBridgeClient,
   TopBridgeConnectionError,
   TopBridgeAuthError,
+  TopBridgeVersionError,
   TopBridgeQuotaError,
   TopBridgePrinterError,
   TopBridgePrintError,
@@ -202,13 +203,11 @@ async function printPriceLabels() {
     if (err instanceof TopBridgeConnectionError) {
       console.error('无法连接到 TopBridge，请确认桌面应用已启动')
     } else if (err instanceof TopBridgeAuthError) {
-      if (err.code === 'UPDATE_REQUIRED') {
-        console.error('TopBridge 版本过低，请更新')
-        const updateUrl = err.storeUrl ?? err.downloadUrl
-        if (updateUrl) window.open(updateUrl)
-      } else {
-        console.error('请先登录 TopBridge App')
-      }
+      console.error('请先登录 TopBridge App')
+    } else if (err instanceof TopBridgeVersionError) {
+      console.error('TopBridge 版本过低，请更新')
+      const updateUrl = err.storeUrl ?? err.downloadUrl
+      if (updateUrl) window.open(updateUrl)
     } else if (err instanceof TopBridgeQuotaError) {
       console.error('打印配额不足:', err.reason)
     } else if (err instanceof TopBridgePrinterError) {

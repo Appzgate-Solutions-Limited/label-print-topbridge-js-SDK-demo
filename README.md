@@ -1,6 +1,6 @@
 # TOPSALE Label Printing
 
-[![npm](https://img.shields.io/npm/v/@appzgatenz/label-print-topbridge-js)](https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js) [![docs](https://img.shields.io/badge/docs-label--printing.topsale.biz-blue)](https://label-printing.topsale.co.nz/)
+[![npm](https://img.shields.io/npm/v/@appzgatenz/label-print-topbridge-js)](https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js) [![docs](https://img.shields.io/badge/docs-label--printing.topsale.co.nz-blue)](https://label-printing.topsale.co.nz/)
 
 **Cloud-based label printing for any printer, anywhere.**
 
@@ -105,7 +105,7 @@ pnpm install
 
 ## Resources
 
-- [SDK Source Code](https://github.com/topsale/label-print-topbridge-js) — GitHub repository
+- [SDK Source Code](https://github.com/Appzgate-Solutions-Limited/label-print-topbridge-js-core) — GitHub repository
 - [NPM Package](https://www.npmjs.com/package/@appzgatenz/label-print-topbridge-js) — `@appzgatenz/label-print-topbridge-js`
 
 ## License

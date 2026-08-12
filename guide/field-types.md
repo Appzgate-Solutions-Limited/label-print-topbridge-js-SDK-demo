@@ -8,7 +8,7 @@ The SDK automatically transforms your product data into the structured format To
 
 You do **not** need to manually specify field types — the SDK handles everything automatically.
 
-::: warning
+:::warning
 **Flat auto-grouping notation removed.** The format where `price`, `currency`, and `unit` are separate sibling keys is no longer supported. Use [Nested Object Syntax](#nested-object-syntax) or [Dot-Path Syntax](#dot-path-syntax) instead.
 :::
 
@@ -111,9 +111,10 @@ This only applies to fields with `text` fieldType in the schema. `textfield` pre
 | code | reason | Source | Description |
 |------|--------|--------|-------------|
 | `DATA_FORMAT` | `newline_truncated` | SDK client | A `text` field contained newlines; auto-truncated to first line |
-| `DPI_MISMATCH` | — | TopBridge App | Printer DPI does not match the template design DPI |
+| `DPI_MISMATCH` | `dpi_mismatch` | TopBridge App | Printer DPI does not match the template design DPI |
+| `SIZE_MISMATCH` | `size_mismatch` | TopBridge App | Label size does not match the template (Brother printers only) |
 
-Both are merged into a single `warnings[]` array on the response. These are non-fatal — the print job still executes.
+All are merged into a single `warnings[]` array on the response. These are non-fatal — the print job still executes.
 
 ## Formula Injection Prevention
 
@@ -126,7 +127,7 @@ Input:  '=@cmd'           →   Output: 'cmd'
 
 ## Deprecated Parameters
 
-::: warning
+:::warning
 The `fieldTypes` and `rawProducts` parameters have been removed. Passing them will throw `TopBridgeValidationError`.
 :::
 

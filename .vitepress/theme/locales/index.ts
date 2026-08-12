@@ -96,7 +96,7 @@ export const features: Record<Locale, { icon: string; title: string; desc: strin
     {
       icon: 'shield',
       title: 'Structured Errors',
-      desc: '10 error types with instanceof narrowing for precise diagnostics.',
+      desc: '14 structured error classes with instanceof narrowing for precise diagnostics.',
     },
     {
       icon: 'rocket',
@@ -124,7 +124,7 @@ export const features: Record<Locale, { icon: string; title: string; desc: strin
     {
       icon: 'shield',
       title: '结构化错误',
-      desc: '10 种错误类型，instanceof 类型窄化，精准定位问题。',
+      desc: '14 个结构化错误类，instanceof 类型窄化，精准定位问题。',
     },
     { icon: 'rocket', title: '预检编排', desc: '一行代码完成健康检查 → 权益验证 → 打印机获取。' },
     {

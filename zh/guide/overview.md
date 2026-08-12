@@ -91,4 +91,4 @@ TopBridge App（本机桌面应用）
 | 依赖 | 零运行时依赖 |
 | 格式 | ESM + CJS 双格式 |
 | Tree-shaking | 支持（`sideEffects: false`） |
-| Node.js | >= 18 |
+| Node.js（构建工具链） | >= 18 |
