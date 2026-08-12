@@ -143,6 +143,7 @@ export function useErrorDemo(
     if (err.downloadUrl) addLog(`  Download: ${err.downloadUrl}`)
     if (err.reason) addLog(`  reason: ${err.reason}`)
     if (err.field) addLog(`  field: ${err.field}`)
+    if (err.details) addLog(`  details: ${JSON.stringify(err.details)}`)
     if (err.limit != null) addLog(`  limit: ${err.limit}`)
     if (err.usedSessions != null) addLog(`  usedSessions: ${err.usedSessions}`)
     if (err.sessions) addLog(`  sessions: ${err.sessions.length}`)

@@ -204,3 +204,19 @@ export const devModeLabels: Record<Locale, { title: string; description: string;
       close: '关闭',
     },
   }
+
+export const playgroundFormLabels: Record<
+  Locale,
+  { codeDrivenPrefix: string; advancedMode: string; codeDrivenSuffix: string }
+> = {
+  en: {
+    codeDrivenPrefix: 'This example is code-driven. Switch to ',
+    advancedMode: 'Advanced Mode',
+    codeDrivenSuffix: ' to edit and run the demo code.',
+  },
+  zh: {
+    codeDrivenPrefix: '此示例由代码驱动。请切换到',
+    advancedMode: '高级模式',
+    codeDrivenSuffix: '以编辑并运行演示代码。',
+  },
+}
