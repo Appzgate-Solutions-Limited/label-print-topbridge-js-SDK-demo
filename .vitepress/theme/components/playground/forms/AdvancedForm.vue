@@ -98,8 +98,8 @@ function querySchema() {
   <div class="pg-form-section">
     <div class="pg-form-title">{{ labels.templatePrinter }}</div>
     <div class="pg-form-row">
-      <label>{{ labels.template }}</label>
-      <select v-model="selectedTemplate">
+      <label for="pg-af-template">{{ labels.template }}</label>
+      <select id="pg-af-template" v-model="selectedTemplate">
         <option v-if="!templates.length" :value="selectedTemplate">{{ selectedTemplate }}</option>
         <option v-for="t in templates" :key="t.code || t.id" :value="t.code || t.id">
           {{ t.name }}
@@ -110,8 +110,8 @@ function querySchema() {
       </button>
     </div>
     <div class="pg-form-row">
-      <label>{{ labels.printer }}</label>
-      <select v-model="selectedPrinter">
+      <label for="pg-af-printer">{{ labels.printer }}</label>
+      <select id="pg-af-printer" v-model="selectedPrinter">
         <option value="" disabled>{{ labels.selectPrinter }}</option>
         <option v-for="p in printers" :key="p.name" :value="p.name">
           {{ p.name }}{{ p.isDefault ? labels.defaultSuffix : '' }}
@@ -123,9 +123,9 @@ function querySchema() {
     <div class="pg-form-title">{{ labels.dynamicForm }}</div>
     <template v-for="field in schemaFields" :key="field.dataField">
       <div v-if="field.fieldType !== 'line'" class="pg-form-row">
-        <label>{{ field.dataField }}<span v-if="field.required" class="pg-required">*</span></label>
+        <label :for="`pg-af-${field.dataField}`">{{ field.dataField }}<span v-if="field.required" class="pg-required">*</span></label>
         <template v-if="field.fieldType === 'price'">
-          <input type="number" step="0.01" placeholder="value" :value="schemaFormData[field.dataField]?.value ?? 1.99"
+          <input :id="`pg-af-${field.dataField}`" type="number" step="0.01" placeholder="value" :value="schemaFormData[field.dataField]?.value ?? 1.99"
             @input="updateSchemaField(field.dataField, { ...schemaFormData[field.dataField], value: parseNumberInput(($event.target as HTMLInputElement).value) })">
           <input type="text" placeholder="$" style="width:40px" :value="schemaFormData[field.dataField]?.currency ?? '$'"
             @input="updateSchemaField(field.dataField, { ...schemaFormData[field.dataField], currency: ($event.target as HTMLInputElement).value })">
@@ -133,18 +133,18 @@ function querySchema() {
             @input="updateSchemaField(field.dataField, { ...schemaFormData[field.dataField], unit: ($event.target as HTMLInputElement).value })">
         </template>
         <template v-else-if="field.fieldType === 'weight'">
-          <input type="number" step="0.01" placeholder="value" :value="schemaFormData[field.dataField]?.value ?? 0.5"
+          <input :id="`pg-af-${field.dataField}`" type="number" step="0.01" placeholder="value" :value="schemaFormData[field.dataField]?.value ?? 0.5"
             @input="updateSchemaField(field.dataField, { ...schemaFormData[field.dataField], value: parseNumberInput(($event.target as HTMLInputElement).value) })">
           <input type="text" placeholder="unit" style="width:60px" :value="schemaFormData[field.dataField]?.unit ?? 'kg'"
             @input="updateSchemaField(field.dataField, { ...schemaFormData[field.dataField], unit: ($event.target as HTMLInputElement).value })">
         </template>
         <template v-else-if="field.fieldType === 'integer'">
-          <input type="number" :min="field.dataField === 'copies' ? 1 : undefined" :max="field.dataField === 'copies' ? 9999 : undefined"
+          <input :id="`pg-af-${field.dataField}`" type="number" :min="field.dataField === 'copies' ? 1 : undefined" :max="field.dataField === 'copies' ? 9999 : undefined"
             :value="schemaFormData[field.dataField] ?? field.default ?? (field.dataField === 'copies' ? 1 : '')"
             @input="updateSchemaField(field.dataField, parseIntegerInput(($event.target as HTMLInputElement).value, field.dataField))">
         </template>
         <template v-else>
-          <input type="text" :value="schemaFormData[field.dataField] ?? (field.dataField === 'name' ? 'Test Product' : '')"
+          <input :id="`pg-af-${field.dataField}`" type="text" :value="schemaFormData[field.dataField] ?? (field.dataField === 'name' ? 'Test Product' : '')"
             @input="updateSchemaField(field.dataField, ($event.target as HTMLInputElement).value)">
         </template>
         <span class="pg-field-type">{{ field.fieldType }}</span>

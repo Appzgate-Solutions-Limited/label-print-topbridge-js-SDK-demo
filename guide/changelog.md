@@ -5,7 +5,7 @@ title: Changelog
 # Changelog
 
 :::tip
-This page mirrors the [CHANGELOG.md](https://github.com/Appzgate-Solutions-Limited/label-print-topbridge-js/blob/main/CHANGELOG.md) of `@appzgatenz/label-print-topbridge-js` and is synced manually on each SDK release.
+This page mirrors the [CHANGELOG.md](https://github.com/Appzgate-Solutions-Limited/label-print-topbridge-js-core/blob/main/CHANGELOG.md) of `@appzgatenz/label-print-topbridge-js` and is synced manually on each SDK release.
 :::
 
 ## 0.6.2
@@ -14,7 +14,7 @@ This page mirrors the [CHANGELOG.md](https://github.com/Appzgate-Solutions-Limit
 
 - Tolerate flattened dotted schema field names for structured widgets. Some TopBridge App builds emit `price.currency` / `price.value` entries in the `template` schema instead of a single parent `price` field; `planFields` now registers the dotted prefix (`price`) as the structured field so nested-object and dot-path product inputs validate correctly. An explicitly declared parent field always takes precedence.
 
-All notable changes to this package are documented in this file. Entries through 0.6.1 were reconstructed from tagged Git history when [Changesets](https://github.com/changesets/changesets) was adopted; later entries are generated from changeset fragments. See the [authoring and release workflow](https://github.com/Appzgate-Solutions-Limited/label-print-topbridge-js/blob/main/docs/changelog-and-release.md) in the SDK repository.
+All notable changes to this package are documented in this file. Entries through 0.6.1 were reconstructed from tagged Git history when [Changesets](https://github.com/changesets/changesets) was adopted; later entries are generated from changeset fragments. See the [authoring and release workflow](https://github.com/Appzgate-Solutions-Limited/label-print-topbridge-js-core/blob/main/docs/changelog-and-release.md) in the SDK repository.
 
 ## 0.6.1
 

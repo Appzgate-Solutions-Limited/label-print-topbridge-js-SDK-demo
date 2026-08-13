@@ -20,7 +20,7 @@ TopBridge 是运行在用户本机的桌面应用（本文称「TopBridge App」
 
 - **混合 WebSocket 管理** — 轻量 API 与推送事件共享一条长连接；打印使用独立短连接
 - **TopBridge App 唤起与重试** — 通过 `launch` 模块编排启动与自动重试
-- **数据转换** — 按模板 schema 自动把产品数据转成 Tray App 所需结构
+- **数据转换** — 按模板 schema 自动把产品数据转成 TopBridge App 所需结构
 - **结构化错误** — 14 个错误类（1 基类 + 13 子类），均支持 `instanceof` 收窄
 - **预检编排** — 一行完成「健康检查 → 权益校验 → 打印机发现」
 - **打印机配置与会话解除** — 通过 `printerSetup` / `session` 配置协议/BPAC、清除 SessionBlocked

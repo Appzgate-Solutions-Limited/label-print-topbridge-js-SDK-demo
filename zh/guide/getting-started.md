@@ -159,7 +159,7 @@ try {
   } else if (err instanceof TopBridgeTemplateError) {
     // 模板不存在或无权限
   } else if (err instanceof TopBridgeNetworkError) {
-    // Tray App 在线，但云端网络断开
+    // TopBridge App 在线，但云端网络断开
   } else if (err instanceof TopBridgeSourceError) {
     // source 不被 TopBridge App 识别
   } else if (err instanceof TopBridgeValidationError) {

@@ -111,30 +111,30 @@ function emitPrint() {
   <div v-else class="pg-form-section">
     <div class="pg-form-title">{{ labels.printSettings }}</div>
     <div class="pg-form-row">
-      <label>{{ labels.name }}</label>
-      <input v-model="productName" type="text">
+      <label for="pg-name">{{ labels.name }}</label>
+      <input id="pg-name" v-model="productName" type="text">
     </div>
     <div class="pg-form-row">
-      <label>{{ labels.price }}</label>
-      <input v-model="productPrice" type="number" step="0.01">
+      <label for="pg-price">{{ labels.price }}</label>
+      <input id="pg-price" v-model="productPrice" type="number" step="0.01">
     </div>
     <div class="pg-form-row">
-      <label>{{ labels.currency }}</label>
-      <input v-model="productCurrency" type="text" style="width: 50px">
-      <label>{{ labels.unit }}</label>
-      <input v-model="productUnit" type="text" style="width: 60px">
+      <label for="pg-currency">{{ labels.currency }}</label>
+      <input id="pg-currency" v-model="productCurrency" type="text" style="width: 50px">
+      <label for="pg-unit">{{ labels.unit }}</label>
+      <input id="pg-unit" v-model="productUnit" type="text" style="width: 60px">
     </div>
     <div class="pg-form-row">
-      <label>{{ labels.copies }}</label>
-      <input v-model="productCopies" type="number" min="1" max="9999">
+      <label for="pg-copies">{{ labels.copies }}</label>
+      <input id="pg-copies" v-model="productCopies" type="number" min="1" max="9999">
     </div>
   </div>
 
   <!-- 共享：Template / Printer 选择 + Print 按钮 -->
   <div class="pg-form-section">
     <div v-if="!multi" class="pg-form-row">
-      <label>{{ labels.template }}</label>
-      <select v-model="selectedTemplate">
+      <label for="pg-template">{{ labels.template }}</label>
+      <select id="pg-template" v-model="selectedTemplate">
         <option v-if="!templates.length" :value="selectedTemplate">{{ selectedTemplate }}</option>
         <option v-for="t in templates" :key="t.code || t.id" :value="t.code || t.id">
           {{ t.name }}
@@ -142,8 +142,8 @@ function emitPrint() {
       </select>
     </div>
     <div v-if="!multi" class="pg-form-row">
-      <label>{{ labels.printer }}</label>
-      <select v-model="selectedPrinter">
+      <label for="pg-printer">{{ labels.printer }}</label>
+      <select id="pg-printer" v-model="selectedPrinter">
         <option value="" disabled>{{ labels.selectPrinter }}</option>
         <option v-for="p in printers" :key="p.name" :value="p.name">
           {{ p.name }}{{ p.isDefault ? labels.defaultSuffix : '' }}
@@ -151,15 +151,15 @@ function emitPrint() {
       </select>
     </div>
     <div v-if="multi" class="pg-form-row">
-      <label>{{ labels.template }}</label>
-      <select v-model="selectedTemplate">
+      <label for="pg-template-m">{{ labels.template }}</label>
+      <select id="pg-template-m" v-model="selectedTemplate">
         <option v-if="!templates.length" :value="selectedTemplate">{{ selectedTemplate }}</option>
         <option v-for="t in templates" :key="t.code || t.id" :value="t.code || t.id">
           {{ t.name }}
         </option>
       </select>
-      <label>{{ labels.printer }}</label>
-      <select v-model="selectedPrinter">
+      <label for="pg-printer-m">{{ labels.printer }}</label>
+      <select id="pg-printer-m" v-model="selectedPrinter">
         <option value="" disabled>{{ labels.selectPrinter }}</option>
         <option v-for="p in printers" :key="p.name" :value="p.name">
           {{ p.name }}{{ p.isDefault ? labels.defaultSuffix : '' }}

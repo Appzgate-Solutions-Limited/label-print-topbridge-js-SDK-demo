@@ -5,7 +5,7 @@ title: 更新日志
 # 更新日志
 
 :::tip
-本页镜像 `@appzgatenz/label-print-topbridge-js` 的 [CHANGELOG.md](https://github.com/Appzgate-Solutions-Limited/label-print-topbridge-js/blob/main/CHANGELOG.md)，随 SDK 每次发版手动同步。
+本页镜像 `@appzgatenz/label-print-topbridge-js` 的 [CHANGELOG.md](https://github.com/Appzgate-Solutions-Limited/label-print-topbridge-js-core/blob/main/CHANGELOG.md)，随 SDK 每次发版手动同步。
 :::
 
 ## 0.6.2
@@ -14,7 +14,7 @@ title: 更新日志
 
 - 容忍结构化 widget 的拍平点号 schema 字段名。部分 TopBridge App 构建会在 `template` schema 中输出 `price.currency` / `price.value` 条目，而非单个父级 `price` 字段；`planFields` 现在会把点号前缀（`price`）注册为结构化字段，使嵌套对象与点路径两种产品输入均可正确通过校验。显式声明的父字段始终优先。
 
-本包的所有重要变更均记录于本文件。0.6.1 及之前的条目在采用 [Changesets](https://github.com/changesets/changesets) 时依据带 tag 的 Git 历史重建；之后的条目由 changeset 片段生成。撰写与发布流程见 SDK 仓库的[撰写与发布文档](https://github.com/Appzgate-Solutions-Limited/label-print-topbridge-js/blob/main/docs/changelog-and-release.md)。
+本包的所有重要变更均记录于本文件。0.6.1 及之前的条目在采用 [Changesets](https://github.com/changesets/changesets) 时依据带 tag 的 Git 历史重建；之后的条目由 changeset 片段生成。撰写与发布流程见 SDK 仓库的[撰写与发布文档](https://github.com/Appzgate-Solutions-Limited/label-print-topbridge-js-core/blob/main/docs/changelog-and-release.md)。
 
 ## 0.6.1
 
