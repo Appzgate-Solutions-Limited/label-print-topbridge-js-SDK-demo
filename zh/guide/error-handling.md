@@ -101,7 +101,7 @@ try {
 }
 ```
 
-## 场景对照表
+## 场景对照表 {#error-to-scenario-mapping}
 
 | 场景 | 错误类型 | 建议处理 |
 |------|----------|----------|
@@ -119,7 +119,7 @@ try {
 | products / 参数非法 | `TopBridgeValidationError` | 修复 `err.field` |
 | 打印失败（其他） | `TopBridgePrintError` | 查看 `err.details` |
 
-## 警告处理
+## 警告处理 {#warning-handling}
 
 ```typescript
 const result = await client.print.execute({ /* ... */ })

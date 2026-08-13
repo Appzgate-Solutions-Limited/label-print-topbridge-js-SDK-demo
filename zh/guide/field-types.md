@@ -53,7 +53,7 @@ const products = [
 ]
 ```
 
-### 嵌套对象语法
+### 嵌套对象语法 {#nested-object-syntax}
 
 对于结构化字段（price、weight），使用嵌套对象：
 
@@ -63,7 +63,7 @@ const products = [
 ]
 ```
 
-### 点路径语法
+### 点路径语法 {#dot-path-syntax}
 
 对于结构化字段（price、weight），可以使用点路径键：
 

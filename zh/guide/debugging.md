@@ -37,4 +37,4 @@ const client = new TopBridgeClient({ logger })
 
 - **不设置 `debug: true`** — 生产环境默认关闭所有日志
 - **使用自定义 Logger** — 仅将 error 级别日志发送到监控系统，避免泄露通信细节
-- **不要在用户可见的 UI 中展示原始错误消息** — 使用[错误与场景对照表](/zh/guide/error-handling#错误与场景对照)将错误转换为用户友好的提示
+- **不要在用户可见的 UI 中展示原始错误消息** — 使用[错误与场景对照表](/zh/guide/error-handling#error-to-scenario-mapping)将错误转换为用户友好的提示
