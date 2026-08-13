@@ -27,9 +27,9 @@ const MOCK_TEMPLATE_SCHEMA = {
   code: 'PRICE_LABEL',
   name: 'Price Label',
   fields: [
-    { dataField: 'name', fieldType: 'text' as const, required: true, default: 'Test Product' },
-    { dataField: 'price', fieldType: 'price' as const, required: true, default: '1.99' },
-    { dataField: 'copies', fieldType: 'integer' as const, required: false, default: '1' },
+    { name: 'name', type: 'text' as const, required: true, default: 'Test Product' },
+    { name: 'price', type: 'price' as const, required: true, default: '1.99' },
+    { name: 'copies', type: 'integer' as const, required: false, default: '1' },
   ],
 }
 
