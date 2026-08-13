@@ -47,7 +47,7 @@ TopBridgeClient (SDK Entry)
     ├── session        Session-limit unblock (kickSession)
     └── events         Push events + connection lifecycle
     │
-    ▼  WebSocket (default ws://localhost:8765/v2; optional fixed WSS)
+    ▼  WebSocket connection (local or secure WSS mode)
 TopBridge App (Local Desktop Application)
     │
     ▼

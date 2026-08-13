@@ -37,7 +37,7 @@ TopBridgeError (Base)
 │     .code: 'TEMPLATE_NOT_FOUND'
 ├── TopBridgeNetworkError        Cloud network disconnected
 │     .code: 'NETWORK_DISCONNECTED'
-├── TopBridgeSourceError         Source rejected by whitelist
+├── TopBridgeSourceError         Source not recognized
 │     .code: 'INVALID_SOURCE'
 ├── TopBridgePrinterSetupError   Printer setup CRUD failed
 │     .code: PrinterSetupErrorCode
@@ -115,7 +115,7 @@ try {
 | Printer setup CRUD failed | `TopBridgePrinterSetupError` | Branch on `err.code` |
 | Template missing | `TopBridgeTemplateError` | Check template ID/Code |
 | Cloud network disconnected | `TopBridgeNetworkError` | Check network |
-| Source rejected | `TopBridgeSourceError` | Use an allowed `source` |
+| Source not recognized | `TopBridgeSourceError` | Verify SDK `source` configuration |
 | Invalid products / params | `TopBridgeValidationError` | Fix `err.field` |
 | Print failed (other) | `TopBridgePrintError` | Inspect `err.details` |
 

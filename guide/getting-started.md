@@ -24,7 +24,7 @@ npm install @appzgatenz/label-print-topbridge-js
 | 4 | User is logged in to TopBridge App | `data.isLoggedIn === true` |
 | 5 | Print entitlement is valid | Benefits check passes |
 | 6 | At least one printer configured with protocol (TSPL/ZPL) | Printer list is non-empty |
-| 7 | Tray App speaks WebSocket API V2 | Unified entry `/v2` |
+| 7 | TopBridge App is up to date | Health check returns `pong` |
 | 8 | CSP allows `topsale:` protocol (if using `launch`) | See [CSP Configuration](/guide/csp) |
 
 :::tip Don't want to write code?
@@ -39,7 +39,7 @@ import { TopBridgeClient } from '@appzgatenz/label-print-topbridge-js'
 const client = new TopBridgeClient()
 ```
 
-The SDK connects to `ws://localhost:8765` by default (internally appends `/v2`). Set `wssEnabled: true` to use the fixed WSS endpoint `wss://topbridge.topsale.co.nz:8764/v2`.
+The SDK automatically connects to TopBridge App on the local machine. Set `wssEnabled: true` to use the fixed secure (WSS) endpoint.
 
 ## Complete Print Workflow
 
@@ -161,7 +161,7 @@ try {
   } else if (err instanceof TopBridgeNetworkError) {
     // TopBridge App is online, but cloud network is disconnected
   } else if (err instanceof TopBridgeSourceError) {
-    // Source rejected by Tray App whitelist
+    // Source not recognized by TopBridge App
   } else if (err instanceof TopBridgeValidationError) {
     // Input validation failed — err.field points to the field
   } else if (err instanceof TopBridgePrintError) {

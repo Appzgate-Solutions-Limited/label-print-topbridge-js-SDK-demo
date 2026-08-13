@@ -24,7 +24,7 @@ npm install @appzgatenz/label-print-topbridge-js
 | 4 | 用户已登录 TopBridge App | `data.isLoggedIn === true` |
 | 5 | 打印权益有效 | 权益验证通过 |
 | 6 | 至少一台打印机已配置协议（TSPL/ZPL） | 打印机列表非空 |
-| 7 | Tray App 支持 WebSocket API V2 | 统一入口 `/v2` |
+| 7 | TopBridge App 版本兼容 | 健康检查返回 `pong` |
 | 8 | CSP 允许 `topsale:` 协议（使用 launch 时） | 详见 [CSP 配置](/zh/guide/csp) |
 
 :::tip 不想写代码？
@@ -39,7 +39,7 @@ import { TopBridgeClient } from '@appzgatenz/label-print-topbridge-js'
 const client = new TopBridgeClient()
 ```
 
-SDK 默认连接 `ws://localhost:8765`（内部自动拼接 `/v2`）。设置 `wssEnabled: true` 可使用固定 WSS 端点 `wss://topbridge.topsale.co.nz:8764/v2`。
+SDK 默认自动连接本地 TopBridge App。设置 `wssEnabled: true` 可使用固定安全（WSS）端点。
 
 ## 完整打印流程
 
@@ -161,7 +161,7 @@ try {
   } else if (err instanceof TopBridgeNetworkError) {
     // Tray App 在线，但云端网络断开
   } else if (err instanceof TopBridgeSourceError) {
-    // source 不在 Tray App 白名单中
+    // source 不被 TopBridge App 识别
   } else if (err instanceof TopBridgeValidationError) {
     // 输入校验失败 — err.field 指向具体字段
   } else if (err instanceof TopBridgePrintError) {

@@ -12,9 +12,9 @@ title: Security Model
 
 The SDK uses fixed, non-configurable connection endpoints. The default mode connects locally to TopBridge App; an optional secure (WSS) mode is also available. This fundamentally prevents redirecting SDK traffic to arbitrary servers.
 
-## 2. Source Verification
+## 2. Request Authentication
 
-The SDK includes a caller-origin identifier (`source`) in all requests for origin verification. Unauthorized calls are rejected by TopBridge App.
+The SDK includes a caller-origin identifier in all requests. TopBridge App validates each request before processing.
 
 ## 3. URL Safety Validation
 

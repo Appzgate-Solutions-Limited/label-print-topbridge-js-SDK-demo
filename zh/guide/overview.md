@@ -47,7 +47,7 @@ TopBridgeClient（SDK 入口）
     ├── session        会话超限解除（kickSession）
     └── events         推送事件 + 连接生命周期
     │
-    ▼  WebSocket（默认 ws://localhost:8765/v2；可选固定 WSS）
+    ▼  WebSocket 连接（本地模式或安全 WSS 模式）
 TopBridge App（本机桌面应用）
     │
     ▼

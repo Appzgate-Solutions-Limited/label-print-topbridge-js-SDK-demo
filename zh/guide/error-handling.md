@@ -37,7 +37,7 @@ TopBridgeError（基类）
 │     .code: 'TEMPLATE_NOT_FOUND'
 ├── TopBridgeNetworkError        云端网络断开
 │     .code: 'NETWORK_DISCONNECTED'
-├── TopBridgeSourceError         source 被白名单拒绝
+├── TopBridgeSourceError         source 未被识别
 │     .code: 'INVALID_SOURCE'
 ├── TopBridgePrinterSetupError   打印机配置 CRUD 失败
 │     .code: PrinterSetupErrorCode
@@ -115,7 +115,7 @@ try {
 | 打印机配置 CRUD 失败 | `TopBridgePrinterSetupError` | 按 `err.code` 分支 |
 | 模板不存在 | `TopBridgeTemplateError` | 检查模板 ID/Code |
 | 云端网络断开 | `TopBridgeNetworkError` | 检查网络 |
-| source 被拒绝 | `TopBridgeSourceError` | 使用允许的 `source` |
+| source 未被识别 | `TopBridgeSourceError` | 检查 SDK `source` 配置 |
 | products / 参数非法 | `TopBridgeValidationError` | 修复 `err.field` |
 | 打印失败（其他） | `TopBridgePrintError` | 查看 `err.details` |
 
