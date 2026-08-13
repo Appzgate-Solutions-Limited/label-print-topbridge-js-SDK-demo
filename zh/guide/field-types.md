@@ -75,6 +75,10 @@ const products = [
 
 两种语法产生完全相同的输出。
 
+:::tip Schema 容错（0.6.2+）
+部分 TopBridge App 构建会在模板 schema 中输出拍平的点号字段（如 `price.value` / `price.currency`），而非父级 `price` 字段。自 0.6.2 起，SDK 会按前缀归组识别为结构化字段，嵌套对象与点路径两种产品输入均可通过校验。schema 中显式声明的父字段始终优先。
+:::
+
 ## copies 规则 {#copies-rules}
 
 `copies` 是保留关键字，控制打印份数：

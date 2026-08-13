@@ -75,6 +75,10 @@ const products = [
 
 Both syntaxes produce identical output.
 
+:::tip Schema tolerance (0.6.2+)
+Some TopBridge App builds emit flattened dotted fields in the template schema (e.g. `price.value` / `price.currency`) instead of a parent `price` field. Since 0.6.2, the SDK groups these by prefix, so both nested-object and dot-path product inputs validate. An explicitly declared parent field in the schema always takes precedence.
+:::
+
 ## copies Rules {#copies-rules}
 
 `copies` is a reserved key that controls the number of print copies:

@@ -78,7 +78,7 @@ grep codeartifact ~/.npmrc
 
 **这是最容易被忽略的步骤。** semver 对 `0.x` 版本的 `^` 约束把 minor 当 breaking：
 
-| 约束 | 实际范围 | 能否匹配 0.6.1 |
+| 约束 | 实际范围 | 能否匹配 0.6.2 |
 |------|----------|----------------|
 | `^0.5.0` | `>=0.5.0 <0.6.0` | 不能 |
 | `^0.6.0` | `>=0.6.0 <0.7.0` | 能 |
@@ -192,7 +192,7 @@ grep '@appzgatenz:registry' ~/.npmrc
 
 两个原因：
 
-1. **版本约束未更新**——`^0.5.0` 匹配不到 `0.6.1`，更新 `package.json`
+1. **版本约束未更新**——`^0.5.0` 匹配不到 `0.6.2`，更新 `package.json`
 2. **lockfile 缓存**——输出 "Lockfile is up to date, resolution step is skipped"，删除 `pnpm-lock.yaml` 重装
 
 ### 切回 main 后 install 报 404

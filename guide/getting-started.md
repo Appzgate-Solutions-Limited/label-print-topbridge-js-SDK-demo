@@ -11,7 +11,7 @@ npm install @appzgatenz/label-print-topbridge-js
 ```
 
 :::tip
-`@appzgatenz/label-print-topbridge-js@0.6.1` is published to npm. The APIs documented on this site are stable; see the [migration guide](/guide/migration-0.6) when upgrading from 0.5.x.
+`@appzgatenz/label-print-topbridge-js@0.6.2` is published to npm. The APIs documented on this site are stable; see the [migration guide](/guide/migration-0.6) when upgrading from 0.5.x.
 :::
 
 ## Prerequisites

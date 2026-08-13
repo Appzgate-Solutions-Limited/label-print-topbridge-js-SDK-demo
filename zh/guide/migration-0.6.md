@@ -7,7 +7,7 @@ title: 迁移到 0.6
 本指南帮助你从约 0.3 至 0.5.x 时代的文档与集成，升级到 `@appzgatenz/label-print-topbridge-js@0.6.x`。
 
 :::tip
-`@appzgatenz/label-print-topbridge-js@0.6.1` 已发布到 npm。0.6.x API 已稳定。
+`@appzgatenz/label-print-topbridge-js@0.6.2` 已发布到 npm。0.6.x API 已稳定。
 :::
 
 ## 一览变更

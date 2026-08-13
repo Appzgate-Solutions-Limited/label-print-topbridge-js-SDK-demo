@@ -44,6 +44,7 @@ const guideSections: {
       { en: 'Installation & Setup', zh: '安装与初始化', slug: 'getting-started' },
       { en: 'CSP Configuration', zh: 'CSP 配置', slug: 'csp' },
       { en: 'Migrating to 0.6', zh: '迁移到 0.6', slug: 'migration-0.6' },
+      { en: 'Changelog', zh: '更新日志', slug: 'changelog' },
     ],
   },
   {
