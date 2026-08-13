@@ -82,7 +82,8 @@ interface PrintProductInput {
 interface SyncedPrinter {
   name: string               // 打印机名称（用作 printer 参数）
   isDefault: boolean         // 是否默认打印机
-  protocol?: 'TSPL' | 'ZPL' // 标签协议
+  protocol: 'TSPL' | 'ZPL' | 'BPAC' | (string & {})  // 标签协议
+  protocolLabel: string      // 协议显示名称
 }
 ```
 

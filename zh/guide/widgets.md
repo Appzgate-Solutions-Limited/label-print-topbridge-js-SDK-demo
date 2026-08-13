@@ -119,10 +119,10 @@ Widget 类型分为三大类：
 
 ```typescript
 interface TemplateFieldSchema {
-  name: string            // DataField 名称（映射到 products 的键）
-  type: WidgetFieldType   // Widget 类型 / fieldType
-  required: boolean       // 字段是否必填
-  default?: any           // 默认值
+  dataField: string            // DataField 名称（映射到 products 的键）
+  fieldType: TemplateFieldType // Widget 类型 / fieldType
+  required: boolean            // 字段是否必填
+  default?: string | number | boolean | null  // 默认值
   subFields?: TemplateFieldSchema[]  // 嵌套子字段（仅 price/weight）
 }
 ```
@@ -139,18 +139,18 @@ const schema = await client.templates.schema('PRICE_LABEL')
 // {
 //   data: {
 //     fields: [
-//       { name: 'name', type: 'text', required: true },
-//       { name: 'price', type: 'price', required: true,
+//       { dataField: 'name', fieldType: 'text', required: true },
+//       { dataField: 'price', fieldType: 'price', required: true,
 //         subFields: [
-//           { name: 'value', type: 'text', required: true },
-//           { name: 'currency', type: 'text' },
-//           { name: 'unit', type: 'text' },
+//           { dataField: 'value', fieldType: 'text', required: true },
+//           { dataField: 'currency', fieldType: 'text' },
+//           { dataField: 'unit', fieldType: 'text' },
 //         ]
 //       },
-//       { name: 'barcode', type: 'barcode', required: false },
-//       { name: 'weight', type: 'weight', required: false },
-//       { name: 'divider', type: 'line', required: false },
-//       { name: 'copies', type: 'integer', required: false, default: 1 },
+//       { dataField: 'barcode', fieldType: 'barcode', required: false },
+//       { dataField: 'weight', fieldType: 'weight', required: false },
+//       { dataField: 'divider', fieldType: 'line', required: false },
+//       { dataField: 'copies', fieldType: 'integer', required: false, default: 1 },
 //     ]
 //   }
 // }

@@ -82,7 +82,8 @@ interface PrintProductInput {
 interface SyncedPrinter {
   name: string               // Printer name (used as printer parameter)
   isDefault: boolean         // Whether this is the default printer
-  protocol?: 'TSPL' | 'ZPL' // Label protocol
+  protocol: 'TSPL' | 'ZPL' | 'BPAC' | (string & {})  // Label protocol
+  protocolLabel: string      // Display-ready protocol name
 }
 ```
 
