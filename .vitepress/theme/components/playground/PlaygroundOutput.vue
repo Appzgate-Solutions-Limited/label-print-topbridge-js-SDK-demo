@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
+import { useLocale } from '../../composables/useLocale'
 import type { LogEntry } from '../../composables/usePlayground'
+import { playgroundLabels } from '../../locales'
 
 const props = defineProps<{
   logs: LogEntry[]
 }>()
+
+const locale = useLocale()
+const labels = computed(() => playgroundLabels[locale.value])
 
 const container = ref<HTMLElement>()
 
@@ -30,12 +35,12 @@ function typeClass(type: LogEntry['type']) {
 <template>
   <div class="pg-output">
     <div class="pg-output-header">
-      <span>Log</span>
-      <button class="pg-btn-sm" @click="$emit('clear')">Clear</button>
+      <span>{{ labels.log }}</span>
+      <button class="pg-btn-sm" @click="$emit('clear')">{{ labels.clear }}</button>
     </div>
     <div ref="container" class="pg-output-content">
       <div v-if="logs.length === 0" class="pg-output-empty">
-        Run an action to see output...
+        {{ labels.emptyLog }}
       </div>
       <template v-for="(entry, i) in logs" :key="i">
         <div v-if="entry.data" :class="['pg-log-line', typeClass(entry.type)]">

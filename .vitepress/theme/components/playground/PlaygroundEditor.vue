@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import LZString from 'lz-string'
-import { onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
+import { useLocale } from '../../composables/useLocale'
+import { playgroundLabels } from '../../locales'
 
 const props = defineProps<{
   modelValue: string
@@ -15,6 +17,9 @@ const emit = defineEmits<{
 const editorContainer = ref<HTMLElement>()
 const editorReady = ref(false)
 const view = shallowRef<any>(null)
+
+const locale = useLocale()
+const labels = computed(() => playgroundLabels[locale.value])
 
 onMounted(async () => {
   const [
@@ -76,9 +81,10 @@ function share() {
   const compressed = LZString.compressToEncodedURIComponent(code)
   const url = new URL(window.location.href)
   url.hash = `code=${compressed}`
-  navigator.clipboard.writeText(url.toString()).then(() => {
-    alert('Share link copied to clipboard!')
-  })
+  navigator.clipboard
+    .writeText(url.toString())
+    .then(() => alert(labels.value.shareCopied))
+    .catch(() => alert(labels.value.shareFailed))
 }
 
 // 从 URL hash 恢复代码
@@ -99,17 +105,17 @@ function tryRestoreFromHash(): string | null {
 <template>
   <div class="pg-editor">
     <div class="pg-editor-toolbar">
-      <span class="pg-editor-label">Code Editor</span>
+      <span class="pg-editor-label">{{ labels.codeEditor }}</span>
       <div class="pg-editor-actions">
-        <span class="pg-editor-hint">Ctrl+Enter to run</span>
-        <button class="pg-btn pg-btn-secondary" @click="share">Share</button>
+        <span class="pg-editor-hint">{{ labels.ctrlEnterHint }}</span>
+        <button class="pg-btn pg-btn-secondary" @click="share">{{ labels.share }}</button>
         <button class="pg-btn pg-btn-primary" :disabled="props.isRunning" @click="handleRun">
-          {{ props.isRunning ? 'Running...' : 'Run' }}
+          {{ props.isRunning ? labels.running : labels.run }}
         </button>
       </div>
     </div>
     <div ref="editorContainer" class="pg-editor-content" />
-    <div v-if="!editorReady" class="pg-editor-loading">Loading editor...</div>
+    <div v-if="!editorReady" class="pg-editor-loading">{{ labels.loadingEditor }}</div>
   </div>
 </template>
 

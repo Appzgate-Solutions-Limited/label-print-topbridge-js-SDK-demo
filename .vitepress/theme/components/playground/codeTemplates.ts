@@ -367,8 +367,8 @@ console.log(\`✓ Print successful: \${result.data.printedCopies} copies\`)
 
 const client = new TopBridgeClient({ debug: true })
 
-// 模拟 SessionBlocked：正常业务调用抛 SESSION_LIMIT_EXCEEDED。
-// （生产环境该错误来自服务端；此处注入以演示完整解除流程。）
+// Simulate SessionBlocked: a normal business call throws SESSION_LIMIT_EXCEEDED.
+// (In production this error comes from the server; injected here to demo the full unblock flow.)
 function callWhileBlocked() {
   throw new TopBridgeSessionError('Session limit exceeded', {
     limit: 2,
@@ -390,14 +390,14 @@ try {
       console.log(\`  \${s.id} [\${s.ipAddress}]\${s.isCurrent ? ' — current device' : ''}\`),
     )
 
-    // 踢掉所有非当前 session（踢 isCurrent 会把本机登出！）
+    // Kick all non-current sessions (kicking isCurrent would log out this device!)
     const toKick = err.sessions.filter((s) => !s.isCurrent).map((s) => s.id)
     const result = await client.session.kickSession(toKick)
     console.log(\`Kicked: \${result.data.kickedSessionIds.join(', ')}\`)
     console.log(\`withinLimit: \${result.data.withinLimit}\`)
 
     if (result.data.withinLimit) {
-      // 阻断已解除——重试原业务调用，无需重新登录
+      // Block cleared — retry the original call, no re-login needed
       const templates = await client.templates.list()
       console.log(\`Retry OK — \${templates.data.count} templates available\`)
     }

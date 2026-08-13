@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useLocale } from '../../../composables/useLocale'
 import type { PlaygroundTemplateItem } from '../../../composables/usePlayground'
+import { playgroundLabels } from '../../../locales'
 
 const props = defineProps<{
   isLoading: boolean
@@ -13,6 +15,9 @@ const emit = defineEmits<{
 }>()
 
 const selectedTemplate = ref('')
+
+const locale = useLocale()
+const labels = computed(() => playgroundLabels[locale.value])
 
 watch(
   () => props.templates,
@@ -29,20 +34,20 @@ function querySchema() {
 
 <template>
   <div class="pg-form-section">
-    <div class="pg-form-title">1. Fetch Templates</div>
+    <div class="pg-form-title">{{ labels.fetchTemplates }}</div>
     <button class="pg-btn pg-btn-primary" :disabled="isLoading" @click="$emit('fetch-templates')">
-      {{ isLoading ? 'Fetching...' : 'Fetch Templates' }}
+      {{ isLoading ? labels.fetching : labels.fetchTemplates }}
     </button>
   </div>
   <div v-if="templates.length" class="pg-form-section">
-    <div class="pg-form-title">2. Query Schema</div>
+    <div class="pg-form-title">{{ labels.querySchemaTitle }}</div>
     <div class="pg-form-row">
       <select v-model="selectedTemplate" @change="querySchema">
-        <option value="" disabled>-- select --</option>
+        <option value="" disabled>{{ labels.selectOption }}</option>
         <option v-for="t in templates" :key="t.code || t.id" :value="t.code || t.id">{{ t.name }}</option>
       </select>
       <button class="pg-btn pg-btn-primary" :disabled="isLoading || !selectedTemplate" @click="querySchema">
-        {{ isLoading ? 'Querying...' : 'Query Schema' }}
+        {{ isLoading ? labels.querying : labels.querySchema }}
       </button>
     </div>
   </div>

@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useLocale } from '../../../composables/useLocale'
 import type {
   PlaygroundPrinter,
   PlaygroundSchemaField,
   PlaygroundTemplateItem,
 } from '../../../composables/usePlayground'
 import { useTemplatePrinterSelection } from '../../../composables/useTemplatePrinterSelection'
+import { playgroundLabels } from '../../../locales'
 
 const props = defineProps<{
   isLoading: boolean
@@ -23,6 +25,8 @@ const { selectedTemplate, selectedPrinter } = useTemplatePrinterSelection(
   () => props.templates,
   () => props.printers,
 )
+const locale = useLocale()
+const labels = computed(() => playgroundLabels[locale.value])
 const schemaFormData = ref<
   Record<string, string | number | { value: string | number; currency?: string; unit?: string }>
 >({})
@@ -92,9 +96,9 @@ function querySchema() {
 
 <template>
   <div class="pg-form-section">
-    <div class="pg-form-title">2. Template & Printer</div>
+    <div class="pg-form-title">{{ labels.templatePrinter }}</div>
     <div class="pg-form-row">
-      <label>Template</label>
+      <label>{{ labels.template }}</label>
       <select v-model="selectedTemplate">
         <option v-if="!templates.length" :value="selectedTemplate">{{ selectedTemplate }}</option>
         <option v-for="t in templates" :key="t.code || t.id" :value="t.code || t.id">
@@ -102,21 +106,21 @@ function querySchema() {
         </option>
       </select>
       <button class="pg-btn" :disabled="isLoading || !selectedTemplate.trim()" @click="querySchema">
-        Query Schema
+        {{ labels.querySchema }}
       </button>
     </div>
     <div class="pg-form-row">
-      <label>Printer</label>
+      <label>{{ labels.printer }}</label>
       <select v-model="selectedPrinter">
-        <option value="" disabled>-- select printer --</option>
+        <option value="" disabled>{{ labels.selectPrinter }}</option>
         <option v-for="p in printers" :key="p.name" :value="p.name">
-          {{ p.name }}{{ p.isDefault ? ' (default)' : '' }}
+          {{ p.name }}{{ p.isDefault ? labels.defaultSuffix : '' }}
         </option>
       </select>
     </div>
   </div>
   <div v-if="schemaFields.length" class="pg-form-section">
-    <div class="pg-form-title">3. Dynamic Form</div>
+    <div class="pg-form-title">{{ labels.dynamicForm }}</div>
     <template v-for="field in schemaFields" :key="field.dataField">
       <div v-if="field.fieldType !== 'line'" class="pg-form-row">
         <label>{{ field.dataField }}<span v-if="field.required" class="pg-required">*</span></label>
@@ -152,7 +156,7 @@ function querySchema() {
         :disabled="isLoading || !selectedTemplate.trim() || !selectedPrinter.trim()"
         @click="emitPrint"
       >
-        {{ isLoading ? 'Printing...' : 'Print' }}
+        {{ isLoading ? labels.printing : labels.print }}
       </button>
     </div>
   </div>

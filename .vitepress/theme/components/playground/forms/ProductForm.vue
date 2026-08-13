@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useLocale } from '../../../composables/useLocale'
 import type { PlaygroundPrinter, PlaygroundTemplateItem } from '../../../composables/usePlayground'
 import { useTemplatePrinterSelection } from '../../../composables/useTemplatePrinterSelection'
+import { playgroundLabels } from '../../../locales'
 
 const props = withDefaults(
   defineProps<{
@@ -21,6 +23,9 @@ const { selectedTemplate, selectedPrinter } = useTemplatePrinterSelection(
   () => props.templates,
   () => props.printers,
 )
+
+const locale = useLocale()
+const labels = computed(() => playgroundLabels[locale.value])
 
 const productName = ref('Test Product')
 const productPrice = ref('3.99')
@@ -83,44 +88,44 @@ function emitPrint() {
 <template>
   <!-- multi=true: 紧凑产品列表布局 -->
   <div v-if="multi" class="pg-form-section">
-    <div class="pg-form-title">2. Product List</div>
+    <div class="pg-form-title">{{ labels.productList }}</div>
     <div class="pg-form-row">
-      <input v-model="productName" placeholder="Name" style="width: 120px">
-      <input v-model="productPrice" type="number" step="0.01" placeholder="Price">
+      <input v-model="productName" :placeholder="labels.name" style="width: 120px">
+      <input v-model="productPrice" type="number" step="0.01" :placeholder="labels.price">
       <input v-model="productCurrency" placeholder="$" style="width: 40px">
-      <input v-model="productUnit" placeholder="Unit" style="width: 60px">
-      <input v-model="productCopies" type="number" min="1" placeholder="Copies" style="width: 60px">
+      <input v-model="productUnit" :placeholder="labels.unit" style="width: 60px">
+      <input v-model="productCopies" type="number" min="1" :placeholder="labels.copies" style="width: 60px">
     </div>
     <div v-for="(p, i) in extraProducts" :key="i" class="pg-form-row">
-      <input v-model="p.name" placeholder="Name" style="width: 120px">
-      <input v-model="p.price" type="number" step="0.01" placeholder="Price">
+      <input v-model="p.name" :placeholder="labels.name" style="width: 120px">
+      <input v-model="p.price" type="number" step="0.01" :placeholder="labels.price">
       <input v-model="p.currency" placeholder="$" style="width: 40px">
-      <input v-model="p.unit" placeholder="Unit" style="width: 60px">
-      <input v-model="p.copies" type="number" min="1" placeholder="Copies" style="width: 60px">
+      <input v-model="p.unit" :placeholder="labels.unit" style="width: 60px">
+      <input v-model="p.copies" type="number" min="1" :placeholder="labels.copies" style="width: 60px">
       <button class="pg-btn pg-btn-sm" @click="removeProduct(i)">×</button>
     </div>
-    <button class="pg-btn pg-btn-sm" @click="addProduct">+ Add Product</button>
+    <button class="pg-btn pg-btn-sm" @click="addProduct">{{ labels.addProduct }}</button>
   </div>
 
   <!-- multi=false: 标签行布局 -->
   <div v-else class="pg-form-section">
-    <div class="pg-form-title">2. Print Settings</div>
+    <div class="pg-form-title">{{ labels.printSettings }}</div>
     <div class="pg-form-row">
-      <label>Name</label>
+      <label>{{ labels.name }}</label>
       <input v-model="productName" type="text">
     </div>
     <div class="pg-form-row">
-      <label>Price</label>
+      <label>{{ labels.price }}</label>
       <input v-model="productPrice" type="number" step="0.01">
     </div>
     <div class="pg-form-row">
-      <label>Currency</label>
+      <label>{{ labels.currency }}</label>
       <input v-model="productCurrency" type="text" style="width: 50px">
-      <label>Unit</label>
+      <label>{{ labels.unit }}</label>
       <input v-model="productUnit" type="text" style="width: 60px">
     </div>
     <div class="pg-form-row">
-      <label>Copies</label>
+      <label>{{ labels.copies }}</label>
       <input v-model="productCopies" type="number" min="1" max="9999">
     </div>
   </div>
@@ -128,7 +133,7 @@ function emitPrint() {
   <!-- 共享：Template / Printer 选择 + Print 按钮 -->
   <div class="pg-form-section">
     <div v-if="!multi" class="pg-form-row">
-      <label>Template</label>
+      <label>{{ labels.template }}</label>
       <select v-model="selectedTemplate">
         <option v-if="!templates.length" :value="selectedTemplate">{{ selectedTemplate }}</option>
         <option v-for="t in templates" :key="t.code || t.id" :value="t.code || t.id">
@@ -137,27 +142,27 @@ function emitPrint() {
       </select>
     </div>
     <div v-if="!multi" class="pg-form-row">
-      <label>Printer</label>
+      <label>{{ labels.printer }}</label>
       <select v-model="selectedPrinter">
-        <option value="" disabled>-- select printer --</option>
+        <option value="" disabled>{{ labels.selectPrinter }}</option>
         <option v-for="p in printers" :key="p.name" :value="p.name">
-          {{ p.name }}{{ p.isDefault ? ' (default)' : '' }}
+          {{ p.name }}{{ p.isDefault ? labels.defaultSuffix : '' }}
         </option>
       </select>
     </div>
     <div v-if="multi" class="pg-form-row">
-      <label>Template</label>
+      <label>{{ labels.template }}</label>
       <select v-model="selectedTemplate">
         <option v-if="!templates.length" :value="selectedTemplate">{{ selectedTemplate }}</option>
         <option v-for="t in templates" :key="t.code || t.id" :value="t.code || t.id">
           {{ t.name }}
         </option>
       </select>
-      <label>Printer</label>
+      <label>{{ labels.printer }}</label>
       <select v-model="selectedPrinter">
-        <option value="" disabled>-- select printer --</option>
+        <option value="" disabled>{{ labels.selectPrinter }}</option>
         <option v-for="p in printers" :key="p.name" :value="p.name">
-          {{ p.name }}{{ p.isDefault ? ' (default)' : '' }}
+          {{ p.name }}{{ p.isDefault ? labels.defaultSuffix : '' }}
         </option>
       </select>
     </div>
@@ -167,7 +172,7 @@ function emitPrint() {
         :disabled="isLoading || !selectedTemplate.trim() || !selectedPrinter.trim()"
         @click="emitPrint"
       >
-        {{ isLoading ? 'Printing...' : multi ? 'Batch Print' : 'Print' }}
+        {{ isLoading ? labels.printing : multi ? labels.batchPrint : labels.print }}
       </button>
     </div>
   </div>

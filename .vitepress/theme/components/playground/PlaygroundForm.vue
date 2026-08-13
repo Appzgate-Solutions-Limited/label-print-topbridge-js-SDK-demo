@@ -6,7 +6,7 @@ import type {
   PlaygroundSchemaField,
   PlaygroundTemplateItem,
 } from '../../composables/usePlayground'
-import { playgroundFormLabels } from '../../locales'
+import { playgroundFormLabels, playgroundLabels } from '../../locales'
 import AdvancedForm from './forms/AdvancedForm.vue'
 import ErrorHandlingForm from './forms/ErrorHandlingForm.vue'
 import ProductForm from './forms/ProductForm.vue'
@@ -15,6 +15,7 @@ import TemplateSchemaForm from './forms/TemplateSchemaForm.vue'
 const { lang } = useData()
 const locale = computed(() => (lang.value === 'zh-CN' ? ('zh' as const) : ('en' as const)))
 const labels = computed(() => playgroundFormLabels[locale.value])
+const pgLabels = computed(() => playgroundLabels[locale.value])
 
 defineProps<{
   template: string
@@ -32,6 +33,7 @@ defineEmits<{
   'fetch-templates': []
   'query-schema': [templateCode: string]
   'error-test': [type: string]
+  'toggle-mode': []
 }>()
 
 const PREFLIGHT_TEMPLATES = ['basic', 'multi-product', 'preflight-only', 'advanced-form']
@@ -40,13 +42,13 @@ const PREFLIGHT_TEMPLATES = ['basic', 'multi-product', 'preflight-only', 'advanc
 <template>
   <div class="pg-form">
     <div v-if="PREFLIGHT_TEMPLATES.includes(template)" class="pg-form-section">
-      <div class="pg-form-title">1. Preflight</div>
+      <div class="pg-form-title">{{ pgLabels.preflight }}</div>
       <div class="pg-form-row">
         <button class="pg-btn pg-btn-primary" :disabled="isLoading" @click="$emit('preflight')">
-          {{ isLoading ? 'Checking...' : 'Run Preflight' }}
+          {{ isLoading ? pgLabels.checking : pgLabels.runPreflight }}
         </button>
         <button v-if="template === 'preflight-only'" class="pg-btn" :disabled="isLoading" @click="$emit('health-check')">
-          Health Check Only
+          {{ pgLabels.healthCheckOnly }}
         </button>
       </div>
     </div>
@@ -92,10 +94,13 @@ const PREFLIGHT_TEMPLATES = ['basic', 'multi-product', 'preflight-only', 'advanc
       @query-schema="$emit('query-schema', $event)"
     />
 
-    <div v-else class="pg-form-section" style="color: var(--vp-text-2)">
+    <div v-else class="pg-form-section pg-code-driven-hint">
       <p>
         {{ labels.codeDrivenPrefix }}<strong>{{ labels.advancedMode }}</strong>{{ labels.codeDrivenSuffix }}
       </p>
+      <button class="pg-btn pg-btn-primary" @click="$emit('toggle-mode')">
+        {{ labels.advancedMode }}
+      </button>
     </div>
   </div>
 </template>
@@ -105,5 +110,14 @@ const PREFLIGHT_TEMPLATES = ['basic', 'multi-product', 'preflight-only', 'advanc
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+.pg-code-driven-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  color: var(--vp-c-text-2);
 }
 </style>

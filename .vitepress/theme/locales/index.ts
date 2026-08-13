@@ -1,6 +1,7 @@
+import type { Locale } from '../composables/useLocale'
 import type { SdkType } from '../composables/useSdkType'
 
-type Locale = 'en' | 'zh'
+export type { Locale }
 
 export const sdkNames: Record<SdkType, string> = {
   'js-core': 'JS Core',
@@ -218,5 +219,148 @@ export const playgroundFormLabels: Record<
     codeDrivenPrefix: '此示例由代码驱动。请切换到',
     advancedMode: '高级模式',
     codeDrivenSuffix: '以编辑并运行演示代码。',
+  },
+}
+
+export const playgroundLabels: Record<
+  Locale,
+  {
+    formMode: string
+    advancedMode: string
+    preflight: string
+    runPreflight: string
+    checking: string
+    healthCheckOnly: string
+    log: string
+    clear: string
+    emptyLog: string
+    codeEditor: string
+    ctrlEnterHint: string
+    share: string
+    shareCopied: string
+    shareFailed: string
+    run: string
+    running: string
+    loadingEditor: string
+    productList: string
+    printSettings: string
+    name: string
+    price: string
+    currency: string
+    unit: string
+    copies: string
+    addProduct: string
+    template: string
+    printer: string
+    selectPrinter: string
+    defaultSuffix: string
+    print: string
+    batchPrint: string
+    printing: string
+    templatePrinter: string
+    dynamicForm: string
+    querySchema: string
+    fetchTemplates: string
+    fetching: string
+    querySchemaTitle: string
+    querying: string
+    selectOption: string
+    realErrorTriggers: string
+    runPreflightError: string
+    emptyProductError: string
+    simulateErrors: string
+  }
+> = {
+  en: {
+    formMode: '← Form Mode',
+    advancedMode: 'Advanced Mode →',
+    preflight: '1. Preflight',
+    runPreflight: 'Run Preflight',
+    checking: 'Checking...',
+    healthCheckOnly: 'Health Check Only',
+    log: 'Log',
+    clear: 'Clear',
+    emptyLog: 'Run an action to see output...',
+    codeEditor: 'Code Editor',
+    ctrlEnterHint: 'Ctrl+Enter to run',
+    share: 'Share',
+    shareCopied: 'Share link copied to clipboard!',
+    shareFailed: 'Failed to copy share link',
+    run: 'Run',
+    running: 'Running...',
+    loadingEditor: 'Loading editor...',
+    productList: '2. Product List',
+    printSettings: '2. Print Settings',
+    name: 'Name',
+    price: 'Price',
+    currency: 'Currency',
+    unit: 'Unit',
+    copies: 'Copies',
+    addProduct: '+ Add Product',
+    template: 'Template',
+    printer: 'Printer',
+    selectPrinter: '-- select printer --',
+    defaultSuffix: ' (default)',
+    print: 'Print',
+    batchPrint: 'Batch Print',
+    printing: 'Printing...',
+    templatePrinter: '2. Template & Printer',
+    dynamicForm: '3. Dynamic Form',
+    querySchema: 'Query Schema',
+    fetchTemplates: '1. Fetch Templates',
+    fetching: 'Fetching...',
+    querySchemaTitle: '2. Query Schema',
+    querying: 'Querying...',
+    selectOption: '-- select --',
+    realErrorTriggers: 'Real Error Triggers',
+    runPreflightError: 'Run Preflight (with error handling)',
+    emptyProductError: 'Empty Product List (ValidationError)',
+    simulateErrors: 'Simulate Errors (instanceof narrowing demo)',
+  },
+  zh: {
+    formMode: '← 表单模式',
+    advancedMode: '高级模式 →',
+    preflight: '1. 预检',
+    runPreflight: '运行预检',
+    checking: '检查中...',
+    healthCheckOnly: '仅健康检查',
+    log: '日志',
+    clear: '清除',
+    emptyLog: '执行操作以查看输出...',
+    codeEditor: '代码编辑器',
+    ctrlEnterHint: 'Ctrl+Enter 运行',
+    share: '分享',
+    shareCopied: '分享链接已复制到剪贴板！',
+    shareFailed: '复制分享链接失败',
+    run: '运行',
+    running: '运行中...',
+    loadingEditor: '编辑器加载中...',
+    productList: '2. 产品列表',
+    printSettings: '2. 打印设置',
+    name: '名称',
+    price: '价格',
+    currency: '货币',
+    unit: '单位',
+    copies: '份数',
+    addProduct: '+ 添加产品',
+    template: '模板',
+    printer: '打印机',
+    selectPrinter: '-- 选择打印机 --',
+    defaultSuffix: '（默认）',
+    print: '打印',
+    batchPrint: '批量打印',
+    printing: '打印中...',
+    templatePrinter: '2. 模板与打印机',
+    dynamicForm: '3. 动态表单',
+    querySchema: '查询 Schema',
+    fetchTemplates: '1. 获取模板',
+    fetching: '获取中...',
+    querySchemaTitle: '2. 查询 Schema',
+    querying: '查询中...',
+    selectOption: '-- 选择 --',
+    realErrorTriggers: '真实错误触发',
+    runPreflightError: '运行预检（含错误处理）',
+    emptyProductError: '空产品列表（ValidationError）',
+    simulateErrors: '模拟错误（instanceof 类型窄化演示）',
   },
 }

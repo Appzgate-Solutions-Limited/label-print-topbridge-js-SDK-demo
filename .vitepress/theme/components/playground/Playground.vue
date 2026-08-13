@@ -3,6 +3,7 @@ import { useData } from 'vitepress'
 import { computed, ref } from 'vue'
 import { useDevMode } from '../../composables/useDevMode'
 import { usePlayground } from '../../composables/usePlayground'
+import { playgroundLabels } from '../../locales'
 import { codeTemplates } from './codeTemplates'
 import DevModeBadge from './DevModeBadge.vue'
 import PlaygroundEditor from './PlaygroundEditor.vue'
@@ -13,6 +14,7 @@ import SdkVersionBadge from './SdkVersionBadge.vue'
 const { lang } = useData()
 const { isDevMode } = useDevMode()
 const locale = computed(() => (lang.value === 'zh-CN' ? ('zh' as const) : ('en' as const)))
+const labels = computed(() => playgroundLabels[locale.value])
 
 const props = defineProps<{
   template: string
@@ -65,7 +67,7 @@ async function handlePreflight() {
         <span v-if="isDevMode" class="pg-dev-indicator">DEV</span>
       </div>
       <button class="pg-toggle-btn" @click="toggleMode">
-        {{ isAdvancedMode ? '← Form Mode' : 'Advanced Mode →' }}
+        {{ isAdvancedMode ? labels.formMode : labels.advancedMode }}
       </button>
     </div>
 
@@ -83,6 +85,7 @@ async function handlePreflight() {
       @fetch-templates="fetchTemplates"
       @query-schema="querySchema"
       @error-test="runErrorTest"
+      @toggle-mode="toggleMode"
     />
 
     <PlaygroundEditor

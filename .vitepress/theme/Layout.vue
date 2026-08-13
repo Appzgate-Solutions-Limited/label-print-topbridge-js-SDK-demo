@@ -3,28 +3,25 @@ import { useData } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import { computed } from 'vue'
 import BetaBanner from './components/BetaBanner.vue'
-import ComingSoonOverlay from './components/ComingSoonOverlay.vue'
-import SdkSwitcher from './components/SdkSwitcher.vue'
 import { provideDevMode } from './composables/useDevMode'
 import { provideSdkType } from './composables/useSdkType'
 
 const { Layout } = DefaultTheme
 const { lang } = useData()
 
-const { sdkType } = provideSdkType()
+const { sdkType, switchSdkType } = provideSdkType()
 provideDevMode()
+
+// SdkSwitcher removed from nav; force js-core to clear stale sessionStorage
+if (sdkType.value !== 'js-core') switchSdkType('js-core')
 
 const locale = computed(() => (lang.value === 'zh-CN' ? ('zh' as const) : ('en' as const)))
 </script>
 
 <template>
   <Layout>
-    <template #nav-bar-content-after>
-      <SdkSwitcher :locale="locale" />
-    </template>
     <template #layout-top>
       <BetaBanner :locale="locale" />
-      <ComingSoonOverlay :sdk-type="sdkType" :locale="locale" />
     </template>
   </Layout>
 </template>
