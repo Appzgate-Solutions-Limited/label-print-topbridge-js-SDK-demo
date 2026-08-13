@@ -110,7 +110,7 @@ const setup = await client.printerSetup.load()
 const off = client.events.on('template', (e) => console.log(e))
 ```
 
-The interactive [Session Management example](/examples/session-management) covers the session-limit flow. Deep guides for printer setup and events are planned; until then use the [API Quick Reference](/guide/api-reference).
+The interactive [Session Management example](/examples/session-management) covers the session-limit flow. Dedicated guides for `printerSetup` and `events` are planned; until then, use the [API Quick Reference](/guide/api-reference).
 
 ## Compatibility checklist
 

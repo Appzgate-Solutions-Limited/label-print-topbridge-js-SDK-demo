@@ -101,6 +101,10 @@ try {
 }
 ```
 
+:::info Why no `TopBridgeConfigError` in the catch chain?
+`TopBridgeConfigError` signals a programming mistake (invalid constructor options), not a runtime failure to catch and handle. Fix it at development time — no need to add it to your `catch` chain.
+:::
+
 ## Error-to-Scenario Mapping
 
 | Scenario | Error Type | Suggested Handling |

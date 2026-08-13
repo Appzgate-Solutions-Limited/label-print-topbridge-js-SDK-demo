@@ -31,7 +31,7 @@ title: API Quick Reference
 | `client.events` | `on(name, handler)` / `off(name, handler)` | unsubscribe / void | Push + connection events |
 
 :::tip
-`printerSetup` and `events` deep guides are coming. For the session-limit flow, see the interactive [Session Management example](/examples/session-management). For everything else, use this table plus the [migration guide](/guide/migration-0.6).
+Dedicated guides for `printerSetup` and `events` are planned. For the session-limit flow, see the interactive [Session Management example](/examples/session-management). For everything else, use this table plus the [migration guide](/guide/migration-0.6).
 :::
 
 ### TopBridgeClientConfig

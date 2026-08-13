@@ -2,9 +2,6 @@
 import { computed } from 'vue'
 import { sdkVersionLabels } from '../../locales'
 
-declare const __SDK_VERSION__: string
-declare const __SDK_SOURCE__: string
-
 const props = withDefaults(
   defineProps<{
     locale?: 'en' | 'zh'

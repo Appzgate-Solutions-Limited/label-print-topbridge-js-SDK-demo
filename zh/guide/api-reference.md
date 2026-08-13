@@ -31,7 +31,7 @@ title: API 速查表
 | `client.events` | `on(name, handler)` / `off(name, handler)` | unsubscribe / void | 推送 + 连接事件 |
 
 :::tip
-`printerSetup` 与 `events` 的深度指南即将推出。Session 超限流程见交互式 [Session 管理示例](/zh/examples/session-management)。其余内容可结合本表与 [迁移指南](/zh/guide/migration-0.6) 使用。
+`printerSetup` 和 `events` 的专题指南规划中。Session 超限流程见交互式 [Session 管理示例](/zh/examples/session-management)。其余内容可结合本表与 [迁移指南](/zh/guide/migration-0.6) 使用。
 :::
 
 ### TopBridgeClientConfig

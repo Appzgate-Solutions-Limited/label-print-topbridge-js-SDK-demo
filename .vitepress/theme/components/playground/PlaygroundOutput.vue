@@ -28,6 +28,7 @@ function typeClass(type: LogEntry['type']) {
     info: 'pg-log-info',
     success: 'pg-log-success',
     error: 'pg-log-error',
+    warn: 'pg-log-warn',
   }[type]
 }
 </script>
@@ -103,6 +104,9 @@ function typeClass(type: LogEntry['type']) {
 }
 .pg-log-error {
   color: #f44747;
+}
+.pg-log-warn {
+  color: #cca700;
 }
 .pg-btn-sm {
   padding: 2px 8px;

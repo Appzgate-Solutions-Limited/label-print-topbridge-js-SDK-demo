@@ -2,9 +2,6 @@
 import { computed, ref } from 'vue'
 import { betaBannerLabels } from '../locales'
 
-declare const __SDK_VERSION__: string
-declare const __SDK_SOURCE__: string
-
 const props = withDefaults(
   defineProps<{
     locale?: 'en' | 'zh'

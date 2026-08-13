@@ -3,7 +3,7 @@ import { ref } from 'vue'
 export interface LogEntry {
   time: string
   message: string
-  type: 'info' | 'success' | 'error'
+  type: 'info' | 'success' | 'error' | 'warn'
   data?: { title: string; content: string }
 }
 

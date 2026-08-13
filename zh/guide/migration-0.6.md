@@ -110,7 +110,7 @@ const setup = await client.printerSetup.load()
 const off = client.events.on('template', (e) => console.log(e))
 ```
 
-Session 超限流程见交互式 [Session 管理示例](/zh/examples/session-management)。打印机配置与事件的深度指南规划中；当前请先看 [API 速查表](/zh/guide/api-reference)。
+Session 超限流程见交互式 [Session 管理示例](/zh/examples/session-management)。`printerSetup` 和 `events` 的专题指南规划中；当前请先看 [API 速查表](/zh/guide/api-reference)。
 
 ## 兼容性清单
 

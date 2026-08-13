@@ -75,7 +75,7 @@ console.log(`已打印 ${result.data.printedCopies} 份`)
 
 > SDK 会自动获取模板 schema 并转换产品数据，无需手动指定字段类型。
 
-会话限制、打印机配置与推送事件详见 [API 速查表](/zh/guide/api-reference) 与 [迁移到 0.6](/zh/guide/migration-0.6)。专题指南将在后续更新中提供。
+会话限制、打印机配置与推送事件详见 [API 速查表](/zh/guide/api-reference) 与 [迁移到 0.6](/zh/guide/migration-0.6)。`printerSetup` 和 `events` 的专题指南规划中。
 
 ## 配置选项
 

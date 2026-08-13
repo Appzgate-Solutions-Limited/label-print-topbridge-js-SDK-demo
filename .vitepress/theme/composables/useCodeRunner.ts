@@ -43,7 +43,7 @@ export function useCodeRunner(
         const customConsole = {
           log: (...args: any[]) => addLog(args.map(String).join(' ')),
           error: (...args: any[]) => addLog(args.map(String).join(' '), 'error'),
-          warn: (...args: any[]) => addLog(args.map(String).join(' ')),
+          warn: (...args: any[]) => addLog(args.map(String).join(' '), 'warn'),
         }
 
         const fn = new Function(...paramNames, 'console', `return (async () => { ${js} })()`)

@@ -8,12 +8,21 @@ const { lang } = useData()
 const locale = computed(() => (lang.value === 'zh-CN' ? 'zh' : 'en'))
 const labels = computed(() => devModeLabels[locale.value])
 
-const { isDevMode, deactivate } = useDevMode()
+const { isDevMode, activate, deactivate } = useDevMode()
 const expanded = ref(false)
 </script>
 
 <template>
-  <div v-if="isDevMode" class="dev-badge" @click="expanded = !expanded">
+  <div
+    v-if="isDevMode"
+    class="dev-badge"
+    role="button"
+    tabindex="0"
+    :aria-expanded="expanded"
+    @click="expanded = !expanded"
+    @keydown.enter="expanded = !expanded"
+    @keydown.space.prevent="expanded = !expanded"
+  >
     <span class="dev-badge-label">DEV</span>
     <div v-if="expanded" class="dev-badge-popup" @click.stop>
       <div class="dev-badge-title">{{ labels.title }}</div>
@@ -21,6 +30,9 @@ const expanded = ref(false)
       <button class="dev-badge-close" @click="deactivate(); expanded = false">{{ labels.close }}</button>
     </div>
   </div>
+  <button v-else class="dev-badge-hint" @click="activate">
+    {{ labels.activateHint }}
+  </button>
 </template>
 
 <style scoped>
@@ -30,6 +42,27 @@ const expanded = ref(false)
   right: 16px;
   z-index: 9999;
   cursor: pointer;
+}
+
+.dev-badge-hint {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 9999;
+  padding: 4px 12px;
+  font-size: 12px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 999px;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-3);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dev-badge-hint:hover {
+  background: var(--vp-c-bg-mute);
+  color: var(--vp-c-text-2);
+  border-color: var(--vp-c-brand-1);
 }
 
 .dev-badge-label {

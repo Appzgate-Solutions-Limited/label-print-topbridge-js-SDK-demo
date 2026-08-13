@@ -75,7 +75,7 @@ console.log(`Printed ${result.data.printedCopies} copies`)
 
 > The SDK automatically fetches the template schema and transforms product data. No need to manually specify field types.
 
-For session limits, printer setup, and push events, see the [API Quick Reference](/guide/api-reference) and [Migrating to 0.6](/guide/migration-0.6). Dedicated guides arrive in a follow-up update.
+For session limits, printer setup, and push events, see the [API Quick Reference](/guide/api-reference) and [Migrating to 0.6](/guide/migration-0.6). Dedicated guides for `printerSetup` and `events` are planned.
 
 ## Configuration Options
 

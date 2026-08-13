@@ -101,6 +101,10 @@ try {
 }
 ```
 
+:::info 为什么 catch 链中没有 `TopBridgeConfigError`？
+`TopBridgeConfigError` 表示编程错误（构造参数非法），不是需要运行时捕获和处理的故障。在开发阶段修复即可，无需加入 `catch` 链。
+:::
+
 ## 场景对照表 {#error-to-scenario-mapping}
 
 | 场景 | 错误类型 | 建议处理 |
